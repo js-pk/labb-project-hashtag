@@ -2,4 +2,4 @@
 /trash
 /public/scripts/
 .DS_Store
-/src/database/database.db
+/database/database.db
