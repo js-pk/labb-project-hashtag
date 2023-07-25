@@ -1,0 +1,27 @@
+<link rel="stylesheet" tyle="text/css" href="/styles/signup.css"></link>
+<%- include("_header") -%>
+<script>
+    function submitForm(action){
+        let form = document.getElementById("form");
+        form.action = action;
+        form.method = 'POST';
+        form.submit();
+    }
+</script>
+<h1>강냉이를 얻고싶다면..</h1>
+
+<form id="form" method="post" onsubmit="submitForm('/user/register'); return false">
+    <fieldset>
+        <legend>닉네임 nickname</legend>
+        <% if (locals.status) { %>
+        <h3><%= locals.status.message %></h3>
+        <% } %>
+        <input type="text" name="name" value="<%= locals.name %>" placeholder="닉네임을 입력하세요"/>
+        <input type="button" onclick="submitForm('/user/register')" value="새로 시작하기" />
+        <% if (locals.status && ["USER_EXPIRED", "USER_EXISTS"].includes(locals.status.type)) { %>
+        <input type="button" onclick="submitForm('/user/login')" value="로그인" />           
+        <% } %>
+    </fieldset>
+</form>
+
+<%- include("_footer") -%>

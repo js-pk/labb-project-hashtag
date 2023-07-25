@@ -1,0 +1,21 @@
+<%- include("../_header") -%>
+<style>
+    body {
+  margin: 0;
+    }
+    #container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+    }
+</style>
+
+<h1>게임 3..</h1>
+
+<button onclick="completeStage('03')">게임 완료</button>
+<button id="capture">capture</button>
+    <div id="container">
+    </div>
+<script src="/scripts/game/game03.js"></script>
+<%- include("../_footer") -%>
