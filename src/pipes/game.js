@@ -1,5 +1,5 @@
 'use strict'
-const Database = require('../database/connection.js');
+const Database = require('../../database/connection.js');
 const db = new Database();
 
 const authorize = function(req) {

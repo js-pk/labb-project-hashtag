@@ -1,6 +1,6 @@
 'use strict'
 
-const Database = require('../database/connection.js');
+const Database = require('../../database/connection.js');
 const db = new Database();
 
 exports.logout = function(req, res) {

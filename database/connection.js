@@ -1,7 +1,7 @@
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
-const isEmpty = require('../javascripts/utils/isEmpty.js');
+const isEmpty = require('../utils/isEmpty.js');
 
 //Connect to DB
 // const db_name = path.join(__dirname, "database.db");

@@ -3,7 +3,7 @@ module.exports = {
         game01: "/src/javascripts/games/01.js",
         game02: "/src/javascripts/games/02.js",
         game03: "/src/javascripts/games/03.js",
-        common: "/src/javascripts/utils/common.js",
+        common: "/src/javascripts/common.js",
     },
     output: {
         filename: 'scripts/[name].js',
