@@ -1,7 +1,7 @@
 const request = require("supertest");
 const app = require("../src/app.js");
 // const agent = request.agent(app);
-const Database = require('../src/database/connection.js');
+const Database = require('../database/connection.js');
 
 const db = new Database();
 
