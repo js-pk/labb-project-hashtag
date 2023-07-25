@@ -16,7 +16,8 @@ const app = express();
 //Config
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "./views"));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static('public'));
+
 app.locals.variables = require('./variables.json');
 
 //Set middlewares
@@ -50,8 +51,5 @@ app.get("/game/complete/:stageNo", game.complete);
 app.post('/user/login', user.login);
 app.post('/user/logout', user.logout);
 app.post('/user/register', user.register);
-
-// app.put('/users/')
-
 
 module.exports = app;
