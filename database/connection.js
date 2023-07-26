@@ -80,7 +80,6 @@ module.exports = class Database {
     delete(table, condition, args) {
         return new Promise((resolve, reject) => {
             const query = 'DELETE FROM ' + table + ' WHERE ' + condition;
-            console.log(query);
             this.db.run(query, args, (err) => {
                 if (err) {
                     console.error(err.message);

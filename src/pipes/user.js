@@ -22,6 +22,14 @@ exports.login = async function(req, res) {
             stage_03: user.stage_03 === 0 ? false : true,
         }
         res.redirect('/')
+    } else {
+        res.render("signup", {
+            name: name,
+            status: {
+                type: "LOGIN_FAILED",
+                message: "존재하지 않는 닉네임입니다."
+            }
+        })
     }
 }
 
