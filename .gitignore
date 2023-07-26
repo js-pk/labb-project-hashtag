@@ -1,5 +1,5 @@
 /node_modules
 /trash
-/public/scripts/
+/public/scripts/games
 .DS_Store
 /database/database.db

@@ -5,16 +5,14 @@ module.exports = {
     mode: isDev ? 'development' : 'production',
     entry: isDev ? 
         {
-            game01: ["/src/javascripts/games/01.js", 'webpack-hot-middleware/client'],
-            game02: ["/src/javascripts/games/02.js", 'webpack-hot-middleware/client'],
-            game03: ["/src/javascripts/games/03.js", 'webpack-hot-middleware/client'],
-            common: ["/src/javascripts/common.js", 'webpack-hot-middleware/client']
+            'games/01': ["/src/javascripts/games/01.js", 'webpack-hot-middleware/client'],
+            'games/02': ["/src/javascripts/games/02.js", 'webpack-hot-middleware/client'],
+            'games/03': ["/src/javascripts/games/03.js", 'webpack-hot-middleware/client'],
         } :
         {
-            game01: "/src/javascripts/games/01.js",
-            game02: "/src/javascripts/games/02.js",
-            game03: "/src/javascripts/games/03.js",
-            common: "/src/javascripts/common.js",
+            'games/01': "/src/javascripts/games/01.js",
+            'games/02': "/src/javascripts/games/02.js",
+            'games/03': "/src/javascripts/games/03.js",
         } 
     ,
     devtool: 'inline-source-map',
@@ -28,10 +26,5 @@ module.exports = {
     output: {
         filename: 'scripts/[name].js',
         path: __dirname + '/public/'
-    },
-    optimization: {
-        splitChunks: {
-            chunks: 'all',
-        }
     }
 };
