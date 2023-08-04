@@ -4,19 +4,10 @@
 <script>
     function submitForm(action){
         let form = document.getElementById("form");
-        if (validateName() && validateEmail()) {
+        if (validateEmail()) {
             form.action = action;
             form.method = 'POST';
             form.submit();
-        }
-    }
-
-    function validateName() {
-        let name = document.getElementById("name");
-        if (name && name.value.trim() != "") {
-            return true;
-        } else {
-            alert("닉네임을 입력해주세요.")
         }
     }
 
@@ -29,24 +20,15 @@
             alert("이메일을 올바르게 입력해주세요.")
         }
     }
-
 </script>
 <h1>강냉이를 얻고싶다면..</h1>
 
-<form id="form" method="post" onsubmit="submitForm('/user/register'); return false">
+<form id="form" method="post" onsubmit="submitForm('/user/login'); return false">
     <fieldset>
         <% if (locals.status) { %>
         <h3><%= locals.status.message %></h3>
         <% } %>
-        <label for="name">닉네임</label>
-        <input 
-            id="name"
-            type="text" 
-            name="name" 
-            maxlength="64"
-            placeholder="닉네임"
-            required
-        />
+
         <label for="email">이메일</label>
         <input 
             id="email"
@@ -57,11 +39,8 @@
             autocomplete="email"
             required
         />
-        <input type="button" onclick="submitForm('/user/register')" value="새로 시작하기" />
-        <a href="/login">이전에 게임을 진행하셨었나요? 로그인 하러가기</a>
-        <% if (locals.status && ["USER_EXPIRED", "USER_EXISTS"].includes(locals.status.type)) { %>
-        <!-- <input type="button" onclick="submitForm('/user/login')" value="로그인" />            -->
-        <% } %>
+        <input type="button" onclick="submitForm('/user/login')" value="로그인" />
+        <a href="/">새로 시작하기</a>
     </fieldset>
 </form>
 

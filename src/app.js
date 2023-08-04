@@ -43,7 +43,8 @@ app.use(
     })
 );
 
-app.get("/", home.run);
+app.get("/", home.index);
+app.get("/login", home.login);
 
 app.get("/game/:stageNo", game.run);
 app.get("/game/complete/:stageNo", game.complete);

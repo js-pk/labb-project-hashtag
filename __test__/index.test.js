@@ -18,7 +18,10 @@ describe("Test /game", () => {
         let testSession = session(app);
         beforeAll((done) => {
             testSession.post('/user/register')
-                .send({"name": "테스트"})
+                .send({
+                    "name": "테스트", 
+                    "email": "test@test.com"
+                })
                 .end((err) => {
                     if (err) return done(err);
                     authSession = testSession;
@@ -26,7 +29,7 @@ describe("Test /game", () => {
                 })
         })
         afterAll(async () => {
-            await db.delete("users", "name=?", ["테스트"]);
+            await db.delete("users", "email=?", ["test@test.com"]);
         });
 
         test("game/01", (done) => {
@@ -71,18 +74,18 @@ describe("Test /game", () => {
 describe("Test /user", () => {
 
     beforeAll(async () => {
-        await db.insert("users", ["name"], ["테스트"]);
+        await db.insert("users", ["name", "email"], ["테스트", "test@test.com"]);
     });
 
     afterAll(async () => {
-        await db.delete("users", "name=?", ["테스트"]);
-        await db.delete("users", "name=?", ["NoUser"]);
+        await db.delete("users", "email=?", ["test@test.com"]);
+        await db.delete("users", "email=?", ["nouser@nooo.com"]);
     });
 
     test("POST user/login, user name exists", async () => {
         const response = await request(app)
             .post('/user/login')
-            .send({"name": "테스트"});
+            .send({"email": "test@test.com"});
         expect(response.statusCode).toEqual(302);
         expect(response.header.location).toEqual('/');
     });
@@ -90,22 +93,28 @@ describe("Test /user", () => {
     test("POST user/login, user name not exists", async () => {
         const response = await request(app)
             .post('/user/login')
-            .send({"name": "NoUser"});
+            .send({"email": "nouser@nooo.com"});
         expect(response.statusCode).toEqual(200);
     });
 
-    test("POST user/register, user name not exists", async () => {
+    test("POST user/register, user email not exists", async () => {
         const response = await request(app)
             .post('/user/register')
-            .send({"name": "NoUser"});
+            .send({
+                "name": "NoUser",
+                "email": "nouser@nooo.com"
+            });
         expect(response.statusCode).toEqual(302);
         expect(response.header.location).toEqual('/game/01');
         
     });
-    test("POST user/register, user name exists", async () => {
+    test("POST user/register, user email already exists", async () => {
         const response = await request(app)
             .post('/user/register')
-            .send({"name": "테스트"});
+            .send({
+                "name": "없는유저",
+                "email": "test@test.com"
+            });
             expect(response.statusCode).toEqual(200);
     });
 
@@ -119,7 +128,7 @@ describe("Test /user", () => {
 
 describe('Test DB', () => {
     test("Insert method", async () => {
-        const response = await db.insert("users", ["name"], ["테스트"]);
+        const response = await db.insert("users", ["name", "email"], ["테스트", "test@test.com"]);
         console.log(response);
         expect(typeof response).toBe("number");
     });
@@ -135,7 +144,7 @@ describe('Test DB', () => {
     });
 
     test("Update method", async () => {
-        const response = await db.update("users", "mail = 'test@gmail.com'", "name=?", ["테스트"]);
+        const response = await db.update("users", "name = '바뀐닉네임'", "email=?", ["test@test.com"]);
         expect(typeof response).toBe("number");
     })
 
@@ -145,7 +154,7 @@ describe('Test DB', () => {
     });
 
     test("Delete method", async () => {
-        const response = await db.delete("users", "name=?", ["테스트"]);
+        const response = await db.delete("users", "email=?", ["test@test.com"]);
         expect(response).toBe("Deleted..");
     });
 });

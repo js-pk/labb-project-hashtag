@@ -14,7 +14,7 @@ const db = new sqlite3.Database(db_name, err => {
 const sql_create = `CREATE TABLE IF NOT EXISTS Users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(100) NOT NULL,
-    mail VARCHAR(100),
+    email VARCHAR(100) NOT NULL UNIQUE,
     stage_01 INTEGER DEFAULT 0 NOT NULL,
     stage_02 INTEGER DEFAULT 0 NOT NULL,
     stage_03 INTEGER DEFAULT 0 NOT NULL
