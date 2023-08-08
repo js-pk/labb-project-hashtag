@@ -1,4 +1,5 @@
 'use strict'
+const fileUpload = require('express-fileupload');
 const Database = require('../../database/connection.js');
 const db = new Database();
 
@@ -8,13 +9,26 @@ const authorize = function(req) {
 
 exports.run = function(req, res, next) {
     const stageNo = req.params.stageNo || "01";
+    const user = req.session.user;
     if (["01", "02", "03"].includes(stageNo)) {
         if (authorize(req)) {
-            res.render(`games/${stageNo}`)
+            res.render(`games/${stageNo}`, {
+                email: user.email
+            })
         } else {
             res.redirect("/")
         }
     }
+}
+
+exports.upload = function(req, res) {
+    const {image} = req.files;
+    if (!image) return res.sendStatus(400);
+    // If does not have image mime type prevent from uploading
+    if (image.mimetype != 'image/png') return res.sendStatus(400);
+    image.mv(__dirname + '/../../public/images/upload/' + image.name);
+
+    res.sendStatus(200);
 }
 
 exports.complete = function(req, res, next) {

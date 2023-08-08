@@ -18,6 +18,7 @@
     "cookie-parser": "^1.4.6",
     "ejs": "^3.1.9",
     "express": "^4.18.2",
+    "express-fileupload": "^1.4.0",
     "express-session": "^1.17.3",
     "memorystore": "^1.6.7",
     "mind-ar": "^1.2.3",

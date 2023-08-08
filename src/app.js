@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
+const fileUpload = require('express-fileupload');
 
 const home = require('./pipes/home');
 const user = require('./pipes/user');
@@ -27,6 +28,7 @@ app.use(
     })
 );
 app.use(express.json());
+app.use(fileUpload());
 
 //Set cookie and session
 app.use(cookieParser());
@@ -48,6 +50,7 @@ app.get("/login", home.login);
 
 app.get("/game/:stageNo", game.run);
 app.get("/game/complete/:stageNo", game.complete);
+app.post("/game/upload", game.upload);
 
 app.post('/user/login', user.login);
 app.post('/user/logout', user.logout);

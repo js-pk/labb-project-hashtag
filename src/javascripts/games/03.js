@@ -1,3 +1,4 @@
+
 import * as THREE from 'three';
 import {MindARThree} from 'mind-ar/dist/mindar-face-three.prod.js';
 
@@ -16,65 +17,84 @@ faceMesh.material.map = texture;
 faceMesh.material.transparent = true;
 faceMesh.material.needsUpdate = true;
 scene.add(faceMesh);
-const start = async() => {
+
+const startARCamera = async() => {
   await mindarThree.start();
   renderer.setAnimationLoop(() => {
     renderer.render(scene, camera);
     if (cap) {
-      // var b = document.createElement('a');
-      // b.href = renderer.domElement.toDataURL();
-      // b.download = 'download_three.png';
-      // b.click();
-      const canvas = document.createElement("canvas");
-      const video = document.getElementsByTagName("video")[0];
-      const ar = renderer.getContext()
-      video.pause();
-
-      let v_width = video.clientWidth*2;
-      let v_height = video.clientHeight*2;
-      
-      canvas.width = v_width;
-      canvas.height = v_height;
-
-      let element = document.querySelector('video'),
-          style = window.getComputedStyle(element),
-          top = style.getPropertyValue('top');
-
-      canvas.getContext('2d').drawImage(video, 0, parseFloat(top), v_width, v_height);
-
-      let arImgData = renderer.domElement.toDataURL()
-      let img = new Image()
-      img.onload = function() {
-        canvas.getContext('2d').drawImage(this, 0, 0, this.width, this.height, 0, 0, v_width, v_height)
-
-        if (window.navigator.msSaveOrOpenBlob) {
-          var blobObject = canvas.msToBlob();
-          window.navigator.msSaveOrOpenBlob(blobObject, 'download.png');
-        } else {
-          var a = document.createElement('a');
-          a.href = canvas.toDataURL("image/png");
-          a.download = 'download.png';
-          a.click();
-        }
-
-        document.querySelector("video").play();
-      }
-      img.src = arImgData
-
-      
+      capture();
     }
     cap = false
   });
 }
-start();
+startARCamera();
 
-
-function capture() {
-  cap = true
+function triggerCapture() {
+  cap = true;
 }
 
+function capture() {
+  const canvas = document.createElement("canvas");
+  const video = document.querySelector("video");
+
+  canvas.width = video.clientWidth*2;
+  canvas.height = video.clientHeight*2;
+  
+  video.pause();
+  let top = window.getComputedStyle(video).getPropertyValue('top');
+  canvas.getContext('2d').drawImage(video, 0, parseFloat(top), canvas.width, canvas.height);
+
+  let arImgData = renderer.domElement.toDataURL();
+  let img = new Image();
+  img.onload = function() {
+    canvas.getContext('2d').drawImage(this, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
+    // downloadImage(canvas);
+    uploadImage(canvas);
+    video.play();
+  }
+  img.src = arImgData;
+}
+
+function downloadImage(canvas) {
+  if (window.navigator.msSaveOrOpenBlob) {
+    let blob = canvas.msToBlob();
+    window.navigator.msSaveOrOpenBlob(blob, 'download.png');
+  } else {
+    let a = document.createElement('a');
+    a.href = canvas.toDataURL("image/png");
+    a.download = 'download.png';
+    a.click();
+  }
+}
+
+function uploadImage(canvas) {
+  const formData = new FormData();
+  canvas.toBlob(async (b) => {
+    try {
+      formData.append("image", b, "filename.png");
+      const response = await fetch("/game/upload", {
+        method: "POST",
+        body: formData
+      });
+      if (response && response.status === 200) {
+        console.log(getFileName());
+      }
+    } catch (error) {
+      console.log("error");
+    }
+    
+  });
+}
+
+function getFileName() {
+  // const email = document.getElementById("email").innerText;
+  // const now = new Date();
+  // return `${email}_${now.getFullYear()}_${now.getMonth()}_${now.getDate()}_${now.getHours()}_${now.getMinutes()}_${now.getSeconds()};
+`}
+
 document.addEventListener("DOMContentLoaded", function() {
-  document.getElementById("capture").addEventListener("click", capture)
+  document.getElementById("capture").addEventListener("click", triggerCapture)
 })
 
 
