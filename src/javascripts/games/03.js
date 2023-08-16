@@ -87,12 +87,6 @@ function uploadImage(canvas) {
   });
 }
 
-function getFileName() {
-  // const email = document.getElementById("email").innerText;
-  // const now = new Date();
-  // return `${email}_${now.getFullYear()}_${now.getMonth()}_${now.getDate()}_${now.getHours()}_${now.getMinutes()}_${now.getSeconds()};
-`}
-
 document.addEventListener("DOMContentLoaded", function() {
   document.getElementById("capture").addEventListener("click", triggerCapture)
 })

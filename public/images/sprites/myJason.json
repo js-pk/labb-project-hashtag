@@ -40,14 +40,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":180,"h":180},
 	"sourceSize": {"w":180,"h":180}
 },
-"canvas.png":
-{
-	"frame": {"x":660,"y":0,"w":1080,"h":1920},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":1080,"h":1920},
-	"sourceSize": {"w":1080,"h":1920}
-},
+
 "tool-box.png":
 {
 	"frame": {"x":1740,"y":0,"w":180,"h":180},
