@@ -18,11 +18,12 @@ const uploadFileS3 = (fileName, fileData) => {
         Body: fileData
     }, (error, data) => {
         if (error) throw error;
-        console.log(data.Location);
+        // console.log(data.Location);
     })
 }
 
 const resizeImage = async (buffer) => {
+    //TODO: should handle error
     return await sharp(buffer)
         .resize({
             width: 1200,
@@ -73,14 +74,18 @@ exports.run = function(req, res, next) {
 // }
 
 exports.upload = async function(req, res) {
+    if (!req.files) return res.status(400).send("File not found");
+
     const {image} = req.files;
-    if (!image) return res.sendStatus(400);
-    if (image.mimetype != 'image/png') return res.sendStatus(400);
+    if (!image || image.mimetype != 'image/png') return res.status(400).send("Wrong image format");
 
     let imageBuffer = Buffer.from(image.data, 'binary');
     let resizedImageBuffer = await resizeImage(imageBuffer);
     uploadFileS3("buffer.png", resizedImageBuffer);
+
+    res.sendStatus(200);
     //TODO: should I update this to DB?
+    //TODO: prevent double clicking upload button.
 }
 
 exports.complete = function(req, res, next) {

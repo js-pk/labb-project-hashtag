@@ -36,7 +36,6 @@ exports.login = async function(req, res) {
 
 exports.register = async function(req, res) {
     const {name, email} = req.body;
-    console.log(req.body);
     if (!name) return console.error("name is not defined.")
     if (!email) return console.error("email is not defined.")
 

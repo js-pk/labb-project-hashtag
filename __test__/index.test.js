@@ -45,7 +45,23 @@ describe("Test /game", () => {
         test("game/03", (done) => {
             authSession.get('/game/03')
                 .expect(200)
-                .end(done)         
+                .end(done)    
+        });
+
+        test("game/upload image exists", (done) => {
+            authSession.post('/game/upload')
+                .field('name', 'asdadas')
+                .attach('image', __dirname + '/test.png')
+                .expect(200)
+                .end(done)
+        }, 30000);
+
+        test("game/upload image not exists", (done) => {
+            authSession.post('/game/upload')
+                .field('name', 'asdadas')
+                .attach('image', undefined)
+                .expect(400)
+                .end(done)
         });
     });
     describe("user not logined", () => {
@@ -129,7 +145,6 @@ describe("Test /user", () => {
 describe('Test DB', () => {
     test("Insert method", async () => {
         const response = await db.insert("users", ["name", "email"], ["테스트", "test@test.com"]);
-        console.log(response);
         expect(typeof response).toBe("number");
     });
 
@@ -157,4 +172,13 @@ describe('Test DB', () => {
         const response = await db.delete("users", "email=?", ["test@test.com"]);
         expect(response).toBe("Deleted..");
     });
+});
+
+describe('Test Download Image from S3', () => {
+   
+    // test("List images", async () => {
+    //     const response = await request(app)
+    //     .get('/photos');
+    //     // console.log(response);
+    // })
 });
