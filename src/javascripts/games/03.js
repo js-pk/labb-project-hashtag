@@ -78,10 +78,11 @@ function uploadImage(canvas) {
         body: formData
       });
       if (response && response.status === 200) {
-        console.log(getFileName());
+        console.log("image uploaded!");
+        // console.log(getFileName());
       }
     } catch (error) {
-      console.log("error");
+      throw new Error(error);
     }
     
   });

@@ -1,13 +1,15 @@
 'use strict'
-const fileUpload = require('express-fileupload');
 const Database = require('../../database/connection.js');
 const db = new Database();
+
 const aws = require('aws-sdk');
 const s3 = new aws.S3({
     accessKeyId: process.env.AWS_ACCESS,
     secretAccessKey: process.env.AWS_SECRET,
     region: process.env.AWS_REGION
-})
+});
+
+const sharp = require('sharp');
 
 const uploadFileS3 = (fileName, fileData) => {
     s3.upload({
@@ -16,8 +18,30 @@ const uploadFileS3 = (fileName, fileData) => {
         Body: fileData
     }, (error, data) => {
         if (error) throw error;
-        // console.log(data.Location);
+        console.log(data.Location);
     })
+}
+
+const resizeImage = async (buffer) => {
+    return await sharp(buffer)
+        .resize({
+            width: 1200,
+            fit: 'outside'
+        })
+        .toBuffer()
+}
+
+const resizeImageToFile = (buffer) => {
+    sharp(buffer)
+        .resize({
+            width: 1200,
+            fit: 'outside'
+        })
+        .toFile(__dirname + '/../../public/images/upload/test.png',
+            (err, info) => {
+
+            }
+        )
 }
 
 const authorize = function(req) {
@@ -38,23 +62,26 @@ exports.run = function(req, res, next) {
     }
 }
 
-exports.upload = function(req, res) {
+// exports.upload = function(req, res) {
+//     const {image} = req.files;
+//     if (!image) return res.sendStatus(400);
+//     // If does not have image mime type prevent from uploading
+//     if (image.mimetype != 'image/png') return res.sendStatus(400);
+//     image.mv(__dirname + '/../../public/images/upload/' + image.name);
+
+//     res.sendStatus(200);
+// }
+
+exports.upload = async function(req, res) {
     const {image} = req.files;
     if (!image) return res.sendStatus(400);
-    // If does not have image mime type prevent from uploading
     if (image.mimetype != 'image/png') return res.sendStatus(400);
-    image.mv(__dirname + '/../../public/images/upload/' + image.name);
 
-    res.sendStatus(200);
+    let imageBuffer = Buffer.from(image.data, 'binary');
+    let resizedImageBuffer = await resizeImage(imageBuffer);
+    uploadFileS3("buffer.png", resizedImageBuffer);
+    //TODO: should I update this to DB?
 }
-
-exports.uploadS3 = function(req, res) {
-    const {image} = req.files;
-    if (!image) return res.sendStatus(400);
-    if (image.mimetype != 'image/png') return res.sendStatus(400);
-    //TODO: get image blob, uploadFileS3(filename, filedata)
-}
-
 
 exports.complete = function(req, res, next) {
     if (authorize(req)) {
