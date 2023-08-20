@@ -3,7 +3,9 @@ import {loader} from './01_init.js';
 
 export function loadResources() {
     loader.onProgress.add(loadProgressHandler);
-    loader.add("/images/sprites/myJason.json").load(setup);
+    loader.add("/images/sprites/game01.json")
+    .add("/images/sprites/tools.json")
+    .load(setup);
 }
 
 export function loadProgressHandler(loader, resource) {

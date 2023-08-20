@@ -3,7 +3,11 @@ import {loader} from './02_init.js';
 
 export function loadResources() {
     loader.onProgress.add(loadProgressHandler);
-    loader.add("/images/sprites/myJason.json").load(setup);
+    loader.add("/images/sprites/bg-soil-glitch.json")
+    .add("/images/sprites/myJason.json")
+    .add("/images/sprites/corn01.png")
+    .load(setup);
+    
 }
 
 export function loadProgressHandler(loader, resource) {

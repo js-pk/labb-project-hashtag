@@ -9,8 +9,8 @@ export const Sprite = PIXI.Sprite;
 export const Rectangle = PIXI.Rectangle;
 export const Graphics=PIXI.Graphics;
 
-export const height = window.innerHeight;
-export const width = height * 10/16;
+export const width = window.innerWidth;
+export const height = width * 16/10;
 
 export const app = new PIXI.Application({
     width: width,
@@ -24,8 +24,16 @@ app.renderer.backgroundColor= 0xAAAAAA;
 app.renderer.autoDensity = true;
 app.renderer.view.style.position = "absolute";
 app.renderer.view.style.display = "block";
-app.renderer.autoDensity = true;
+app.renderer.resizeTo = window;
+
 
 document.getElementById("game1").appendChild(app.view);
 
- 
+ // Handle the resize event
+window.addEventListener("resize", () => {
+    // Adjust width and height according to the new window width
+    const newWidth = window.innerWidth;
+    const newHeight = newWidth * 16/10;
+
+    app.renderer.resize(newWidth, newHeight);
+});

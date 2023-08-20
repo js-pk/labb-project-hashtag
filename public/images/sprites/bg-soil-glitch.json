@@ -1,0 +1,44 @@
+{"frames": {
+
+"BG_01_750x1200.png":
+{
+	"frame": {"x":0,"y":108,"w":750,"h":1200},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":750,"h":1200},
+	"sourceSize": {"w":750,"h":1200}
+},
+"Decay_glitch_3x_0000.png":
+{
+	"frame": {"x":0,"y":0,"w":108,"h":108},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":108,"h":108},
+	"sourceSize": {"w":108,"h":108}
+},
+"soil01.png":
+{
+	"frame": {"x":108,"y":0,"w":108,"h":108},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":108,"h":108},
+	"sourceSize": {"w":108,"h":108}
+},
+"soil02.png":
+{
+	"frame": {"x":216,"y":0,"w":108,"h":108},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":108,"h":108},
+	"sourceSize": {"w":108,"h":108}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "bg-soil-glitch.png",
+	"format": "RGBA8888",
+	"size": {"w":750,"h":1308},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:cf24e93cdf8b4030516721cedda0964c:78cfef3d3248df7dd82e00ae09458298:f7b913e581984f3c4766f748c0cf96d3$"
+}
+}
