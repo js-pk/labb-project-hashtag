@@ -16,24 +16,68 @@ export const app = new PIXI.Application({
     width: width,
     height: height,
     antialias: true,
-    transparent: false,
+    transparent: true,
     resolution: window.innerWidth.devicePixelRatio || 1
 });
 
-app.renderer.backgroundColor= 0xAAAAAA;
+//app.renderer.backgroundColor= 0xAAAAAA;
 app.renderer.autoDensity = true;
 app.renderer.view.style.position = "absolute";
 app.renderer.view.style.display = "block";
+app.renderer.view.style.border="2px solid #333";
 app.renderer.resizeTo = window;
 
 
-document.getElementById("game2").appendChild(app.view);
+document.body.appendChild(app.view);
 
- // Handle the resize event
-window.addEventListener("resize", () => {
-    // Adjust width and height according to the new window width
-    const newWidth = window.innerWidth;
-    const newHeight = newWidth * 16/10;
+let background = new PIXI.Sprite();
+app.stage.addChild(background);
 
-    app.renderer.resize(newWidth, newHeight);
-});
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            func.apply(context, args);
+        }, wait);
+    };
+}
+
+
+export function resize() {
+    let w, h;
+
+    // Determine window's aspect ratio
+    const windowRatio = window.innerWidth / window.innerHeight;
+    
+   // Game's target aspect ratio for landscape
+    const landscapeGameRatio = 16 / 10;
+
+    // Game's target aspect ratio for portrait
+    const portraitGameRatio = 10 / 16;
+
+    if (window.innerWidth > window.innerHeight) { // Landscape mode
+        w = window.innerWidth;
+        h = w / landscapeGameRatio;
+    } else { // Portrait mode
+        h = window.innerHeight;
+        w = h * portraitGameRatio;
+    }
+
+    // Resize the renderer
+    app.renderer.resize(w, h);
+
+    // Adjust the position to center the game on the screen
+    app.renderer.view.style.left = `${(window.innerWidth - w) / 2}px`;
+    app.renderer.view.style.top =0;
+    
+}
+// Debounced version of the resize function
+const debouncedResize = debounce(resize, 100);
+
+// Handle the resize event
+window.addEventListener("resize", debouncedResize);
+
+// Initial resize
+resize();

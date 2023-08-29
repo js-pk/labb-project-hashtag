@@ -6,6 +6,7 @@ export function loadResources() {
     loader.add("/images/sprites/bg-soil-glitch.json")
     .add("/images/sprites/myJason.json")
     .add("/images/sprites/corn01.png")
+    .add("/images/sprites/soils.json")
     .load(setup);
     
 }

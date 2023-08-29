@@ -1,0 +1,52 @@
+{"frames": {
+
+"soil_plain02@3x.png":
+{
+	"frame": {"x":0,"y":0,"w":420,"h":630},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":420,"h":630},
+	"sourceSize": {"w":420,"h":630}
+},
+"soil_plain@3x.png":
+{
+	"frame": {"x":0,"y":630,"w":420,"h":630},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":420,"h":630},
+	"sourceSize": {"w":420,"h":630}
+},
+"soils02@3x.png":
+{
+	"frame": {"x":0,"y":1260,"w":108,"h":108},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":108,"h":108},
+	"sourceSize": {"w":108,"h":108}
+},
+"soils03@3x.png":
+{
+	"frame": {"x":108,"y":1260,"w":108,"h":108},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":108,"h":108},
+	"sourceSize": {"w":108,"h":108}
+},
+"soils04-1@3x.png":
+{
+	"frame": {"x":216,"y":1260,"w":108,"h":108},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":108,"h":108},
+	"sourceSize": {"w":108,"h":108}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "soils.png",
+	"format": "RGBA8888",
+	"size": {"w":420,"h":1368},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:2f52bb7bf8575b530fbc7dc5183b94c9:382d37b159e1788d148147a0007736a6:55fd36e2a1f3d945ed569fc8fc4f6dfe$"
+}
+}
