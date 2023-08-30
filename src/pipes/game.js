@@ -1,6 +1,7 @@
 'use strict'
 const Database = require('../../database/connection.js');
 const db = new Database();
+const ULID = require('ulid');
 
 const aws = require('aws-sdk');
 const s3 = new aws.S3({
@@ -63,16 +64,6 @@ exports.run = function(req, res, next) {
     }
 }
 
-// exports.upload = function(req, res) {
-//     const {image} = req.files;
-//     if (!image) return res.sendStatus(400);
-//     // If does not have image mime type prevent from uploading
-//     if (image.mimetype != 'image/png') return res.sendStatus(400);
-//     image.mv(__dirname + '/../../public/images/upload/' + image.name);
-
-//     res.sendStatus(200);
-// }
-
 exports.upload = async function(req, res) {
     if (!req.files) return res.status(400).send("File not found");
 
@@ -81,10 +72,9 @@ exports.upload = async function(req, res) {
 
     let imageBuffer = Buffer.from(image.data, 'binary');
     let resizedImageBuffer = await resizeImage(imageBuffer);
-    uploadFileS3("buffer.png", resizedImageBuffer);
+    uploadFileS3(`${ULID.ulid()}.png`, resizedImageBuffer);
 
     res.sendStatus(200);
-    //TODO: should I update this to DB?
     //TODO: prevent double clicking upload button.
 }
 

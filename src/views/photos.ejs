@@ -11,7 +11,10 @@
     </head>
     
     <body>
-        
-
+        <% if (locals.photos) { %>
+        <% for (const photo of locals.photos) { %>
+            <img class="ar_photo" src="https://labb-photos.s3.ap-northeast-2.amazonaws.com/<%= photo.Key %>" />
+        <% } %>
+        <% } %>
     </body>
 </html>
