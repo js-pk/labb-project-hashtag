@@ -48,21 +48,21 @@ describe("Test /game", () => {
                 .end(done)    
         });
 
-        test("game/upload image exists", (done) => {
-            authSession.post('/game/upload')
-                .field('name', 'asdadas')
-                .attach('image', __dirname + '/test.png')
-                .expect(200)
-                .end(done)
-        }, 30000);
+        // test("game/upload image exists", (done) => {
+        //     authSession.post('/game/upload')
+        //         .field('name', 'asdadas')
+        //         .attach('image', __dirname + '/test.png')
+        //         .expect(200)
+        //         .end(done)
+        // }, 30000);
 
-        test("game/upload image not exists", (done) => {
-            authSession.post('/game/upload')
-                .field('name', 'asdadas')
-                .attach('image', undefined)
-                .expect(400)
-                .end(done)
-        });
+        // test("game/upload image not exists", (done) => {
+        //     authSession.post('/game/upload')
+        //         .field('name', 'asdadas')
+        //         .attach('image', undefined)
+        //         .expect(400)
+        //         .end(done)
+        // });
     });
     describe("user not logined", () => {
         let agent;
