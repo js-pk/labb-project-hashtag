@@ -11,4 +11,4 @@ app.use(webpackDevMiddleware(compiler, {
 }));
 
 app.use(webpackHotMiddleware(compiler));
-app.listen(3000, () => console.log('http://localhost:3000'));
+app.listen(80, () => console.log('http://localhost:80'));
