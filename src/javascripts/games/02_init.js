@@ -17,7 +17,7 @@ export const app = new PIXI.Application({
     height: height,
     antialias: true,
     transparent: true,
-    resolution: window.innerWidth.devicePixelRatio || 1
+    resolution: window.devicePixelRatio || 1
 });
 
 //app.renderer.backgroundColor= 0xAAAAAA;

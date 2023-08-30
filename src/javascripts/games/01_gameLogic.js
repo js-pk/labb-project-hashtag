@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 
-import { app, Container, Sprite, Graphics,resources } from './01_init.js';
+import { app, Container, Sprite, Graphics,resources,resolution } from './01_init.js';
 import {stageSentences} from './01_texts.js';
 
      let batContainer,toolboxContainer,items,stoneSprite,melon,rake,melonCounterText, wateringCan,seedPouch, batSize,spacing, cursorSprite,guideBox,guideText,successText;
@@ -36,7 +36,7 @@ import {stageSentences} from './01_texts.js';
     }
 
  //   const baseSpacing = 55;
-    const baseBatSize = 54; // Original rectangle size
+    const baseBatSize = 30; // Original rectangle size
 
     // Adjust spacing and rectangle size based on the window size
    // spacing = baseSpacing * scale;
@@ -67,18 +67,20 @@ export function setup(){
 
 function createBat(){
      batContainer = new Container();
-
+   
+    let batPlain=new Sprite(id["soil_plain@4x.png"]);
+    batPlain.scale.set(0.25);
+    batContainer.addChild(batPlain);
+    
     for(let i = 0; i < numberOfCol; i++) {
         for(let j = 0; j < numberOfRows; j++) {
             let batSpot = new Sprite(id["soils02@3x.png"]);
-          //  batSpot.beginFill(0xFFFFFF, 0.4);
-           // batSpot.drawRect(0, 0, batSize, batSize);
-          //  batSpot.endFill();
+        
             batSpot.isFilled = false;
             batSpot.width=batSize;
             batSpot.height=batSize;
-            const x = batSize * i;
-            const y = batSize * j;
+            const x = batSize* i;
+            const y = batSize*j;
             batSpot.x = x;
             batSpot.y = y;
             batSpot.interactive = true;
@@ -88,15 +90,16 @@ function createBat(){
         }
     }
 
-    batContainer.x = (app.view.width - batContainer.width) / 2;
-    batContainer.y = (app.view.height - batContainer.height) / 2;
+    batContainer.x = ((app.view.width/resolution) - batContainer.width) / 2;
+    batContainer.y = ((app.view.height/resolution) - batContainer.height) / 2;
 
-
+  
    stoneSprite=new PIXI.Sprite(items["items_0000_Stone.png"]);
    stoneSprite.scale.set(scale);
    stoneSprite.visible=false;
    gameScene.addChild(stoneSprite);
     gameScene.addChild(batContainer);
+  
 }
 
 function CreateGuideConsole(){
@@ -112,13 +115,13 @@ const sentences=stageSentences[gameStage];
  }
 guideBox=new PIXI.Graphics();
 guideBox.beginFill(0xFFFFFF, 0.4);
-guideBox.drawRect(0,0,batContainer.width*1.5,app.view.height/10);
+guideBox.drawRect(0,0,batContainer.width*1.5,(app.view.height/resolution)/10);
 guideBox.endFill();
-guideBox.x=(app.view.width-guideBox.width)/2;
-guideBox.y=app.view.height/20;
+guideBox.x=((app.view.width/resolution)-guideBox.width)/2;
+guideBox.y=(app.view.height/resolution)/20;
 gameScene.addChild(guideBox);
 
-const baseSize = 24; // This is your base font size for a known screen size, e.g., 800px width
+const baseSize = 50; // This is your base font size for a known screen size, e.g., 800px width
 const baseScreenWidth = 800; // The screen width you designed for
 const currentScreenWidth = window.innerWidth; // Get current screen (viewport) width    
 let dynamicFontSize= (currentScreenWidth/baseScreenWidth)*baseSize;
@@ -182,6 +185,7 @@ function continueGuideMessages(){
 
 
 function CreateToolBox() {
+    let spacing=batContainer.width/4+5;
     let isLandscape = app.view.width > app.view.height;
     
     // Initialize positions to zero; these will be relative to the toolboxContainer
@@ -219,11 +223,11 @@ function CreateToolBox() {
     // Now, adjust the toolboxContainer's position based on app's view
     if (isLandscape) {
         toolboxContainer.x = 50;  // A little padding from the left side
-        toolboxContainer.y = (app.view.height - toolboxContainer.height) / 2;
+        toolboxContainer.y = ((app.view.height/resolution) - toolboxContainer.height) / 2;
 
     } else {
-        toolboxContainer.x = (app.view.width - toolboxContainer.width) / 2;
-        toolboxContainer.y = app.view.height - toolboxContainer.height - 70;
+        toolboxContainer.x = ((app.view.width/resolution) - toolboxContainer.width) / 2;
+        toolboxContainer.y = (app.view.height/resolution) - toolboxContainer.height - 30;
     }
     rake=new Sprite(items["itemsR_0003_Rake.png"]);
     rake.width=batSize;
@@ -242,7 +246,11 @@ function CreateToolBox() {
     wateringCan.height=batSize;
     wateringCan.x=toolbox2.x;
     wateringCan.y=toolbox2.y;
-    wateringCan.visible=false;
+    console.log(toolbox2.x);
+    console.log(toolbox2.y);
+    console.log(wateringCan.x);
+    console.log(wateringCan.y);
+    wateringCan.visible=true;
     wateringCan.interactive=false;
     wateringCan.on('pointerdown',function(){
         setSpriteAsCursor(wateringCan);
@@ -255,7 +263,7 @@ function CreateToolBox() {
     seedPouch.height=batSize;
     seedPouch.x=toolbox3.x;
     seedPouch.y=toolbox3.y;
-    seedPouch.visible=false;
+    seedPouch.visible=true;
     seedPouch.interactive=false;
     seedPouch.on('pointerdown',function(){
     setSpriteAsCursor(seedPouch);
@@ -307,10 +315,10 @@ function CreatehealthBar() {
     
     if (isLandscape) {
         // Landscape Mode - Horizontal Health Bar
-        healthBar.position.set((app.view.width - health) / 2, app.view.height - 60); // 50 units padding from the bottom
+        healthBar.position.set(((app.view.width/resolution) - health) / 2, (app.view.height/resolution) - 60); // 50 units padding from the bottom
     } else {
         // Portrait Mode - Vertical Health Bar
-        healthBar.position.set(window.innerWidth / 11, (app.view.height-healthBar.height)/2-150);
+        healthBar.position.set(window.innerWidth / 11, ((app.view.height/resolution)-healthBar.height)/2-150);
     }
     
     gameScene.addChild(healthBar);
