@@ -48,7 +48,10 @@ function capture() {
   let arImgData = renderer.domElement.toDataURL();
   let img = new Image();
   img.onload = function() {
-    canvas.getContext('2d').drawImage(this, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
+    const context = canvas.getContext('2d');
+    context.translate(canvas.width, 0);
+    context.scale(-1, 1);
+    context.drawImage(this, 0, 0, this.width, this.height, 0, 0, canvas.width, canvas.height);
     // downloadImage(canvas);
     uploadImage(canvas);
     video.play();
@@ -84,7 +87,6 @@ function uploadImage(canvas) {
     } catch (error) {
       throw new Error(error);
     }
-    
   });
 }
 
