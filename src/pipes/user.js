@@ -12,7 +12,7 @@ exports.logout = function(req, res) {
 
 exports.login = async function(req, res) {
     const {email} = req.body;
-    const user = await db.first('users', "email=?", [email]);
+    const user = await db.first('users', "WHERE email=?", [email]);
     if (user) {
         req.session.user = {
             id: user.id,
@@ -39,7 +39,7 @@ exports.register = async function(req, res) {
     if (!name) return console.error("name is not defined.")
     if (!email) return console.error("email is not defined.")
 
-    const user = await db.first('users', "email=?", [email]);
+    const user = await db.first('users', "WHERE email=?", [email]);
     if (user) {
         res.render("signup", {
             name: name,

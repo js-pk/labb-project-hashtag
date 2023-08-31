@@ -3,16 +3,6 @@ const sqlite3 = require('sqlite3').verbose();
 
 const isEmpty = require('../utils/isEmpty.js');
 
-//Connect to DB
-// const db_name = path.join(__dirname, "database.db");
-
-// const db = new sqlite3.Database(db_name, err => {
-//     if (err) {
-//         console.error(err.message);
-//         throw err;
-//     }
-// })
-
 module.exports = class Database {
     constructor() {
         this.name = path.join(__dirname, "database.db");
@@ -24,10 +14,10 @@ module.exports = class Database {
         })
     }
 
-    first(table, condition, args) {
+    first(table, query, args) {
         return new Promise((resolve, reject) => {
-            const query = 'SELECT * FROM ' + table + ' WHERE ' + condition;
-            this.db.get(query, args, (err, row) => {
+            const queryString = 'SELECT * FROM ' + table + ' ' + query + " LIMIT 1";
+            this.db.get(queryString, args, (err, row) => {
                 if (err) {
                     console.error(err.message);
                     reject(err);
@@ -37,15 +27,14 @@ module.exports = class Database {
         })
     }
 
-    all(table, condition, args, limit) {
+    all(table, query, args, limit) {
         return new Promise((resolve, reject) => {
-            const query = 'SELECT * FROM ' + table + ' WHERE ' + condition +(limit ? " LIMIT " + limit : '');
-            this.db.all(query, args, (err, rows) => {
+            const queryString = 'SELECT * FROM ' + table + ' ' + query + (limit ? " LIMIT " + limit : '');
+            this.db.all(queryString, args, (err, rows) => {
                 if (err) {
                     console.error(err.message);
                     reject(err);
                 }
-                
                 resolve(rows || []);
             })
         })

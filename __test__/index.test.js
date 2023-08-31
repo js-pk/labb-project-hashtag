@@ -149,12 +149,12 @@ describe('Test DB', () => {
     });
 
     test("First method/ item exists", async () => {
-        const response = await db.first("users", "name=?", ["테스트"]);
+        const response = await db.first("users", "WHERE name=?", ["테스트"]);
         expect(response.name).toBe("테스트");
     });
 
     test("Frst method/ item not exists", async () => { 
-        const response = await db.first("users", "name=?", ["afafadasddf11fdf2ad"]);
+        const response = await db.first("users", "WHERE name=?", ["afafadasddf11fdf2ad"]);
         expect(response).toBeNull();
     });
 
@@ -164,7 +164,7 @@ describe('Test DB', () => {
     })
 
     test("All method", async () => {
-        const response = await db.all("users", "stage_01=?", [0]);
+        const response = await db.all("users", "WHERE stage_01=?", [0]);
         expect(Array.isArray(response)).toBe(true);
     });
 

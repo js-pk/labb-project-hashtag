@@ -2,8 +2,8 @@ const path = require('path');
 const sqlite3 = require("sqlite3").verbose();
 
 // Connect DB
-const db_name = path.join(__dirname, "database.db");
-const db = new sqlite3.Database(db_name, err => {
+const dbName = path.join(__dirname, "database.db");
+const db = new sqlite3.Database(dbName, err => {
     if (err) {
         return console.error(err.message);
     }
@@ -11,7 +11,7 @@ const db = new sqlite3.Database(db_name, err => {
 })
 
 // Create Users Table
-const sql_create = `CREATE TABLE IF NOT EXISTS Users (
+const createUsers = `CREATE TABLE IF NOT EXISTS Users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -20,10 +20,23 @@ const sql_create = `CREATE TABLE IF NOT EXISTS Users (
     stage_03 INTEGER DEFAULT 0 NOT NULL
   );`;
 
+const createPhotos = `CREATE TABLE IF NOT EXISTS Photos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key VARCHAR(100) NOT NULL UNIQUE,
+    user_id INTEGER NOT NULL
+);`;
+
 // Run Users Table
-db.run(sql_create, err => {
+db.run(createUsers, err => {
     if (err) {
         return console.error(err.message);
     }
     console.log("Successful creation of the 'Users' table")
+})
+
+db.run(createPhotos, err => {
+    if (err) {
+        return console.error(err.message);
+    }
+    console.log("Successful creation of the 'Photos' table")
 })
