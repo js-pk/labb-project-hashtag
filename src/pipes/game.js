@@ -2,24 +2,30 @@
 const Database = require('../../database/connection.js');
 const db = new Database();
 const ULID = require('ulid');
-
+const sharp = require('sharp');
 const aws = require('aws-sdk');
+
 const s3 = new aws.S3({
     accessKeyId: process.env.AWS_ACCESS,
     secretAccessKey: process.env.AWS_SECRET,
     region: process.env.AWS_REGION
 });
 
-const sharp = require('sharp');
+const uploadMetaDataDB = async (key, userId) => {
+    db.insert('photos', ["key", "user_id"], [key, userId])
+        .catch((err) => {
+            console.err(err.message)
+        })
+}
 
-const uploadFileS3 = (fileName, fileData) => {
+const uploadFileS3 = async (fileName, fileData, callback) => {
     s3.upload({
         Bucket: 'labb-photos',
         Key: fileName,
         Body: fileData
     }, (error, data) => {
         if (error) throw error;
-        // console.log(data.Location);
+        callback();
     })
 }
 
@@ -66,13 +72,13 @@ exports.run = function(req, res, next) {
 
 exports.upload = async function(req, res) {
     if (!req.files) return res.status(400).send("File not found");
-
     const {image} = req.files;
     if (!image || image.mimetype != 'image/png') return res.status(400).send("Wrong image format");
 
     let imageBuffer = Buffer.from(image.data, 'binary');
     let resizedImageBuffer = await resizeImage(imageBuffer);
-    uploadFileS3(`${ULID.ulid()}.png`, resizedImageBuffer);
+    let key = ULID.ulid();
+    uploadFileS3(`${key}.png`, resizedImageBuffer, () => uploadMetaDataDB(key, req.session.user.id));
 
     res.sendStatus(200);
     //TODO: prevent double clicking upload button.
