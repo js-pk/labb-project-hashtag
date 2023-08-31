@@ -65,4 +65,8 @@ app.post('/user/register', user.register);
 
 app.get("/photos", photo.listAlbums);
 
+app.get("/init", (req, res) => {
+    res.render("init");
+})
+
 module.exports = app;

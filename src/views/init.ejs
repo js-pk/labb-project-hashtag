@@ -1,0 +1,31 @@
+<%- include("_header") -%>
+
+
+<script>
+    navigator.geolocation.getCurrentPosition((position) => {
+        const MUSEUM = {
+            latitude: 37.579347006678674,
+            longitude: 126.98053362142642
+        };
+
+        const DEBUG = {
+            latitude: 37.5411668,
+            longitude: 127.0116351
+        };
+        const offset = 0.005; //approximitely 500m
+
+        const lat = position.coords.latitude;
+        const long = position.coords.longitude;
+        const inLatBoundary = (DEBUG.latitude - offset <= lat && lat <= DEBUG.latitude + offset);
+        const inLongBoundary = (DEBUG.longitude - offset <= long && long <= DEBUG.longitude + offset);
+
+        if (inLatBoundary && inLongBoundary) {
+            console.log("HERE");
+        } else {
+            console.log("NO")
+        }
+    });
+
+
+</script>
+<%- include("_footer") -%>
