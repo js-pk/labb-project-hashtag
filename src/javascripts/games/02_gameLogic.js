@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 
-import { app, Container, Sprite, TextureCache, Graphics,resources } from './02_init.js';
+import { app, Container, Sprite, TextureCache, Graphics,resources,resolution } from './02_init.js';
 
    let countdownText,id,soils,bgSprites,batContainer,gameScene,gameOverScene, GameoverText,state, bg;
     let countdownTime=100;
@@ -10,29 +10,15 @@ import { app, Container, Sprite, TextureCache, Graphics,resources } from './02_i
  //밭 한칸당 4점 x 24 = 96점
 let score=96;
 let ecoPoint=0;
-    let numberOfCol;
-    let numberOfRows;
+ 
     // Assuming your 750px wide window fits 4 columns with 60 spacing in portrait
     const baseWindowWidth = 750 / 2;
-    
-    if (app.view.width > app.view.height) { // Check if it's in landscape orientation
-        // In landscape, adjust scale based on height
-        scale = app.view.height / baseWindowWidth;
-        numberOfCol = 6;  // Set columns to 6 in landscape
-        numberOfRows = 4; // Set rows to 4 in landscape
-    } else {
-        scale = app.view.width / baseWindowWidth;
-        numberOfCol = 4;  // Set columns to 4 in portrait
-        numberOfRows = 6; // Set rows to 6 in portrait
-    }
 
- //   const baseSpacing = 55;
-    const baseBatSize = 54; // Original rectangle size
+    scale = app.view.width / baseWindowWidth;
 
-    // Adjust spacing and rectangle size based on the window size
-   // spacing = baseSpacing * scale;
+    const baseBatSize = 30; // Original rectangle size
+
     batSize = baseBatSize * scale;
-  
  
 
 export function setup(){
@@ -66,7 +52,7 @@ function createCountdown(){
         countdownText = null;
     }
     countdownText=new PIXI.Text('60', {fontFamily:'Arial',fontSize:36,fill:'black'});
-  countdownText.x=app.view.width/2;
+  countdownText.x=(app.view.width/resolution)/2;
   countdownText.y=30;
   countdownText.anchor.set(0.5);
   gameScene.addChild(countdownText);
@@ -110,8 +96,8 @@ for(let i = 0; i < numberOfCol; i++) {
 }
 }
 
-batContainer.x = (app.view.width - batContainer.width) / 2;
-batContainer.y = (app.view.height - batContainer.height) / 2;
+batContainer.x = ((app.view.width/resolution) - batContainer.width) / 2;
+batContainer.y = ((app.view.height/resolution) - batContainer.height) / 2;
 gameScene.addChild(batContainer);
 }
 function createGameOverScene(){

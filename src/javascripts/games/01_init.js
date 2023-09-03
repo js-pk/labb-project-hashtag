@@ -48,29 +48,23 @@ function debounce(func, wait) {
 }
 
 export function resize() {
-    let w, h;
+   let w, h;
 
-    const landscapeGameRatio = 16 / 10;
     const portraitGameRatio = 10 / 16;
 
-    if (window.innerWidth > window.innerHeight) {
-        // Landscape Mode
-        w = window.innerWidth;
-        h = w / landscapeGameRatio;
+    // Detect landscape orientation
+    const isLandscape = window.matchMedia("(orientation: landscape)").matches;
 
-        if (h > window.innerHeight) {
-            h = window.innerHeight;
-            w = h * landscapeGameRatio;
-        }
-    } else {
-        // Portrait Mode
-        h = window.innerHeight;
-        w = h * portraitGameRatio;
+    // Swap values for width and height if in landscape
+    const actualWidth = isLandscape ? window.innerHeight : window.innerWidth;
+    const actualHeight = isLandscape ? window.innerWidth : window.innerHeight;
 
-        if (w > window.innerWidth) {
-            w = window.innerWidth;
-            h = w / portraitGameRatio;
-        }
+    h = actualHeight;
+    w = h * portraitGameRatio;
+
+    if (w > actualWidth) {
+        w = actualWidth;
+        h = w / portraitGameRatio;
     }
 
     app.renderer.resize(w*resolution, h*resolution); 
@@ -80,11 +74,9 @@ export function resize() {
     app.renderer.view.style.height = `${h}px`;
     console.log('appStyleWidth', app.renderer.view.style.width);
     console.log('appViewWidth',app.view.width);
-    //adjust the css display size
-   // app.renderer.view.style.left = `${(window.innerWidth - w) / 2}px`;
-   app.renderer.view.style.left=0;
-   // app.renderer.view.style.top = `${(window.innerHeight - h) / 2}px`;
-   app.renderer.view.style.top=0;
+
+    app.renderer.view.style.left = `${(actualWidth - w) / 2}px`;
+    app.renderer.view.style.top = 0;
 }
 
 const debouncedResize = debounce(resize, 100);

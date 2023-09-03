@@ -3,13 +3,13 @@ import * as PIXI from 'pixi.js';
 import { app, Container, Sprite, Graphics,resources,resolution } from './01_init.js';
 import {stageSentences} from './01_texts.js';
 
-     let batContainer,toolboxContainer,items,stoneSprite,melon,rake,melonCounterText, wateringCan,seedPouch, batSize,spacing, cursorSprite,guideBox,guideText,successText;
+     let batContainer,toolboxContainer,items,stoneSprite,melon,rake,melonCounterText, wateringCan,seedPouch, batSize, cursorSprite,guideBox,guideText,successText;
      let wateringCanClicked = false;
      let seedPouchClicked=false;
      let rakeClicked=false;
       let state,id,rocks,healthBar,outerBar, redBar, GameoverText,toolbox1,toolbox2,toolbox3,toolbox4, gameScene,gameOverScene,successScene;
       let gameStage=0;
-      let health=328;
+      let health=500;
       let bat1Array=[];
       let melonClicks=2;
       let currentMessage={
@@ -24,24 +24,16 @@ import {stageSentences} from './01_texts.js';
   
     let scale;
 
-    if (app.view.width > app.view.height) { // Check if it's in landscape orientation
-        // In landscape, adjust scale based on height
-        scale = app.view.height / baseWindowWidth;
-        numberOfCol = 6;  // Set columns to 6 in landscape
-        numberOfRows = 4; // Set rows to 4 in landscape
-    } else {
         scale = app.view.width / baseWindowWidth;
-        numberOfCol = 4;  // Set columns to 4 in portrait
-        numberOfRows = 6; // Set rows to 6 in portrait
-    }
+        numberOfCol = 4;  
+        numberOfRows = 6; 
 
- //   const baseSpacing = 55;
     const baseBatSize = 30; // Original rectangle size
 
-    // Adjust spacing and rectangle size based on the window size
-   // spacing = baseSpacing * scale;
     batSize = baseBatSize * scale;
-  
+    let yOffset;
+    let baseToolBoxSize=180/3;
+    let ToolBoxSize=baseBatSize*scale;
     
 export function setup(){
     console.log("All image files loaded");
@@ -49,7 +41,7 @@ export function setup(){
     id = resources["/images/sprites/soils.json"].textures;
     items = resources["/images/sprites/tools.json"].textures;
     rocks=resources["/images/sprites/rock-soils.json"].textures;
-
+  
     gameScene = new Container();
     app.stage.addChild(gameScene);
 
@@ -66,39 +58,47 @@ export function setup(){
 }
 
 function createBat(){
-     batContainer = new Container();
-   
-    let batPlain=new Sprite(id["soil_plain@4x.png"]);
-    batPlain.scale.set(0.25);
-    batContainer.addChild(batPlain);
     
+   
+    let batPlain=new Sprite(id["soil_plain@3x.png"]);
+    batPlain.width=batSize*numberOfCol;
+    batPlain.height=batSize*numberOfRows;
+    batPlain.x=((app.view.width/resolution)-batPlain.width)/2;
+    batPlain.y=((app.view.height/resolution)-batPlain.height)/2+90;
+    gameScene.addChild(batPlain);
+    
+     batContainer = new Container();
     for(let i = 0; i < numberOfCol; i++) {
         for(let j = 0; j < numberOfRows; j++) {
-            let batSpot = new Sprite(id["soils02@3x.png"]);
-        
-            batSpot.isFilled = false;
-            batSpot.width=batSize;
-            batSpot.height=batSize;
+            let batSpot = new PIXI.Graphics();
+            
+            batSpot.beginFill(0xFF0000,0.01);
+            
             const x = batSize* i;
             const y = batSize*j;
+            
+            batSpot.drawRect(0,0,batSize,batSize);
+            batSpot.endFill();
+            
+            batSpot.isFilled = false;
+
             batSpot.x = x;
             batSpot.y = y;
             batSpot.interactive = true;
             batSpot.cursor = 'pointer';
             batSpot.on('pointerdown', onClick);
-            batContainer.addChild(batSpot);
+           batContainer.addChild(batSpot);
         }
     }
-
+    
     batContainer.x = ((app.view.width/resolution) - batContainer.width) / 2;
-    batContainer.y = ((app.view.height/resolution) - batContainer.height) / 2;
-
-  
+    batContainer.y = ((app.view.height/resolution) - batContainer.height) / 2+90;
+     gameScene.addChild(batContainer);
+   
    stoneSprite=new PIXI.Sprite(items["items_0000_Stone.png"]);
    stoneSprite.scale.set(scale);
    stoneSprite.visible=false;
    gameScene.addChild(stoneSprite);
-    gameScene.addChild(batContainer);
   
 }
 
@@ -114,18 +114,18 @@ const sentences=stageSentences[gameStage];
      guideBox=null;
  }
 guideBox=new PIXI.Graphics();
-guideBox.beginFill(0xFFFFFF, 0.4);
-guideBox.drawRect(0,0,batContainer.width*1.5,(app.view.height/resolution)/10);
+guideBox.beginFill(0xFFFFFF);
+guideBox.drawRoundedRect(0,0,batContainer.width*1.3,(app.view.height/resolution)/8,40);
 guideBox.endFill();
 guideBox.x=((app.view.width/resolution)-guideBox.width)/2;
-guideBox.y=(app.view.height/resolution)/20;
+guideBox.y=(app.view.height/resolution)/10;
 gameScene.addChild(guideBox);
 
 const baseSize = 50; // This is your base font size for a known screen size, e.g., 800px width
 const baseScreenWidth = 800; // The screen width you designed for
 const currentScreenWidth = window.innerWidth; // Get current screen (viewport) width    
 let dynamicFontSize= (currentScreenWidth/baseScreenWidth)*baseSize;
-guideText=new PIXI.Text(sentences[0],{fontFamily:'Arial',fontSize:dynamicFontSize, fill:'#C133FF'});
+guideText=new PIXI.Text(sentences[0],{fontFamily:'Arial',fontSize:dynamicFontSize, fill:'#000000'});
 guideText.anchor.set(0.5);
 guideText.x=guideBox.width/2;
 guideText.y=guideBox.height/2;
@@ -186,7 +186,7 @@ function continueGuideMessages(){
 
 function CreateToolBox() {
     let spacing=batContainer.width/4+5;
-    let isLandscape = app.view.width > app.view.height;
+  //  let isLandscape = app.view.width > app.view.height;
     
     // Initialize positions to zero; these will be relative to the toolboxContainer
     let relativeX = 0;
@@ -203,11 +203,11 @@ function CreateToolBox() {
         toolbox.y = relativeY;
         toolboxContainer.addChild(toolbox);
 
-        if (isLandscape) {
-            relativeY += spacing;
-        } else {
+       // if (isLandscape) {
+       //     relativeY += spacing;
+        //} else {
             relativeX += spacing;
-        }
+       // }
 
         return toolbox;
     }
@@ -220,45 +220,47 @@ function CreateToolBox() {
     
     gameScene.addChild(toolboxContainer);
     
-    // Now, adjust the toolboxContainer's position based on app's view
-    if (isLandscape) {
-        toolboxContainer.x = 50;  // A little padding from the left side
-        toolboxContainer.y = ((app.view.height/resolution) - toolboxContainer.height) / 2;
+    // // Now, adjust the toolboxContainer's position based on app's view
+    // if (isLandscape) {
+    //     toolboxContainer.x = 50;  // A little padding from the left side
+    //     toolboxContainer.y = ((app.view.height/resolution) - toolboxContainer.height) / 2;
 
-    } else {
+    // } else {
         toolboxContainer.x = ((app.view.width/resolution) - toolboxContainer.width) / 2;
         toolboxContainer.y = (app.view.height/resolution) - toolboxContainer.height - 30;
-    }
-    rake=new Sprite(items["itemsR_0003_Rake.png"]);
+   // }
+    rake=new Sprite(items["tool_true@3x.png"]);
     rake.width=batSize;
     rake.height=batSize;
     rake.x=toolbox1.x;
     rake.y=toolbox1.y;
     rake.interactive=true;
     rake.on('pointerdown',function(){
-        setSpriteAsCursor(rake);
+         deactivateItem(rake);
         rakeClicked=true;
+        console.log('rakeClicked');
+        console.log(rake.width);
+        console.log(batSize);
+
     })
     toolboxContainer.addChild(rake);
     
-    wateringCan=new Sprite(items["items_0001_Watering.png"]);
-    wateringCan.width=batSize;
-    wateringCan.height=batSize;
+    wateringCan=new Sprite(items["water_true@3x.png"]);
+    wateringCan.width=ToolBoxSize;
+    wateringCan.height=ToolBoxSize;
     wateringCan.x=toolbox2.x;
     wateringCan.y=toolbox2.y;
-    console.log(toolbox2.x);
-    console.log(toolbox2.y);
-    console.log(wateringCan.x);
-    console.log(wateringCan.y);
+   
     wateringCan.visible=true;
     wateringCan.interactive=false;
     wateringCan.on('pointerdown',function(){
-        setSpriteAsCursor(wateringCan);
-        wateringCanClicked=true;
+        deactivateItem(wateringCan);
+        wateringCanClicked=true
+        console.log('wateringCanClicked');
     });
     toolboxContainer.addChild(wateringCan);
     
-    seedPouch=new Sprite(items["items_0002_Seed.png"]);
+    seedPouch=new Sprite(items["seeds_true@3x.png"]);
     seedPouch.width=batSize;
     seedPouch.height=batSize;
     seedPouch.x=toolbox3.x;
@@ -266,12 +268,14 @@ function CreateToolBox() {
     seedPouch.visible=true;
     seedPouch.interactive=false;
     seedPouch.on('pointerdown',function(){
-    setSpriteAsCursor(seedPouch);
+       deactivateItem(seedPouch);
     seedPouchClicked=true;
+            console.log('seedPouchClicked');
+
     })
     toolboxContainer.addChild(seedPouch);
     
-    melon = new Sprite(items["items_0004_Melon.png"]);
+    melon = new Sprite(items["melon_true@3x.png"]);
     melon.width=batSize;
     melon.height=batSize;
     melon.x = toolbox4.x ;
@@ -285,66 +289,56 @@ function CreateToolBox() {
     melonCounterText.y = melon.y - 5;
     toolboxContainer.addChild(melonCounterText);
 }
-function setSpriteAsCursor(originalSprite){
-    originalSprite.visible=false;
-    if(cursorSprite){
-        cursorSprite.destroy();
+
+function deactivateItem(item){
+    if(item===rake){
+       
+        item.texture= items["tool_false@3x.png"];
+        item.width=batSize;
+        item.height=batSize;
     }
-    cursorSprite=new PIXI.Sprite(originalSprite.texture);
-    cursorSprite.anchor.set(0.5);
-    cursorSprite.scale.set(0.5);
-    gameScene.addChild(cursorSprite);
-    //app.view.style.cursor="none";
-    app.view.addEventListener('mousemove',moveCursorSprite);
-    app.view.addEventListener('touchmove',moveCursorSprite);
+    if(item===wateringCan){
+        item.texture=items["water_false@3x.png"];
+        item.width=batSize;
+        item.height=batSize;
+    }
+    if(item===seedPouch){
+        item.texture=items["seeds_false@3x.png"];
+        item.width=batSize;
+        item.height=batSize;
+    }
 }
-function moveCursorSprite(event){
-  const pointer = event.touches ? event.touches[0] : event;
-    const bounds = app.view.getBoundingClientRect(); // Get the canvas position and dimensions
-
-    // Adjust cursorSprite's position by considering the canvas offsets
-    cursorSprite.x = pointer.clientX - bounds.left;
-    cursorSprite.y = pointer.clientY - bounds.top;
-}
-
 
 function CreatehealthBar() {
-    let isLandscape = app.view.width > app.view.height;
-    
-    healthBar = new Container();
-    
-    if (isLandscape) {
-        // Landscape Mode - Horizontal Health Bar
-        healthBar.position.set(((app.view.width/resolution) - health) / 2, (app.view.height/resolution) - 60); // 50 units padding from the bottom
-    } else {
-        // Portrait Mode - Vertical Health Bar
-        healthBar.position.set(window.innerWidth / 11, ((app.view.height/resolution)-healthBar.height)/2-150);
-    }
-    
-    gameScene.addChild(healthBar);
+healthBar = new Container();
 
-    const innerBar = new Graphics();
-    innerBar.beginFill(0x000000);
-    innerBar.drawRect(0, 0, isLandscape ? health :10, isLandscape ? 10 : health);
-    innerBar.endFill();
-    healthBar.addChild(innerBar);
+// Set position for Portrait Mode - Vertical Health Bar
+healthBar.position.set(window.innerWidth / 6, ((app.view.height/resolution) - healthBar.height) / 2 - 150);
 
-    outerBar = new Graphics();
-    outerBar.beginFill(0x00FF00);
-    outerBar.drawRect(0, 0, isLandscape ? health : 10, isLandscape ? 10: health);
-    outerBar.endFill();
-    healthBar.addChild(outerBar);
+gameScene.addChild(healthBar);
 
-    redBar = new Graphics();
-    redBar.beginFill(0xFF3300);
-    redBar.drawRect(0, 0, isLandscape ? health : 10, isLandscape ? 10: health);
-    redBar.endFill();
-    healthBar.addChild(redBar);
+const innerBar = new Graphics();
+innerBar.beginFill(0x000000);
+innerBar.drawRoundedRect(0, 0, 7*scale, health,20);
+innerBar.endFill();
+healthBar.addChild(innerBar);
+
+outerBar = new Graphics();
+outerBar.beginFill(0x00FF00);
+outerBar.drawRoundedRect(0, 0, 7*scale, health,20);
+outerBar.endFill();
+healthBar.addChild(outerBar);
+
+redBar = new Graphics();
+redBar.beginFill(0xFF3300);
+redBar.drawRoundedRect(0, 0, 7*scale, health,20);
+redBar.endFill();
+healthBar.addChild(redBar);
 }
 
 function checkTransition(){
     let clickedCount = Array.from(batContainer.children).filter(sprite => sprite.isFilled).length;
-    let soilCount = Array.from(batContainer.children).filter(sprite => sprite.texture === id["soil01.png"]).length;
+    let soilCount = Array.from(batContainer.children).filter(sprite => sprite.texture === id["soils02@3x.png"]).length;
     let totalSpots = 4 * 6; // We know the exact number of spots from the loop
 
     if (gameStage === 1 && soilCount === totalSpots) {
@@ -364,7 +358,7 @@ function onClick(){
   if (this.texture === rocks["soils0-1.png"] || this.texture === rocks["soils0-2.png"] || this.texture === rocks["soils0-3.png"]) {
         this.texture = id["soils02@3x.png"];
         checkTransition();
-        health -=10;
+        health -=20;
         return; // Return early after handling rock click
     }
     
@@ -380,17 +374,19 @@ function onClick(){
             let randomRock=rockVariations[Math.floor(Math.random()*rockVariations.length)];
             batSprite=new Sprite(rocks[randomRock]);
         }else{
-            batSprite = new Sprite(id["soil01.png"]);
+            batSprite = new Sprite(id["soils02@3x.png"]);
 
         }
         batSprite.interactive = true;
         batSprite.on('pointerdown', onClick);
         bat1Array.push(batSprite);
-        wateringCan.visible=false;
         wateringCan.interactive=false;
 
-    } else if (gameStage === 2 && wateringCanClicked) {
-        batSprite = new Sprite(id["soils03@3x.png"]);
+    } else if (gameStage===2 ){
+        wateringCan.interactive=true;
+        
+        if(wateringCanClicked){
+             batSprite = new Sprite(id["soils03@3x.png"]);
         batSprite.interactive = true;
         batSprite.on('pointerdown', onClick);
         
@@ -400,7 +396,10 @@ function onClick(){
         } else {
             bat1Array.push(batSprite);
         }
-    } else if(gameStage===3 && seedPouchClicked){
+       
+    } 
+        
+    }else if(gameStage===3 && seedPouchClicked){
         batSprite = new Sprite(id["soils04-1@3x.png"]); 
         batSprite.interactive = true;
         batSprite.on('pointerdown', onClick);
@@ -414,7 +413,6 @@ function onClick(){
     }
 
     if (batSprite) {
-       // console.log("batSprite has been created");
 
      batSprite.width=batSize;
      batSprite.height=batSize;
@@ -426,8 +424,8 @@ function onClick(){
         this.parent.removeChild(this); // Remove the original square
       
        checkTransition();
-  health -=10;
-//console.log("Health decreased to:", health);
+  health -=20;
+
 
 }
 
@@ -456,9 +454,73 @@ function transitionToStage3(){
    sprite.isFilled=false;
   });
 }
+function gameLoop(delta){
+    //Runs the current game `state` in a loop and renders the sprites
+  state(delta);
+}   
+  
+function play(delta) {
+    // Increase health over time
+    health += 0.05 * delta;
+
+    // Ensure health doesn't exceed maximum
+    if (health > 500) {
+        health = 500;
+    }
+
+    let healthPercentage = (health / 500) * 100;
+    let isLandscape = app.view.width > app.view.height;
+
+    if (isLandscape) {
+        if (healthPercentage > 50) {
+            outerBar.width = health;
+            redBar.width = 0;  // Hide red bar when green bar is dominant
+        } else {
+            redBar.width = health;  
+            outerBar.width = 0;  
+        }
+
+        // Horizontal positioning
+        outerBar.x = 500 - outerBar.width;
+        redBar.x = outerBar.x - redBar.width;
+    } else {
+        if (healthPercentage > 50) {
+            outerBar.height = health;
+            redBar.height = 0;  // Hide red bar when green bar is dominant
+        } else {
+            redBar.height = health;  
+            outerBar.height = 0;  
+        }
+
+        // Vertical positioning
+        outerBar.y = 500- outerBar.height;
+        redBar.y = outerBar.y - redBar.height;
+    }
+
+    if (health <= 0) {
+        state = end;
+    }
+    
+    if (health < 30) {
+    currentMessage.type = "warning";
+    displayWarning("벌써 지친건가요? 체력이 모두 떨어기 전에 잠시 쉬어주세요", 3000); // 5 seconds warning duration
+}
+}
+
+function melonClick(){
+ health +=100;
+ melonClicks--;
+     melonCounterText.text = melonClicks;
+
+ if(melonClicks ==0){
+  melon.visible=false;
+  melon.interactive=false;
+  melon.off('pointerdown',melonClick);
+ }
+}
 function createSuccessScene(){
     
-   const text = "해냈군요! ▶\n\n당신이 클릭 한 번으로 밭을 갈고 \n\n옥수수를 심는다고 해서, \n\n그게 진짜 농사보다 덜 중요한 건 아니에요. ▶\n\n디지털 세계에서도 '노동'이라는 것은 존재하거든요. ▶\n\n이것을 ‘놀이노동’이라고 해요.";
+   const text = "해냈군요! \n\n당신이 클릭 한 번으로 밭을 갈고 \n\n옥수수를 심는다고 해서, \n\n그게 진짜 농사보다 덜 중요한 건 아니에요. \n\n디지털 세계에서도 '노동'이라는 것은 존재하거든요. ▶\n\n이것을 ‘놀이노동’이라고 해요.";
 
    successScene=new Container();
    app.stage.addChild(successScene);
@@ -477,9 +539,9 @@ function showButtons(){
     retryButton.drawRoundedRect(0,0,100,50,50,5);
     retryButton.endFill();
     
-    nextButton.beginFill(0x8A2BE2);
-    nextButton.drawRoundedRect(0,0,100,50,50,5);
-    nextButton.endFill();
+    // nextButton.beginFill(0x8A2BE2);
+    // nextButton.drawRoundedRect(0,0,100,50,50,5);
+    // nextButton.endFill();
     
     retryButton.interactive=true;
     retryButton.on('pointerdown',restartGame);
@@ -498,7 +560,7 @@ function showButtons(){
    retryButton.visible=true;
    nextButton.visible=true;
    app.stage.addChild(retryButton);
-   app.stage.addChild(nextButton);
+ //  app.stage.addChild(nextButton);
 }
 
 
@@ -507,79 +569,13 @@ function CreateGameOverScene(){
   gameOverScene=new Container();
   app.stage.addChild(gameOverScene);
   gameOverScene.visible=false;
-  GameoverText=new PIXI.Text('Game Over!',
+  GameoverText=new PIXI.Text('벌써 지친건가요? 체력이 모두 떨어기 전에 잠시 쉬어주세요',
   {fontFamily: "Arial", fontSize: 50, fill: "white"});
   GameoverText.x=app.view.width/2-GameoverText.width/2;
   GameoverText.y=app.view.height/2;
   gameOverScene.addChild(GameoverText);
 }
 
-
-
-function gameLoop(delta){
-    //Runs the current game `state` in a loop and renders the sprites
-  state(delta);
-}   
-  
-function play(delta) {
-    // Increase health over time
-    health += 0.05 * delta;
-
-    // Ensure health doesn't exceed maximum
-    if (health > 328) {
-        health = 328;
-    }
-
-    let healthPercentage = (health / 328) * 100;
-    let isLandscape = app.view.width > app.view.height;
-
-    if (isLandscape) {
-        if (healthPercentage > 50) {
-            outerBar.width = health;
-            redBar.width = 0;  // Hide red bar when green bar is dominant
-        } else {
-            redBar.width = health;  
-            outerBar.width = 0;  
-        }
-
-        // Horizontal positioning
-        outerBar.x = 328 - outerBar.width;
-        redBar.x = outerBar.x - redBar.width;
-    } else {
-        if (healthPercentage > 50) {
-            outerBar.height = health;
-            redBar.height = 0;  // Hide red bar when green bar is dominant
-        } else {
-            redBar.height = health;  
-            outerBar.height = 0;  
-        }
-
-        // Vertical positioning
-        outerBar.y = 328 - outerBar.height;
-        redBar.y = outerBar.y - redBar.height;
-    }
-
-    if (health <= 0) {
-        state = end;
-    }
-    
-    if (health < 30) {
-    currentMessage.type = "warning";
-    displayWarning("벌써 지친건가요? 체력이 모두 떨어기 전에 잠시 쉬어주세요", 3000); // 5 seconds warning duration
-}
-}
-
-function melonClick(){
- health +=50;
- melonClicks--;
-     melonCounterText.text = melonClicks;
-
- if(melonClicks ==0){
-  melon.visible=false;
-  melon.interactive=false;
-  melon.off('pointerdown',melonClick);
- }
-}
 function SuccessScene(){
     
     console.log("success");
@@ -624,9 +620,9 @@ function restartGame() {
         cursorSprite.removeChildren();
 
     }
-    app.view.removeEventListener('mousemove', moveCursorSprite);
-    app.view.removeEventListener('touchmove', moveCursorSprite);
-    app.view.style.cursor = "default"; // Set back to default cursor
+    // app.view.removeEventListener('mousemove', moveCursorSprite);
+    // app.view.removeEventListener('touchmove', moveCursorSprite);
+    // app.view.style.cursor = "default"; // Set back to default cursor
     
     createBat();
     createSuccessScene();
@@ -648,11 +644,9 @@ function restartGame() {
     app.ticker.add(gameLoop);
 
     app.ticker.start();
-   // console.log("Before resetting health:", health);
-    health = 328;
-   // console.log("After resetting health:", health);
+    health = 500;
 
     outerBar.height = health;
-    outerBar.y = 328 - health;
+    outerBar.y = 500 - health;
     rakeClicked=false;
 }
