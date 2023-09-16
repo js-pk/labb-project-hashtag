@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ko">
-
+    
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -8,13 +8,79 @@
         <script src="/scripts/common.js"></script>
         <link rel="stylesheet" type="text/css" href="/styles/global.css"></link>
         <link rel="stylesheet" type="text/css" href="/styles/photos.css"></link>
+        <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.js"></script>
+        <script>
+            const photoURLs = "<%= locals.photos.map(photo => `https:\/\/labb-photos.s3.ap-northeast-2.amazonaws.com/${photo.key}.png`).toString()%>".split(",");
+            let photos;
+    
+            function setup(){
+              createCanvas(windowWidth, windowHeight);
+            
+              circles = [];
+              packCircles(1000);
+            
+              drawPhotos();
+              noLoop();
+            }
+
+            function preload() {
+              photos = photoURLs.map(url => loadImage(url));
+            }
+            
+            function packCircles(N){
+              for(let n = 0; n < N; n++){
+                let xPos = random(windowWidth);
+                let yPos = random(windowHeight);
+            
+                let diameter = random(50,600);
+                let placeable = true;
+            
+                for(let k = 0; k < circles.length; k++){
+                  let otherCircle = circles[k];
+                  let d = dist(xPos, yPos, otherCircle.x, otherCircle.y);
+            
+                  if(d < otherCircle.diameter/2 + diameter/2+2){
+                    placeable = false;
+                    break;
+                  }
+                }
+            
+                if(placeable){
+                  circles.push({x: xPos, y: yPos, diameter: diameter});
+                }
+              }
+            }
+            
+            function drawPhotos(){
+              console.log(circles.length);
+              circles.sort((a, b) => b.diameter - a.diameter);
+              
+              for(let n = 0; n < circles.length; n++){
+                const circle = circles[n];
+                const photo = photos[n];
+                
+                if (!photo) return;
+                
+                const xPos = circle.x-(circle.diameter/2);
+                const yPos = circle.y-(circle.diameter/2);
+                const dWidth = circle.diameter;
+                const dHeight = circle.diameter;
+                
+                image(photo, xPos, yPos, dWidth, dHeight, 0, 0, photo.width, photo.height, CONTAIN);
+              }
+            }
+        </script>
+        
+        <script>
+          window.onload = () => {
+            setTimeout(() => {
+              location.reload();
+            }, 60 * 1000)
+          }
+        </script>
     </head>
     
     <body>
-        <% if (locals.photos) { %>
-        <% for (const photo of locals.photos) { %>
-            <img class="ar_photo" src="https://labb-photos.s3.ap-northeast-2.amazonaws.com/<%= photo.key %>.png" />
-        <% } %>
-        <% } %>
+      <div id='p5_loading'></div>
     </body>
 </html>

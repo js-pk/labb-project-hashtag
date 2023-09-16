@@ -10,9 +10,8 @@ const db = new Database();
 //     params: {Bucket: 'labb-photos'}
 // });
 
-exports.listAlbums = async (req, res, next) => {
+exports.run = async (req, res, next) => {
   const recentPhotos = await db.all('photos', 'ORDER BY id DESC', [], 100);
-
   res.render("photos", {
     photos: recentPhotos
   });

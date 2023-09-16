@@ -63,7 +63,7 @@ app.post('/user/login', user.login);
 app.post('/user/logout', user.logout);
 app.post('/user/register', user.register);
 
-app.get("/photos", photo.listAlbums);
+app.get("/photos", photo.run);
 
 app.get("/init", (req, res) => {
     res.render("init");
