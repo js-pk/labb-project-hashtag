@@ -30,39 +30,72 @@
         }
     }
 
+    function validateCheckbox() {
+        let checkbox = document.getElementById("checkbox");
+        if (checkbox.checked) {
+            return true;
+        } else {
+             alert("개인 정보 활용에 동의해주세요.")
+        }
+    }
+
 </script>
-<h1>강냉이를 얻고싶다면..</h1>
-
-<form id="form" method="post" onsubmit="submitForm('/user/register'); return false">
-    <fieldset>
-        <% if (locals.status) { %>
-        <h3><%= locals.status.message %></h3>
-        <% } %>
-        <label for="name">닉네임</label>
-        <input 
-            id="name"
-            type="text" 
-            name="name" 
-            maxlength="64"
-            placeholder="닉네임"
-            required
-        />
-        <label for="email">이메일</label>
-        <input 
-            id="email"
-            type="email" 
-            name="email"
-            maxlength="64"
-            placeholder="username@example.org"
-            autocomplete="email"
-            required
-        />
-        <input type="button" onclick="submitForm('/user/register')" value="새로 시작하기" />
-        <a href="/login">이전에 게임을 진행하셨었나요? 로그인 하러가기</a>
-        <% if (locals.status && ["USER_EXPIRED", "USER_EXISTS"].includes(locals.status.type)) { %>
-        <!-- <input type="button" onclick="submitForm('/user/login')" value="로그인" />            -->
-        <% } %>
-    </fieldset>
-</form>
-
+<main>
+    <img id="title" alt="원클릭 쓰리 강냉이" src="/images/title.png" />
+    <form id="form" method="post" onsubmit="submitForm('/user/register'); return false">
+        <fieldset>
+            <% if (locals.status) { %>
+            <h3><%= locals.status.message %></h3>
+            <% } %>
+            <label for="name">닉네임을 입력하세요</label>
+            <input 
+                id="name"
+                class="text-input"
+                type="text" 
+                name="name" 
+                maxlength="64"
+                placeholder="닉네임"
+                required
+            />
+            <label for="email">E-MAIL을 입력하세요</label>
+            <input 
+                id="email"
+                class="text-input"
+                type="email" 
+                name="email"
+                maxlength="64"
+                placeholder="username@example.org"
+                autocomplete="email"
+                required
+            />
+            <label 
+      
+                class="checkbox-container" 
+                for="personal-info-agreement"
+            >
+                전시 기간 동안 개인 정보 활용 및 위치 정보 수집에 동의합니다.
+                <input 
+                    id="checkbox"
+                    type="checkbox"
+                    name="personal-info-agreement"
+                    required
+                />
+                <span class="checkmark"></span>
+            </label>
+            
+            <input 
+                type="button" 
+                class="button" 
+                onclick="submitForm('/user/register')" 
+                value="시작"
+            />
+            
+            <a class="guiding-text" href="/login">이전에 게임을 진행하셨었나요?<br/> -> 로그인 하러가기 -></a>
+            
+            <% if (locals.status && ["USER_EXPIRED", "USER_EXISTS"].includes(locals.status.type)) { %>
+            <!-- <input type="button" onclick="submitForm('/user/login')" value="로그인" />            -->
+            <% } %>
+        </fieldset>
+    </form>
+</main>
 <%- include("_footer") -%>

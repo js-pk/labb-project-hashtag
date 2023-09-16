@@ -21,27 +21,34 @@
         }
     }
 </script>
-<h1>강냉이를 얻고싶다면..</h1>
-
-<form id="form" method="post" onsubmit="submitForm('/user/login'); return false">
-    <fieldset>
-        <% if (locals.status) { %>
-        <h3><%= locals.status.message %></h3>
-        <% } %>
-
-        <label for="email">이메일</label>
-        <input 
-            id="email"
-            type="email" 
-            name="email"
-            maxlength="64"
-            placeholder="username@example.org"
-            autocomplete="email"
-            required
-        />
-        <input type="button" onclick="submitForm('/user/login')" value="로그인" />
-        <a href="/">새로 시작하기</a>
-    </fieldset>
-</form>
+<main>
+    <img id="title" alt="원클릭 쓰리 강냉이" src="/images/title.png" />
+    <form id="form" method="post" onsubmit="submitForm('/user/login'); return false">
+        <fieldset>
+            <% if (locals.status) { %>
+            <h3><%= locals.status.message %></h3>
+            <% } %>
+    
+            <label for="email">E-MAIL을 입력하세요</label>
+            <input 
+                id="email"
+                class="text-input"
+                type="email" 
+                name="email"
+                maxlength="64"
+                placeholder="username@example.org"
+                autocomplete="email"
+                required
+            />
+            <input 
+                type="button" 
+                class="button" 
+                onclick="submitForm('/user/login')" 
+                value="로그인" 
+            />
+            <a class="guiding-text" href="/">새로 시작하기</a>
+        </fieldset>
+    </form>
+</main>
 
 <%- include("_footer") -%>
