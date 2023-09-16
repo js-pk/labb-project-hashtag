@@ -1,0 +1,76 @@
+{"frames": {
+
+"WaterDeer_walkL_3x_0000_1.png":
+{
+	"frame": {"x":0,"y":0,"w":312,"h":312},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":312,"h":312},
+	"sourceSize": {"w":312,"h":312}
+},
+"WaterDeer_walkL_3x_0001_2.png":
+{
+	"frame": {"x":312,"y":0,"w":312,"h":312},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":312,"h":312},
+	"sourceSize": {"w":312,"h":312}
+},
+"WaterDeer_walkL_3x_0002_3.png":
+{
+	"frame": {"x":624,"y":0,"w":312,"h":312},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":312,"h":312},
+	"sourceSize": {"w":312,"h":312}
+},
+"WaterDeer_walkL_3x_0003_4.png":
+{
+	"frame": {"x":0,"y":312,"w":312,"h":312},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":312,"h":312},
+	"sourceSize": {"w":312,"h":312}
+},
+"WaterDeer_walkL_3x_0004_5.png":
+{
+	"frame": {"x":312,"y":312,"w":312,"h":312},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":312,"h":312},
+	"sourceSize": {"w":312,"h":312}
+},
+"WaterDeer_walkL_3x_0005_6.png":
+{
+	"frame": {"x":624,"y":312,"w":312,"h":312},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":312,"h":312},
+	"sourceSize": {"w":312,"h":312}
+},
+"WaterDeer_walkL_3x_0006_7.png":
+{
+	"frame": {"x":0,"y":624,"w":312,"h":312},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":312,"h":312},
+	"sourceSize": {"w":312,"h":312}
+},
+"WaterDeer_walkL_3x_0007_8.png":
+{
+	"frame": {"x":312,"y":624,"w":312,"h":312},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":312,"h":312},
+	"sourceSize": {"w":312,"h":312}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "waterDeer_from_Right.png",
+	"format": "RGBA8888",
+	"size": {"w":936,"h":936},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:5aad9e6252779e3a24471cf0ab1b1180:8ce45a5d24f56b98abddd0343f33c5fd:49c88eb0e76619aeeea7cd0cc5962a15$"
+}
+}

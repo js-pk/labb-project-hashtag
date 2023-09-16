@@ -1,0 +1,52 @@
+{"frames": {
+
+"Crow_flying_Right_3x_0000_1.png":
+{
+	"frame": {"x":0,"y":0,"w":150,"h":150},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":150},
+	"sourceSize": {"w":150,"h":150}
+},
+"Crow_flying_Right_3x_0001_2.png":
+{
+	"frame": {"x":150,"y":0,"w":150,"h":150},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":150},
+	"sourceSize": {"w":150,"h":150}
+},
+"Crow_flying_Right_3x_0002_3.png":
+{
+	"frame": {"x":300,"y":0,"w":150,"h":150},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":150},
+	"sourceSize": {"w":150,"h":150}
+},
+"Crow_flying_Right_3x_0003_4.png":
+{
+	"frame": {"x":450,"y":0,"w":150,"h":150},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":150},
+	"sourceSize": {"w":150,"h":150}
+},
+"Crow_flying_Right_3x_0004_5.png":
+{
+	"frame": {"x":600,"y":0,"w":150,"h":150},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":150},
+	"sourceSize": {"w":150,"h":150}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "crow_from_left.png",
+	"format": "RGBA8888",
+	"size": {"w":750,"h":150},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:dbebe21f21f68c59405f1b0f251762af:bd68bc55ee55dcedc3d730a0c858f872:8abe276c93ef18c3197d9fa57596b2a9$"
+}
+}

@@ -425,10 +425,7 @@ function onClick(){
       
        checkTransition();
   health -=20;
-
-
 }
-
 }
 
 function transitionToStage2(){

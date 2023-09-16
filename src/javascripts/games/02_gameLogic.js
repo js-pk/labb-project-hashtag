@@ -5,7 +5,7 @@ import { app, Container, Sprite, TextureCache, Graphics,resources,resolution } f
    let countdownText,id,soils,bgSprites,batContainer,gameScene,gameOverScene, GameoverText,state, bg;
     let countdownTime=100;
     let lastTime=Date.now();
-    let cornSprite1, cornAni1;
+    let cornSprite1, cornSprite2,cornSprite3,cornSprite4,cornSprite5,cornAni1,cornSpriteSheets,beeFrames,mothFrames, walkingRightTextures1,walkingRightTextures2,walkingRightTextures3,walkingLeftTextures1,walkingLeftTextures2,walkingLeftTextures3;
     let scale,batSize,retryButton,exitButton,YesButton,NoButton;
  //밭 한칸당 4점 x 24 = 96점
 let score=96;
@@ -19,14 +19,30 @@ let ecoPoint=0;
     const baseBatSize = 30; // Original rectangle size
 
     batSize = baseBatSize * scale;
- 
+    
+    let currentSpriteSheetIndex=0;
+    let accumulatedTime=0;
 
 export function setup(){
    
    
     bgSprites= resources["/images/sprites/bg-soil-glitch.json"].textures;
     cornSprite1=resources["/images/sprites/corn01.png"].texture;
-    id=resources["/images/sprites/myJason.json"].textures;
+    cornSprite2=resources["/images/sprites/corn02.png"].texture;
+    cornSprite3=resources["/images/sprites/corn03.png"].texture;
+    cornSprite4=resources["/images/sprites/corn04.png"].texture;
+    cornSprite5=resources["/images/sprites/corn05.png"].texture;
+    cornSpriteSheets=[cornSprite1,cornSprite2,cornSprite3,cornSprite4,cornSprite5];
+    
+    beeFrames=resources["/images/sprites/bees-spritesheet.json"].textures;
+    mothFrames=resources["/images/sprites/moth-spritesheet.json"].textures;
+    
+    walkingRightTextures1=resources["/images/sprites/crow_from_left.json"].textures;
+    walkingRightTextures2=resources["/images/sprites/waterDeer_from_left.json"].textures;
+    walkingRightTextures3=resources["/images/sprites/boar_fromLeft.json"].textures;
+    walkingLeftTextures1=resources["/images/sprites/crow_from_right.json"].textures;
+    walkingLeftTextures2=resources["/images/sprites/waterDeer_from_Right.json"].textures;
+    walkingLeftTextures3=resources["/images/sprites/boar_fromRight.json"].textures;
     soils=resources["/images/sprites/soils.json"].textures;
 
     gameScene=new Container();
@@ -57,10 +73,11 @@ function createCountdown(){
   countdownText.anchor.set(0.5);
   gameScene.addChild(countdownText);
 }
-function createBat(){
-      let numberOfCol = 4, numberOfRows = 6;     
-  let cornFrames = getCornFrames();
 
+
+function createBat(){
+  let numberOfCol = 4, numberOfRows = 6;     
+  let cornFrames = getCornFrames(cornSpriteSheets[currentSpriteSheetIndex]);
    batContainer = new Container();
 
 for(let i = 0; i < numberOfCol; i++) {
@@ -100,6 +117,289 @@ batContainer.x = ((app.view.width/resolution) - batContainer.width) / 2;
 batContainer.y = ((app.view.height/resolution) - batContainer.height) / 2;
 gameScene.addChild(batContainer);
 }
+
+function switchToNextSpriteSheet(){
+    currentSpriteSheetIndex=(currentSpriteSheetIndex+1)% cornSpriteSheets.length;
+    //update frames for all cornAni1 instances on the stage.
+    batContainer.children.forEach(child => {
+        if(child instanceof PIXI.AnimatedSprite){
+            const frames=getCornFrames(cornSpriteSheets[currentSpriteSheetIndex]);
+            child.textures=frames;
+            child.gotoAndPlay(0);
+        }
+    });
+    
+}
+
+function getCornFrames(spriteSheetTexture){
+   const totalFrames = 2;
+    const singleFrameWidth = spriteSheetTexture.baseTexture.width / totalFrames;
+    let frames = [];
+
+    for (let i = 0; i < totalFrames; i++) {
+        let frame = new PIXI.Rectangle(singleFrameWidth * i, 0, singleFrameWidth, spriteSheetTexture.baseTexture.height);
+        let textureFrame = new PIXI.Texture(spriteSheetTexture.baseTexture, frame);
+        frames.push(textureFrame);
+    }
+
+    return frames;
+}
+
+function resumeYes(){
+    ecoPoint --;
+    resume();
+}
+function resumeNo(){
+    ecoPoint++;
+    resume();
+}
+function resume(){
+    app.ticker.start();
+}
+function gameLoop(delta) {
+  //Runs the current game `state` in a loop and renders the sprites
+  play(delta);
+
+  if(countdownTime <=0){
+    end();
+  }
+}
+
+function play(delta) {
+  //All the game logic goes here
+  let currentTime=Date.now();
+  let deltaTime=(currentTime-lastTime)/1000;
+  //countdown logic 
+  countdownTime -= deltaTime;
+
+  if(countdownTime <=0){
+    countdownTime=0;
+  }
+  countdownText.text= Math.floor(countdownTime).toString();
+
+  lastTime=currentTime;
+
+ if(countdownTime <= 70 && countdownTime >= 40){
+    if(Math.random() < 0.03){  //1% chance every frame
+      generateBugs();
+    }
+  }
+  
+  if(countdownTime <=100 && countdownTime >=70){
+      if(Math.random() <0.03){
+          generateAnimals();
+      }
+  }
+
+  handleCollisions();
+  
+  if(countdownTime <=20){
+      app.ticker.stop();
+      if(score >=40){
+          console.log("success");
+           let successText = new PIXI.Text('살충제를 살포할까요?', { fontFamily: 'Arial', fontSize: 32, fill: 0x00FF00 });
+        successText.x = (app.view.width - successText.width) / 2;  // centering the text
+        successText.y = (app.view.height - successText.height) / 2; // centering the text
+            gameScene.addChild(successText);
+           showYesorNoButtons();
+           
+      }else{
+          console.log("fail. score is", score);
+          showButtons();
+      }
+  }
+  
+  accumulatedTime +=deltaTime;
+  if(accumulatedTime >=20){
+      switchToNextSpriteSheet();
+      accumulatedTime -=20; // reset the accumulated time or subtract 20 from it
+    
+  }
+}
+
+function checkCollision(sprite,targetSprite){
+   if (!(sprite instanceof PIXI.Sprite) || !(targetSprite instanceof PIXI.Sprite)) {
+        return false;
+    }
+    
+    let spriteBounds = sprite.getBounds();
+    let spotBounds = targetSprite.getBounds();
+
+    return spriteBounds.x + spriteBounds.width > spotBounds.x &&
+           spriteBounds.x < spotBounds.x + spotBounds.width &&
+           spriteBounds.y + spriteBounds.height > spotBounds.y &&
+           spriteBounds.y < spotBounds.y + spotBounds.height;
+}
+
+
+function handleCollisions(){
+    app.stage.children.forEach(child => {
+        if (child instanceof PIXI.Sprite && child.vx && child.vy) {
+            let hasCollided = false;
+
+            for(let i = batContainer.children.length - 1; i >= 0; i--) {
+                let currentCorn = batContainer.children[i];
+               if (!currentCorn.isFilled && 
+       (currentCorn.isLeftmost || currentCorn.isRightmost || currentCorn.isUppermost || currentCorn.isBottommost) && 
+       checkCollision(child, currentCorn)) {
+           score -=4;
+           console.log(score);
+                    currentCorn.isFilled = true;
+                    hasCollided = true;
+                    child.vx = 0; // Stop sprite from moving in x direction
+                    child.vy = 0; // Stop sprite from moving in y direction
+                    child.isCollided=true;
+                    
+                    overlayGlitch(currentCorn);
+                    batContainer.removeChild(currentCorn);  // Remove the corn sprite from the container
+                    
+                    break; // since one random sprite should only collide with one cornSprite at most
+                    
+                }
+            }
+            
+            if (!hasCollided) {
+                child.x += child.vx * child.speed;
+                child.y += child.vy * child.speed;
+            }
+        }
+    });
+}
+
+function overlayGlitch(cornSprite){
+    let overlay= new Sprite(bgSprites["Decay_glitch_3x_0000.png"]);
+    overlay.scale.set(0.2);
+    overlay.x=cornSprite.x;
+    overlay.y=cornSprite.y;
+    
+    batContainer.addChild(overlay);
+   // cornSprite.interactive=false;
+}
+
+function generateBugs(){
+  //randomly select which animation to use
+  let randomBugAni=Math.random()<0.5? beeFrames:mothFrames;
+  // Get all frame names from the selected animation
+    let frameNames = Object.keys(randomBugAni);
+    //convert frame names to textures
+    let frames=frameNames.map(name=> randomBugAni[name]);
+    
+    //create an animated spirte with the chosen frames
+    let sprite=new PIXI.AnimatedSprite(frames);
+    sprite.animationSpeed=0.3;
+    sprite.play();
+    //sprite.scale.set(0.6);
+    sprite.isCollided=false;
+    
+    // Randomly position the sprite on the canvas
+    let randomSide = Math.floor(Math.random() * 4);
+    switch (randomSide) {
+        case 0: // top
+            sprite.x = Math.random() * app.view.width;
+            sprite.y = 0;
+            break;
+        case 1: // right
+            sprite.x = app.view.width;
+            sprite.y = Math.random() * app.view.height;
+            break;
+        case 2: // bottom
+            sprite.x = Math.random() * app.view.width;
+            sprite.y = app.view.height;
+            break;
+        case 3: // left
+            sprite.x = 0;
+            sprite.y = Math.random() * app.view.height;
+            break;
+    }
+    
+    // Calculate the direction towards the center of the canvas
+    let directionX = app.view.width / 2 - sprite.x;
+    let directionY = app.view.height / 2 - sprite.y;
+    let length = Math.sqrt(directionX * directionX + directionY * directionY);
+    sprite.vx = directionX / length;
+    sprite.vy = directionY / length;
+
+    // Set a random speed
+    sprite.speed = Math.random() * 3 + 2; // Random speed between 2 to 5
+
+    app.stage.addChild(sprite);
+
+    sprite.interactive = true;
+    sprite.on('pointerdown', pushSpriteAway);
+
+    return sprite;
+    
+}
+
+function generateAnimals(){
+    let walkingRight= Math.random() <0.5;
+    let randomAnimalIndex= Math.floor(Math.random() *3); 
+    
+    let animationTextures;
+     if (walkingRight) {
+        switch(randomAnimalIndex) {
+            case 0: animationTextures = walkingRightTextures1; break;
+            case 1: animationTextures = walkingRightTextures2; break;
+            case 2: animationTextures = walkingRightTextures3; break;
+        }
+    } else {
+        switch(randomAnimalIndex) {
+            case 0: animationTextures = walkingLeftTextures1; break;
+            case 1: animationTextures = walkingLeftTextures2; break;
+            case 2: animationTextures = walkingLeftTextures3; break;
+        }
+    }
+   // Convert frame names to textures
+    let frames = Object.keys(animationTextures).map(name => animationTextures[name]);
+
+    // Create an animated sprite with the chosen frames
+    let sprite = new PIXI.AnimatedSprite(frames);
+    sprite.animationSpeed = 0.1;  // Adjust this value as needed
+    sprite.play();
+    
+    //sprite.scale.set(0.2);
+    sprite.isCollided = false;
+
+    if (walkingRight) {
+        sprite.x = 0;
+        sprite.vx = 1;  // Or adjust speed as required
+    } else {
+        sprite.x = app.view.width - sprite.width;
+        sprite.vx = -1; // Moving left
+    }
+    sprite.y = Math.random() * (app.view.height - sprite.height);
+
+    // Set a speed
+    sprite.speed = Math.random() * 3 + 2; // Random speed between 2 to 5
+
+    app.stage.addChild(sprite);
+
+    sprite.interactive = true;
+    sprite.on('pointerdown', pushSpriteAway);
+
+    return sprite;
+}
+
+function pushSpriteAway(event){
+    let sprite=event.currentTarget;
+    let interactionData=event.data;
+    let globalPosition=interactionData.global;
+    
+
+        //calculate direction from sprite to pointer position
+        let dx=globalPosition.x-sprite.x;
+        let dy=globalPosition.y-sprite.y;
+        let distance=Math.sqrt(dx *dx +dy *dy);
+        
+         // Normalize the direction and set a push force
+        let pushForce = 10; // You can adjust this value
+        sprite.vx = -(dx / distance) * pushForce;
+        sprite.vy = -(dy / distance) * pushForce;
+        
+        // You might want to reset the isCollided flag if you want further interactions
+        sprite.isCollided = false;
+}
+
 function createGameOverScene(){
     //create gameover scene 
   gameOverScene=new Container();
@@ -206,206 +506,6 @@ function showYesorNoButtons(){
 
     YesButton.visible = true;
     NoButton.visible = true;
-}
-
-function getCornFrames(){
-    const totalFrames=2;
-    const spriteSheetTexture=cornSprite1;
-    const singleFrameWidth = spriteSheetTexture.baseTexture.width / totalFrames;
-    let frames = [];
-
-    for (let i = 0; i < totalFrames; i++) {
-        let frame = new PIXI.Rectangle(singleFrameWidth * i, 0, singleFrameWidth, spriteSheetTexture.baseTexture.height);
-        let textureFrame = new PIXI.Texture(spriteSheetTexture.baseTexture, frame);
-        frames.push(textureFrame);
-    }
-
-    return frames;
-}
-
-function resumeYes(){
-    ecoPoint --;
-    resume();
-}
-function resumeNo(){
-    ecoPoint++;
-    resume();
-}
-function resume(){
-    app.ticker.start();
-}
-function gameLoop(delta) {
-  //Runs the current game `state` in a loop and renders the sprites
-  play(delta);
-
-  if(countdownTime <=0){
-    end();
-  }
-  
-  
-}
-
-function play(delta) {
-  //All the game logic goes here
-  let currentTime=Date.now();
-  let deltaTime=(currentTime-lastTime)/1000;
-  //countdown logic 
-  countdownTime -= deltaTime;
-
-  if(countdownTime <=0){
-    countdownTime=0;
-  }
-  countdownText.text= Math.floor(countdownTime).toString();
-
-  lastTime=currentTime;
-
- if(countdownTime <= 70 && countdownTime >= 40){
-    if(Math.random() < 0.01){  //1% chance every frame
-      generateSprite();
-    }
-  }
-
-  handleCollisions();
-  
-  if(countdownTime <=20){
-      app.ticker.stop();
-      if(score >=40){
-          console.log("success");
-           let successText = new PIXI.Text('살충제를 살포할까요?', { fontFamily: 'Arial', fontSize: 32, fill: 0x00FF00 });
-        successText.x = (app.view.width - successText.width) / 2;  // centering the text
-        successText.y = (app.view.height - successText.height) / 2; // centering the text
-            gameScene.addChild(successText);
-           showYesorNoButtons();
-           
-      }else{
-          console.log("fail. score is", score);
-          showButtons();
-      }
-  }
-}
-function checkCollision(sprite,targetSprite){
-   if (!(sprite instanceof PIXI.Sprite) || !(targetSprite instanceof PIXI.Sprite)) {
-        return false;
-    }
-    
-    let spriteBounds = sprite.getBounds();
-    let spotBounds = targetSprite.getBounds();
-
-    return spriteBounds.x + spriteBounds.width > spotBounds.x &&
-           spriteBounds.x < spotBounds.x + spotBounds.width &&
-           spriteBounds.y + spriteBounds.height > spotBounds.y &&
-           spriteBounds.y < spotBounds.y + spotBounds.height;
-}
-
-
-function handleCollisions(){
-    app.stage.children.forEach(child => {
-        if (child instanceof PIXI.Sprite && child.vx && child.vy) {
-            let hasCollided = false;
-
-            for(let i = batContainer.children.length - 1; i >= 0; i--) {
-                let currentCorn = batContainer.children[i];
-               if (!currentCorn.isFilled && 
-       (currentCorn.isLeftmost || currentCorn.isRightmost || currentCorn.isUppermost || currentCorn.isBottommost) && 
-       checkCollision(child, currentCorn)) {
-           score -=4;
-           console.log(score);
-                    currentCorn.isFilled = true;
-                    hasCollided = true;
-                    child.vx = 0; // Stop sprite from moving in x direction
-                    child.vy = 0; // Stop sprite from moving in y direction
-                    child.isCollided=true;
-                    
-                    overlayGlitch(currentCorn);
-                    batContainer.removeChild(currentCorn);  // Remove the corn sprite from the container
-                    
-                    break; // since one random sprite should only collide with one cornSprite at most
-                    
-                }
-            }
-            
-            if (!hasCollided) {
-                child.x += child.vx * child.speed;
-                child.y += child.vy * child.speed;
-            }
-        }
-    });
-}
-
-function overlayGlitch(cornSprite){
-    let overlay= new Sprite(bgSprites["Decay_glitch_3x_0000.png"]);
-    overlay.scale.set(0.2);
-    overlay.x=cornSprite.x;
-    overlay.y=cornSprite.y;
-    
-    batContainer.addChild(overlay);
-   // cornSprite.interactive=false;
-}
-
-function generateSprite(){
-  let frameNames=Object.keys(id);
-  //randomly select a frame name
-  let randomFrameName=frameNames[Math.floor(Math.random()* frameNames.length)];
-
-  let sprite= new PIXI.Sprite(id[randomFrameName]);
-  sprite.scale.set(0.2);
-  sprite.isCollided=false;
-  //randomly position the sprite on the canvas
-  let randomSide= Math.floor(Math.random() *4);
-  switch (randomSide){
-    case 0: //top
-      sprite.x=Math.random() * app.view.width;
-      sprite.y=0;
-      break;
-    case 1: //right
-      sprite.x=app.view.width;
-      sprite.y=Math.random() *app.view.height;
-      break;
-    case 2: //bottom
-      sprite.x=Math.random()* app.view.width;
-      sprite.y=app.view.height;
-      break;
-    case 3: //left
-      sprite.x=0;
-      sprite.y=Math.random()*app.view.height;
-      break;
-  }
-
-  //calculate the direction towards the center of the canvas
-  let directionX=app.view.width/2-sprite.x;
-  let directionY=app.view.height/2-sprite.y;
-  let length=Math.sqrt(directionX *directionX +directionY*directionY);
-  sprite.vx=directionX/length;
-  sprite.vy=directionY/length;
-
-  //set a random speed
-  sprite.speed=Math.random()*3 +2; //random speed between 2 to 5
-
-  app.stage.addChild(sprite);
-  
-  sprite.interactive=true;
-  sprite.on('pointerdown', pushSpriteAway);
-  return sprite;
-}
-
-function pushSpriteAway(event){
-    let sprite=event.currentTarget;
-    let interactionData=event.data;
-    let globalPosition=interactionData.global;
-    
-
-        //calculate direction from sprite to pointer position
-        let dx=globalPosition.x-sprite.x;
-        let dy=globalPosition.y-sprite.y;
-        let distance=Math.sqrt(dx *dx +dy *dy);
-        
-         // Normalize the direction and set a push force
-        let pushForce = 10; // You can adjust this value
-        sprite.vx = -(dx / distance) * pushForce;
-        sprite.vy = -(dy / distance) * pushForce;
-        
-        // You might want to reset the isCollided flag if you want further interactions
-        sprite.isCollided = false;
 }
 
 function exitGame(){

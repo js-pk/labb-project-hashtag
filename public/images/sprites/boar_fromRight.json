@@ -1,0 +1,44 @@
+{"frames": {
+
+"Boar_runningL_3x_0000_1.png":
+{
+	"frame": {"x":0,"y":0,"w":345,"h":345},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":345,"h":345},
+	"sourceSize": {"w":345,"h":345}
+},
+"Boar_runningL_3x_0001_2.png":
+{
+	"frame": {"x":345,"y":0,"w":345,"h":345},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":345,"h":345},
+	"sourceSize": {"w":345,"h":345}
+},
+"Boar_runningL_3x_0002_3.png":
+{
+	"frame": {"x":690,"y":0,"w":345,"h":345},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":345,"h":345},
+	"sourceSize": {"w":345,"h":345}
+},
+"Boar_runningL_3x_0003_4.png":
+{
+	"frame": {"x":1035,"y":0,"w":345,"h":345},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":345,"h":345},
+	"sourceSize": {"w":345,"h":345}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "boar_fromRight.png",
+	"format": "RGBA8888",
+	"size": {"w":1380,"h":345},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:c1cf523e3641f247b1d13e6d39e23919:740a1643990df7c97a95fa464ed98f0d:e0dc97e3a483a55023486af47ff8c40d$"
+}
+}
