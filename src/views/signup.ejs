@@ -4,7 +4,7 @@
 <script>
     function submitForm(action){
         let form = document.getElementById("form");
-        if (validateName() && validateEmail()) {
+        if (validateName() && validateEmail() && validateCheckbox()) {
             form.action = action;
             form.method = 'POST';
             form.submit();
