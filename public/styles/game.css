@@ -2,22 +2,20 @@
 html{
     margin:0;
     padding:0;
-  
-    background-image:url("/images/sprites/bg750x1200.png");
-  width:100vw;
-  height:100vh;
-
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
+ 
+    background: rgb(188,226,234);
+    background: -webkit-linear-gradient(rgba(188,226,234,1) 5%, rgba(255,251,205,1) 39%, rgba(252,226,195,1) 47%, rgba(254,234,205,1) 71%, rgba(221,235,194,1) 100%);
+    background: -moz-linear-gradient(rgba(188,226,234,1) 5%, rgba(255,251,205,1) 39%, rgba(252,226,195,1) 47%, rgba(254,234,205,1) 71%, rgba(221,235,194,1) 100%);
+    background: -o-linear-gradient(rgba(188,226,234,1) 5%, rgba(255,251,205,1) 39%, rgba(252,226,195,1) 47%, rgba(254,234,205,1) 71%, rgba(221,235,194,1) 100%);
+    background: linear-gradient(rgba(188,226,234,1) 5%, rgba(255,251,205,1) 39%, rgba(252,226,195,1) 47%, rgba(254,234,205,1) 71%, rgba(221,235,194,1) 100%);
+    width:100vw;
+    height:100vh;
     
 }
 
 
   
 body{
-  
-/* background:linear-gradient(to bottom,#a8ebff,#fffbb7,#ffe5b7,#f2ffb7);*/
  margin:0;
  padding:0;
  height:100vh;
