@@ -2,9 +2,10 @@
 <%- include("_header") -%>
 <link rel="stylesheet" type="text/css" href="/styles/signup.css"/>
 <script>
+    
     function submitForm(action){
         let form = document.getElementById("form");
-        if (validateName() && validateEmail() && validateCheckbox()) {
+        if (validateName() && validateEmail() && validateCheckbox() && validateLocation()) {
             form.action = action;
             form.method = 'POST';
             form.submit();
@@ -16,7 +17,7 @@
         if (name && name.value.trim() != "") {
             return true;
         } else {
-            alert("닉네임을 입력해주세요.")
+            alert("닉네임을 입력해주세요.");
         }
     }
 
@@ -26,7 +27,7 @@
         if (email && email.value.match(regex)) {
             return true;
         } else {
-            alert("이메일을 올바르게 입력해주세요.")
+            alert("이메일을 올바르게 입력해주세요.");
         }
     }
 
@@ -35,8 +36,30 @@
         if (checkbox.checked) {
             return true;
         } else {
-             alert("개인 정보 활용에 동의해주세요.")
+             alert("개인 정보 활용에 동의해주세요.");
         }
+    }
+    
+    function validateLocation() {
+        if (isNearby) {
+            return true;
+        } else {
+            alert("국립현대미술관 내부에서 실행해주세요.");
+        }
+    }
+    
+    function handleLocationPopupClick() {
+        if (isNearby) {
+            hideAllPopup();
+        } 
+    }
+    let isNearby;
+    window.onload = async() => {
+        isNearby = await isNearbyMuseum();
+        if (!isNearby) {
+            showPopup("location-popup");
+        }
+        
     }
 
 </script>
@@ -44,9 +67,7 @@
     <img id="title" alt="원클릭 쓰리 강냉이" src="/images/title.png" />
     <form id="form" method="post" onsubmit="submitForm('/user/register'); return false">
         <fieldset>
-            <% if (locals.status) { %>
-            <h3><%= locals.status.message %></h3>
-            <% } %>
+            
             <label for="name">닉네임을 입력하세요</label>
             <input 
                 id="name"

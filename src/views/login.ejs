@@ -4,7 +4,7 @@
 <script>
     function submitForm(action){
         let form = document.getElementById("form");
-        if (validateEmail()) {
+        if (validateEmail() && validateLocation()) {
             form.action = action;
             form.method = 'POST';
             form.submit();
@@ -20,15 +20,33 @@
             alert("이메일을 올바르게 입력해주세요.")
         }
     }
+    
+    function validateLocation() {
+        if (isNearby) {
+            return true;
+        } else {
+            alert("국립현대미술관 내부에서 실행해주세요.");
+        }
+    }
+    
+    function handleLocationPopupClick() {
+        if (isNearby) {
+            hideAllPopup();
+        } 
+    }
+    let isNearby;
+    window.onload = async() => {
+        isNearby = await isNearbyMuseum();
+        if (!isNearby) {
+            showPopup("location-popup");
+        }
+        
+    }
 </script>
 <main>
     <img id="title" alt="원클릭 쓰리 강냉이" src="/images/title.png" />
     <form id="form" method="post" onsubmit="submitForm('/user/login'); return false">
         <fieldset>
-            <% if (locals.status) { %>
-            <h3><%= locals.status.message %></h3>
-            <% } %>
-    
             <label for="email">E-MAIL을 입력하세요</label>
             <input 
                 id="email"
@@ -49,6 +67,28 @@
             <a class="guiding-text" href="/">새로 시작하기</a>
         </fieldset>
     </form>
+    <div id="location-popup" class="popup" style="visibility:hidden">
+        <p class="content">
+            게임 <원클릭 쓰리강냉이>는
+            국립현대미술관 서울관 내부에서만 플레이가 가능합니다.
+            <br/>
+            <br/>
+            2023.11.2.-2024.4.2. 기간동안 
+            ‘프로젝트 해시태그 2023’ 전시실에서 실행하세요.
+            <br/>
+            <br/>
+            labB
+        </p>
+        <button onclick="handleLocationPopupClick()">확인</button>
+    </div>
+    <% if (locals.status) { %>
+    <div id="error-popup" class="popup">
+        <p class="content">
+            <%= locals.status.message %>
+        </p>
+        <button onclick="handleLocationPopupClick()">확인</button>
+    </div>
+    <% } %>
 </main>
 
 <%- include("_footer") -%>

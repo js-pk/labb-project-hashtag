@@ -53,6 +53,7 @@ app.use(
 );
 
 app.get("/", home.index);
+app.get("/register", home.register);
 app.get("/login", home.login);
 
 app.get("/game/:stageNo", game.run);
