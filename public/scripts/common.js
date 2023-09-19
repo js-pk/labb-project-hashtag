@@ -119,24 +119,31 @@ async function isNearbyMuseum() {
 function showPopup(popupId) {
     const popup = document.getElementById(popupId);
     if (popup) {
-        document.getElementById("container").style.overflow = "hidden";
-        document.body.style.overflow = "hidden";
-        document.body.style.pointerEvents = "none";
+        disableBackgroundMovement();
         popup.style.pointerEvents = "auto";
         popup.style.visibility = "visible";
     }
 }
 
 function hideAllPopup() {
-    document.getElementById("container").style.overflow = "scroll";
-    document.body.style.overflow = "scroll";
-    document.body.style.pointerEvents = "auto";
+    enableBackgroundMovement();
     const popups = document.getElementsByClassName("popup");
     for (const popup of popups) {
         popup.style.visibility = "hidden";
     }
 }
 
+function disableBackgroundMovement() {
+    document.getElementById("container").style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    document.body.style.pointerEvents = "none";
+}
+
+function enableBackgroundMovement() {
+    document.getElementById("container").style.overflow = "scroll";
+    document.body.style.overflow = "scroll";
+    document.body.style.pointerEvents = "auto";
+}
 // {
 //     popupId: "id (필수)",
 //     title: "상단 헤더 텍스트",
@@ -154,14 +161,18 @@ function hideAllPopup() {
 //     ]
 // }
 
-function addPopup({ popupId, title, content, imgURL, buttons }) {
+function addPopup({ popupId, title, content, imgURL, buttons }, whilePopupVisible) {
     if (document.getElementById(popupId)) {
         return false;
     }
     
+    disableBackgroundMovement();
+    whilePopupVisible ? whilePopupVisible() : null;
     const popup = document.createElement("div");
     popup.classList.add("popup");
     popup.id = popupId;
+    popup.style.pointerEvents = 'auto';
+    
     if (title) {
         const titleElement = document.createElement("h3");
         const titleText = document.createTextNode(title);
@@ -183,8 +194,6 @@ function addPopup({ popupId, title, content, imgURL, buttons }) {
     
     const buttonContainer = document.createElement("div");
     buttonContainer.classList.add("button-container");
-    popup.appendChild(buttonContainer);
-    
     buttons.forEach(button => {
         const buttonElement = document.createElement("button");
         const buttonText = document.createTextNode(button.title);
@@ -192,6 +201,7 @@ function addPopup({ popupId, title, content, imgURL, buttons }) {
         buttonElement.onclick = button.onclick;
         buttonContainer.appendChild(buttonElement);
     })
+    popup.appendChild(buttonContainer);
     
     document.body.appendChild(popup);
 }
