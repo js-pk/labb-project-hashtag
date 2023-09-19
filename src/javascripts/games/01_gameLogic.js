@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 
 import { app, Container, Sprite, Graphics,resources,resolution } from './01_init.js';
 import {stageSentences} from './01_texts.js';
+import {createTutorial,startTutorial} from './01_tutorial.js';
 
      let batContainer,toolboxContainer,items,stoneSprite,melon,rake,melonCounterText, wateringCan,seedPouch, batSize, cursorSprite,guideBox,guideText,successText;
      let wateringCanClicked = false;
@@ -19,7 +20,6 @@ import {stageSentences} from './01_texts.js';
       }
       let numberOfCol;
     let numberOfRows;
-    // Assuming your 750px wide window fits 4 columns with 60 spacing in portrait
     const baseWindowWidth = 750 / 2;
   
     let scale;
@@ -31,7 +31,7 @@ import {stageSentences} from './01_texts.js';
     const baseBatSize = 30; // Original rectangle size
 
     batSize = baseBatSize * scale;
-    let yOffset;
+  
     let baseToolBoxSize=180/3;
     let ToolBoxSize=baseBatSize*scale;
     
@@ -41,9 +41,12 @@ export function setup(){
     id = resources["/images/sprites/soils.json"].textures;
     items = resources["/images/sprites/tools.json"].textures;
     rocks=resources["/images/sprites/rock-soils.json"].textures;
-  
+ 
+    
     gameScene = new Container();
+    gameScene.visible=false;
     app.stage.addChild(gameScene);
+
 
     createBat();
     CreateGameOverScene();
@@ -52,10 +55,17 @@ export function setup(){
     CreateGuideConsole();
     createSuccessScene();
     
+    createTutorial(app.stage);
+    startTutorial(() => {
+        gameScene.visible=true;
+    });
+    
     app.ticker.add(delta => gameLoop(delta));
 
     state=play;
 }
+
+
 
 function createBat(){
     

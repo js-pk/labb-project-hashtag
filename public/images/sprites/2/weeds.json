@@ -1,0 +1,44 @@
+{"frames": {
+
+"weed01@2x.png":
+{
+	"frame": {"x":0,"y":0,"w":72,"h":72},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":72},
+	"sourceSize": {"w":72,"h":72}
+},
+"weed02@2x.png":
+{
+	"frame": {"x":72,"y":0,"w":72,"h":72},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":72},
+	"sourceSize": {"w":72,"h":72}
+},
+"weed03@2x.png":
+{
+	"frame": {"x":144,"y":0,"w":72,"h":72},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":72},
+	"sourceSize": {"w":72,"h":72}
+},
+"weed04@2x.png":
+{
+	"frame": {"x":216,"y":0,"w":72,"h":72},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":72},
+	"sourceSize": {"w":72,"h":72}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "weeds.png",
+	"format": "RGBA8888",
+	"size": {"w":288,"h":72},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:f2bba870b911c5b4e6ea352c5960c3c1:18cbaca0d5b0ceb4c2f8f1215b432e0e:90d6d4edccfc2c90eb987eb481a62153$"
+}
+}

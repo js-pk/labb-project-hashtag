@@ -48,6 +48,8 @@ function debounce(func, wait) {
 }
 
 export function resize() {
+    console.log("Resize function called!"); // This log
+
    let w, h;
 
     const portraitGameRatio = 10 / 16;

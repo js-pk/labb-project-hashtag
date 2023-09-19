@@ -1,0 +1,28 @@
+{"frames": {
+
+"Corn_fail01@2x.png":
+{
+	"frame": {"x":0,"y":0,"w":72,"h":76},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":76},
+	"sourceSize": {"w":72,"h":76}
+},
+"Corn_fail02@2x.png":
+{
+	"frame": {"x":72,"y":0,"w":72,"h":76},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":76},
+	"sourceSize": {"w":72,"h":76}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "corn-fail.png",
+	"format": "RGBA8888",
+	"size": {"w":144,"h":76},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:4ee2228583553cbe91cf0f5415ec214c:7588460b49231829201265443282e4f4:2dd69a280398c03499345259a6c3edb7$"
+}
+}

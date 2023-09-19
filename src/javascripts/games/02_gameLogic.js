@@ -2,15 +2,15 @@ import * as PIXI from 'pixi.js';
 
 import { app, Container, Sprite, TextureCache, Graphics,resources,resolution } from './02_init.js';
 
-   let countdownText,id,soils,bgSprites,batContainer,gameScene,gameOverScene, GameoverText,state, bg;
+   let countdownText,id,soils,bgSprites,batContainer,gameScene,gameOverScene, GameoverText,state, bg,cornfail;
     let countdownTime=100;
     let lastTime=Date.now();
     let cornSprite1, cornSprite2,cornSprite3,cornSprite4,cornSprite5,cornAni1,cornSpriteSheets,beeFrames,mothFrames, walkingRightTextures1,walkingRightTextures2,walkingRightTextures3,walkingLeftTextures1,walkingLeftTextures2,walkingLeftTextures3;
-    let scale,batSize,retryButton,exitButton,YesButton,NoButton;
+    let scale,batSize,retryButton,exitButton,YesButton,NoButton,weeds, weedKeys;
  //밭 한칸당 4점 x 24 = 96점
 let score=96;
 let ecoPoint=0;
- 
+
     // Assuming your 750px wide window fits 4 columns with 60 spacing in portrait
     const baseWindowWidth = 750 / 2;
 
@@ -26,24 +26,27 @@ let ecoPoint=0;
 export function setup(){
    
    
-    bgSprites= resources["/images/sprites/bg-soil-glitch.json"].textures;
-    cornSprite1=resources["/images/sprites/corn01.png"].texture;
-    cornSprite2=resources["/images/sprites/corn02.png"].texture;
-    cornSprite3=resources["/images/sprites/corn03.png"].texture;
-    cornSprite4=resources["/images/sprites/corn04.png"].texture;
-    cornSprite5=resources["/images/sprites/corn05.png"].texture;
+    bgSprites= resources["/images/sprites/2/bg-soil-glitch.json"].textures;
+    cornSprite1=resources["/images/sprites/2/corn01.png"].texture;
+    cornSprite2=resources["/images/sprites/2/corn02.png"].texture;
+    cornSprite3=resources["/images/sprites/2/corn03.png"].texture;
+    cornSprite4=resources["/images/sprites/2/corn04.png"].texture;
+    cornSprite5=resources["/images/sprites/2/corn05.png"].texture;
     cornSpriteSheets=[cornSprite1,cornSprite2,cornSprite3,cornSprite4,cornSprite5];
     
-    beeFrames=resources["/images/sprites/bees-spritesheet.json"].textures;
-    mothFrames=resources["/images/sprites/moth-spritesheet.json"].textures;
+    beeFrames=resources["/images/sprites/2/bees-spritesheet.json"].textures;
+    mothFrames=resources["/images/sprites/2/moth-spritesheet.json"].textures;
     
-    walkingRightTextures1=resources["/images/sprites/crow_from_left.json"].textures;
-    walkingRightTextures2=resources["/images/sprites/waterDeer_from_left.json"].textures;
-    walkingRightTextures3=resources["/images/sprites/boar_fromLeft.json"].textures;
-    walkingLeftTextures1=resources["/images/sprites/crow_from_right.json"].textures;
-    walkingLeftTextures2=resources["/images/sprites/waterDeer_from_Right.json"].textures;
-    walkingLeftTextures3=resources["/images/sprites/boar_fromRight.json"].textures;
+    walkingRightTextures1=resources["/images/sprites/2/crow_from_left.json"].textures;
+    walkingRightTextures2=resources["/images/sprites/2/waterDeer_from_left.json"].textures;
+    walkingRightTextures3=resources["/images/sprites/2/boar_fromLeft.json"].textures;
+    walkingLeftTextures1=resources["/images/sprites/2/crow_from_right.json"].textures;
+    walkingLeftTextures2=resources["/images/sprites/2/waterDeer_from_Right.json"].textures;
+    walkingLeftTextures3=resources["/images/sprites/2/boar_fromRight.json"].textures;
     soils=resources["/images/sprites/soils.json"].textures;
+    weeds=resources["/images/sprites/2/weeds.json"].textures;
+    cornfail=resources["/images/sprites/2/corn-fail.json"].textures;
+    weedKeys=Object.keys(weeds);
 
     gameScene=new Container();
     app.stage.addChild(gameScene);     
@@ -80,6 +83,8 @@ function createBat(){
   let cornFrames = getCornFrames(cornSpriteSheets[currentSpriteSheetIndex]);
    batContainer = new Container();
 
+   
+    
 for(let i = 0; i < numberOfCol; i++) {
     for(let j = 0; j < numberOfRows; j++) {
         let batSpot=new Sprite(soils["soils03@3x.png"]);
@@ -110,12 +115,42 @@ for(let i = 0; i < numberOfCol; i++) {
         
         cornAni1.isBottommost= (j ===numberOfRows-1);
         batContainer.addChild(cornAni1);
+        
+      
 }
 }
+
 
 batContainer.x = ((app.view.width/resolution) - batContainer.width) / 2;
 batContainer.y = ((app.view.height/resolution) - batContainer.height) / 2;
 gameScene.addChild(batContainer);
+}
+
+function getRandomWeed() {
+    const randomIndex = Math.floor(Math.random() * weedKeys.length);
+    const weed = new Sprite(weeds[weedKeys[randomIndex]]);
+    
+    weed.interactive = true;
+    weed.buttonMode = true;  // Changes the cursor to a hand when hovering over the sprite
+    
+    weed.on('pointerdown', () => {
+        batContainer.removeChild(weed);  // Remove the weed from the container when clicked
+    });
+    
+    return weed;
+}
+
+function spawnWeed() {
+    const randomColumn = Math.floor(Math.random() * 4); // as you have 4 columns
+    const randomRow = Math.floor(Math.random() * 6);   // as you have 6 rows
+
+    let weed = getRandomWeed();
+    weed.width = batSize;
+    weed.height = batSize;
+    weed.x = batSize * randomColumn;
+    weed.y = batSize * randomRow;
+
+    batContainer.addChild(weed);
 }
 
 function switchToNextSpriteSheet(){
@@ -178,14 +213,20 @@ function play(delta) {
   countdownText.text= Math.floor(countdownTime).toString();
 
   lastTime=currentTime;
+ 
+ if (countdownTime <= 100 && countdownTime >= 70) {
+    if (Math.random() < 0.01) { // 1% chance every frame
+        spawnWeed();
+    }
+}
 
- if(countdownTime <= 70 && countdownTime >= 40){
-    if(Math.random() < 0.03){  //1% chance every frame
+ if(countdownTime <= 70 && countdownTime >= 30){
+    if(Math.random() < 0.03){  
       generateBugs();
     }
   }
   
-  if(countdownTime <=100 && countdownTime >=70){
+  if(countdownTime <=30 && countdownTime >=0){
       if(Math.random() <0.03){
           generateAnimals();
       }
@@ -193,21 +234,21 @@ function play(delta) {
 
   handleCollisions();
   
-  if(countdownTime <=20){
-      app.ticker.stop();
-      if(score >=40){
-          console.log("success");
-           let successText = new PIXI.Text('살충제를 살포할까요?', { fontFamily: 'Arial', fontSize: 32, fill: 0x00FF00 });
-        successText.x = (app.view.width - successText.width) / 2;  // centering the text
-        successText.y = (app.view.height - successText.height) / 2; // centering the text
-            gameScene.addChild(successText);
-           showYesorNoButtons();
+//   if(countdownTime <=20){
+//       app.ticker.stop();
+//       if(score >=40){
+//           console.log("success");
+//           let successText = new PIXI.Text('살충제를 살포할까요?', { fontFamily: 'Arial', fontSize: 32, fill: 0x00FF00 });
+//         successText.x = (app.view.width - successText.width) / 2;  // centering the text
+//         successText.y = (app.view.height - successText.height) / 2; // centering the text
+//             gameScene.addChild(successText);
+//           showYesorNoButtons();
            
-      }else{
-          console.log("fail. score is", score);
-          showButtons();
-      }
-  }
+//       }else{
+//           console.log("fail. score is", score);
+//           showButtons();
+//       }
+//   }
   
   accumulatedTime +=deltaTime;
   if(accumulatedTime >=20){
@@ -267,8 +308,9 @@ function handleCollisions(){
 }
 
 function overlayGlitch(cornSprite){
-    let overlay= new Sprite(bgSprites["Decay_glitch_3x_0000.png"]);
-    overlay.scale.set(0.2);
+    let overlay= new Sprite(cornfail["Corn_fail02@2x.png"]);
+    overlay.width=cornSprite.width;
+    overlay.height=cornSprite.height;
     overlay.x=cornSprite.x;
     overlay.y=cornSprite.y;
     
@@ -331,12 +373,13 @@ function generateBugs(){
     
 }
 
-function generateAnimals(){
-    let walkingRight= Math.random() <0.5;
-    let randomAnimalIndex= Math.floor(Math.random() *3); 
+function generateAnimals() {
+    console.log('animal time!');
+    let walkingRight = Math.random() < 0.5;
+    let randomAnimalIndex = Math.floor(Math.random() * 3); 
     
     let animationTextures;
-     if (walkingRight) {
+    if (walkingRight) {
         switch(randomAnimalIndex) {
             case 0: animationTextures = walkingRightTextures1; break;
             case 1: animationTextures = walkingRightTextures2; break;
@@ -349,28 +392,23 @@ function generateAnimals(){
             case 2: animationTextures = walkingLeftTextures3; break;
         }
     }
-   // Convert frame names to textures
-    let frames = Object.keys(animationTextures).map(name => animationTextures[name]);
 
-    // Create an animated sprite with the chosen frames
+    let frames = Object.keys(animationTextures).map(name => animationTextures[name]);
     let sprite = new PIXI.AnimatedSprite(frames);
-    sprite.animationSpeed = 0.1;  // Adjust this value as needed
+    sprite.animationSpeed = 0.1;
     sprite.play();
-    
-    //sprite.scale.set(0.2);
     sprite.isCollided = false;
 
     if (walkingRight) {
         sprite.x = 0;
-        sprite.vx = 1;  // Or adjust speed as required
+        sprite.vx = 1;  // Move right
     } else {
         sprite.x = app.view.width - sprite.width;
-        sprite.vx = -1; // Moving left
+        sprite.vx = -1;  // Move left
     }
     sprite.y = Math.random() * (app.view.height - sprite.height);
 
-    // Set a speed
-    sprite.speed = Math.random() * 3 + 2; // Random speed between 2 to 5
+    sprite.speed = Math.random() * 3 + 2;
 
     app.stage.addChild(sprite);
 
@@ -379,6 +417,8 @@ function generateAnimals(){
 
     return sprite;
 }
+
+
 
 function pushSpriteAway(event){
     let sprite=event.currentTarget;
@@ -401,7 +441,6 @@ function pushSpriteAway(event){
 }
 
 function createGameOverScene(){
-    //create gameover scene 
   gameOverScene=new Container();
   app.stage.addChild(gameOverScene);
   gameOverScene.visible=false;
@@ -544,7 +583,7 @@ function restartGame(){
     createGameOverScene();
   
     // Reset the game timer
-    countdownTime = 60;
+    countdownTime = 100;
 
     // Set the visibility of game scenes
     gameScene.visible = true;
