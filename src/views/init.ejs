@@ -1,31 +1,52 @@
 <%- include("_header") -%>
-
+<link rel="stylesheet" type="text/css" href="/styles/global.css"/>
+<link rel="stylesheet" type="text/css" href="/styles/init.css"/>
 
 <script>
-    navigator.geolocation.getCurrentPosition((position) => {
-        const MUSEUM = {
-            latitude: 37.579347006678674,
-            longitude: 126.98053362142642
-        };
 
-        const DEBUG = {
-            latitude: 37.5411668,
-            longitude: 127.0116351
-        };
-        const offset = 0.005; //approximitely 500m
-
-        const lat = position.coords.latitude;
-        const long = position.coords.longitude;
-        const inLatBoundary = (DEBUG.latitude - offset <= lat && lat <= DEBUG.latitude + offset);
-        const inLongBoundary = (DEBUG.longitude - offset <= long && long <= DEBUG.longitude + offset);
-
-        if (inLatBoundary && inLongBoundary) {
-            console.log("HERE");
-        } else {
-            console.log("NO")
+    function handleScreenClick(e) {
+        if (e.target.matches('main') || e.target.matches('#title')) {
+            // document.getElementById('location-popup').style.visibility = "visible";
+            
+            addPopup({
+                popupId: 'location-popup',
+                title: '랩삐를 도와 옥수수 농사를 시작할까요?',
+                content: "게임 <원클릭 쓰리강냉이>는 국립현대미술관 서울관 내부에서만 플레이가 가능합니다.\n\n위치정보를 허용하시겠습니까? 팝업이 뜨면 '허용'을 눌러주세요!\n\nlabB",
+                imgURL: '/images/popup/4-2-1_energy.png',
+                buttons: [{
+                    title: "확인",
+                    onclick: (event) => handleButtonClick(event)
+                }]    
+            })
         }
-    });
-
-
+        
+    }
+    
+    function handleButtonClick(e) {
+        location='./register'
+    }
+    
+    window.onload = () => {
+    }
 </script>
+<main onclick="handleScreenClick(event)">
+    <img id="title" alt="원클릭 쓰리 강냉이" src="/images/title.png" />
+    <!--<div id="location-popup" class="popup" style="visibility:hidden;">-->
+    <!--    <h3>랩삐를 도와 옥수수 농사를 시작할까요?</h3>-->
+    <!--    <p class="content">-->
+    <!--        게임 <원클릭 쓰리강냉이>는-->
+    <!--        국립현대미술관 서울관 내부에서만 플레이가 가능합니다.-->
+    <!--        <br/>-->
+    <!--        <br/>-->
+    <!--        위치정보를 허용하시겠습니까? 팝업이 뜨면 '허용'을 눌러주세요!-->
+    <!--        <br/>-->
+    <!--        <br/>-->
+    <!--        labB-->
+    <!--    </p>-->
+    <!--    <div class="button-container">-->
+    <!--        <button onclick="handleButtonClick(event)">확인</button>-->
+    <!--        <button>아니오</button>-->
+    <!--    </div>-->
+    <!--</div>-->
+</main>
 <%- include("_footer") -%>
