@@ -67,6 +67,18 @@ function sendPutRequest(uri, json = null, func) {
 
 /* global navigator */
 
+
+function getMobileOS () {
+    const ua = navigator.userAgent
+    if (/android/i.test(ua)) {
+        return "Android"
+    }
+    else if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+        return "iOS"
+    }
+    return "Other"
+}
+
 function getPosition (options) {
     return new Promise(function (resolve, reject) {
         navigator.geolocation.getCurrentPosition(resolve, reject, options);
@@ -76,43 +88,44 @@ function getPosition (options) {
 async function isNearbyMuseum() {
     return await true;
     
-    // return await getPosition()
-    //     .then((position) => {
-    //         const MUSEUM = {
-    //             latitude: 37.579347006678674,
-    //             longitude: 126.98053362142642
-    //         };
+    return await getPosition()
+        .then((position) => {
+            const MUSEUM = {
+                latitude: 37.579347006678674,
+                longitude: 126.98053362142642
+            };
     
-    //         const DEBUG = {
-    //             latitude: 37.5411668,
-    //             longitude: 127.0116351
-    //         };
-    //         const offset = 0.005; //approximitely 500m
+            const DEBUG = {
+                latitude: 37.5411668,
+                longitude: 127.0116351
+            };
+            const offset = 0.005; //approximitely 500m
     
-    //         const lat = position.coords.latitude;
-    //         const long = position.coords.longitude;
-    //         const inLatBoundary = (DEBUG.latitude - offset <= lat && lat <= DEBUG.latitude + offset);
-    //         const inLongBoundary = (DEBUG.longitude - offset <= long && long <= DEBUG.longitude + offset);
+            const lat = position.coords.latitude;
+            const long = position.coords.longitude;
+            const inLatBoundary = (DEBUG.latitude - offset <= lat && lat <= DEBUG.latitude + offset);
+            const inLongBoundary = (DEBUG.longitude - offset <= long && long <= DEBUG.longitude + offset);
             
-    //         //dedug
-            
-    //         return true;
-            
-    //         // if (inLatBoundary && inLongBoundary) {
-    //         //     return true;
-    //         // } else {
-    //         //     return false;
-    //         // }
-    //     }).catch((err) => {
-    //         console.log(err);
-    //         if (err.code == 1) {
-    //             //todo: add andriod
-    //             alert("위치정보를 허용해주세요! \n설정 - 개인정보 및 보안 - 위치 서비스 - Safari 웹사이트 를 선택후 위치 접근 허용을 '앱을 사용하는 동안' 혹은 '다음번에 묻기'를 선택해주세요.")
-    //         } else {
-    //             alert("위치정보를 불러오는데 문제가 발생했습니다.")
-    //         }
-            
-    //     })
+            if (inLatBoundary && inLongBoundary) {
+                return true;
+            } else {
+                return false;
+            }
+        }).catch((err) => {
+            console.log(err);
+            if (err.code == 1) {
+                //todo: add andriod
+                if (getMobileOS() == "iOS") {
+                    alert("위치정보를 허용해주세요! \n설정 - 개인정보 및 보안 - 위치 서비스 - Safari 웹사이트 를 선택후 위치 접근 허용을 '앱을 사용하는 동안' 혹은 '다음번에 묻기'를 선택해주세요.")
+                } else if (getMobileOS() == "Android") {
+                    // TODO: andriod alert
+                } else {
+                    alert("위치정보 권한이 없습니다. 브라우저의 위치 정보 사용을 허용해주세요!")
+                }
+            } else {
+                alert("위치정보를 불러오는데 문제가 발생했습니다.")
+            }
+        })
 } 
 
 
