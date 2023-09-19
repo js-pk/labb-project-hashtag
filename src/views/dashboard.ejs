@@ -1,17 +1,21 @@
 <link rel="stylesheet" type="text/css" href="/styles/dashboard.css"></link>
 <%- include("_header") -%>
 
-<a  href="/game/01">게임1</a>
-<a  href="/game/02">게임2</a>
-<a  href="/game/03">게임3</a>
-
-
-
-<button>소식 받아보기</button>
-<button>강냉이받기</button>
-
-<form id="form" action="/user/logout" method="post">
-    <input type="submit" value="로그아웃" /> 
-</form>
-
+    <div id="cloud"></div>
+    <div id="home"></div>
+    <img id="scarecrow" src="/images/dashboard/scarecrow.png"/>
+    
+    <div class="action-container">
+        <img id="title" alt="원클릭 쓰리 강냉이" src="/images/title.png" />
+        <a class="button" href="/game/01">Level 1</a>
+        <a class="button" href="/game/02">Level 2</a>
+        <a class="button" href="/game/03">Level 3</a>
+        <button class="button">Reward</button>
+        <button class="button">Credit</button>
+        <button class="button">환경설정</button>
+        
+        <form id="form" action="/user/logout" method="post">
+            <input type="submit" value="로그아웃" /> 
+        </form>
+    </div>
 <%- include("_footer") -%>

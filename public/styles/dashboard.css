@@ -1,0 +1,85 @@
+
+body {
+    overflow: hidden;
+    height: 0;
+    
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: rgb(150,224,218);
+    background: -webkit-linear-gradient(bottom, rgba(150,224,218,1) 0%, rgba(106,147,240,1) 100%);
+    background: -moz-linear-gradient(bottom, rgba(150,224,218,1) 0%, rgba(106,147,240,1) 100%);
+    background: -o-linear-gradient(bottom, rgba(150,224,218,1) 0%, rgba(106,147,240,1) 100%);
+    background: linear-gradient(to top, rgba(150,224,218,1) 0%, rgba(106,147,240,1) 100%);
+}
+
+#container {
+    width: 100%;
+    height: 100%;
+}
+
+#home {
+    width: 100%;
+    height: 100%;
+    bottom:0;
+    background-image: url("/images/dashboard/cornfield.png");
+    position: fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+#cloud {
+    width: 100%;
+    height: 100%;
+    bottom:0;
+    background-image: url("/images/dashboard/cloud.png");
+    position: fixed;
+    background-size: cover;
+    background-position: 50%;
+    background-repeat: no-repeat;
+}
+
+#scarecrow {
+    position: fixed;
+    bottom: 0;
+    right: 5%;
+    width: 75%;
+    max-width:320px;
+    
+}
+
+.action-container {
+    position: fixed;
+    bottom: 64px;
+    left: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+img#title {
+    width: 64px;
+    height: auto;
+    margin-bottom: 24px;
+}
+
+.button {
+    padding: 8px 20px;
+    margin-bottom: 12px;
+    min-width: 120px;
+    
+    background-color: #000000;
+    color: #ffffff;
+    font-size: 20px;
+    border-radius: 32px;
+    
+    text-decoration: none;
+    text-align: center;
+    
+    border: none;
+    box-shadow: none;
+}
+
+.button:hover {
+    background-color: #333333;
+}
