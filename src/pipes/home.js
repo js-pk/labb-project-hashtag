@@ -8,6 +8,15 @@ exports.index = function(req, res, next) {
     if (authorize(req)) {
         res.render("dashboard")
     } else {
+        res.render("init")
+    }
+    
+}
+
+exports.register = function(req, res, next) {
+    if (authorize(req)) {
+        res.render("dashboard")
+    } else {
         res.render("signup")
     }
 }
