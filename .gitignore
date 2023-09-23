@@ -1,6 +1,6 @@
 /node_modules
 /trash
-/public/scripts/games
+/public/scripts/
 /public/images/upload/*
 .DS_Store
 /database/database.db
