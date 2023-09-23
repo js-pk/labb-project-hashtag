@@ -1,39 +1,6 @@
+import { common } from '../common';
 
-import * as THREE from 'three';
-import {MindARThree} from 'mind-ar/dist/mindar-face-three.prod.js';
-
-const mindarThree = new MindARThree({
-    container: document.querySelector("#container"),
-});
-
-let cap = false;
-const {renderer, scene, camera} = mindarThree;
-
-const light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 1 );
-scene.add(light);
-const faceMesh = mindarThree.addFaceMesh();
-// const texture = new THREE.TextureLoader().load('https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.2/examples/face-tracking/assets/canonical_face_model_uv_visualization.png');
-const texture = new THREE.TextureLoader().load('/images/test.png');
-faceMesh.material.map = texture;
-faceMesh.material.transparent = true;
-faceMesh.material.needsUpdate = true;
-scene.add(faceMesh);
-
-const startARCamera = async() => {
-  await mindarThree.start();
-  renderer.setAnimationLoop(() => {
-    renderer.render(scene, camera);
-    if (cap) {
-      capture();
-    }
-    cap = false
-  });
-}
-startARCamera();
-
-function triggerCapture() {
-  cap = true;
-}
+let isCapturing = false;
 
 function capture() {
   const canvas = document.createElement("canvas");

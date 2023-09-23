@@ -8,7 +8,8 @@ export function loadResources() {
     .add("/images/sprites/rock-soils.json")
     .add("/images/tutorial/player.png")
     .add("/images/tutorial/star.png")
-    .add("/images/tutorial/soils04-3@3x.png")
+   
+    .add("/images/tutorial/farm-plain-min.png")
     .load(setup);
 }
 
