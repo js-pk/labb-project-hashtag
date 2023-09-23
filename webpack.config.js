@@ -1,20 +1,13 @@
 const webpack = require('webpack');
-const isDev = process.env.NODE_ENV === 'development'
+const TerserPlugin = require("terser-webpack-plugin");
+const isDev = process.env.NODE_ENV === 'development';
 
 module.exports = {
     mode: isDev ? 'development' : 'production',
-    entry: isDev ? 
-        {
-            'games/01': ["/src/javascripts/games/01.js", 'webpack-hot-middleware/client'],
-            'games/02': ["/src/javascripts/games/02.js", 'webpack-hot-middleware/client'],
-            'games/03': ["/src/javascripts/games/03.js", 'webpack-hot-middleware/client'],
-        } :
-        {
-            'games/01': "/src/javascripts/games/01.js",
-            'games/02': "/src/javascripts/games/02.js",
-            'games/03': "/src/javascripts/games/03.js",
-        } 
-    ,
+    entry: {
+        pixi: ['/src/javascripts/games/01', '/src/javascripts/games/02'],
+        ar: ['/src/javascripts/games/03']
+    },
     devtool: 'inline-source-map',
     devServer: {
       static: './public',
