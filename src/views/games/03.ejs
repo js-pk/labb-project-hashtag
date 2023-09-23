@@ -1,24 +1,51 @@
 <%- include("../_header") -%>
-<link rel="stylesheet" type="text/css" href="/styles/game.css"></link>
-<style>
-    body {
-  margin: 0;
-    }
-    #container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
-    }
-</style>
-<main>
-  <h1>게임 3..</h1>
+<link rel="stylesheet" type="text/css" href="/styles/ar.css"></link>
+<script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-face-aframe.prod.js"></script>
+
+<div class="example-container">
+    <a-scene 
+      mindar-face 
+      embedded 
+      color-space="sRGB" 
+      renderer="colorManagement: true, physicallyCorrectLights" 
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: false"
+      loading-screen="enabled: false"
+    >
+      <a-assets>
+        <a-asset-item id="headModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.2/examples/face-tracking/assets/sparkar/headOccluder.glb"></a-asset-item>
+       <a-asset-item id="corn" src="/assets/glasses.gltf"></a-asset-item>
+        <a-asset-item id="beard" src="/assets/beard.gltf"></a-asset-item>
+      </a-assets>
+      <a-camera active="false" look-controls-enabled="true" position="0 0 0"></a-camera>
+<!-- head occluder -->
+      <a-entity mindar-face-target="anchorIndex: 168">
+        <a-gltf-model mindar-face-occluder position="0 -0.3 0.15"rotation="0 0 0" scale="0.065 0.065 0.065" src="#headModel"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-face-target="anchorIndex: 168">
+        <a-gltf-model rotation="0 -0 0" position="0 0 0" scale="0.12 0.12 0.12" src="#corn"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-face-target="anchorIndex: 0">
+        <a-gltf-model rotation="0 -0 0" position="0 -0.38 -0.25" scale="0.18 0.18 0.18" src="#beard"></a-gltf-model>
+      </a-entity>
+    </a-scene>
+</div>
+<div class="bottom-bar">
+  <button id="capture"></button>
+</div>
+<div class="capture-loading">
+  <div class="top-bar">옥수수 얼굴 데이터를 콘코인으로 변환 중입니다.</div>
+  <div class="bottom-bar">Now Loading...</div>
+</div>
+
+<!--<main>-->
+<!--  <h1>게임 3..</h1>-->
   
-  <span id="email"><%= locals.email %></span>
-  <button onclick="completeStage('03')">게임 완료</button>
-  <button id="capture">capture</button>
-      <div id="container">
-      </div>
-</main>
-<script src="/scripts/games/03.js"></script>
+<!--  <span id="email"><%= locals.email %></span>-->
+<!--  <button onclick="completeStage('03')">게임 완료</button>-->
+<!--</main>-->
+
+<script src="/scripts/ar.js"></script>
+
 <%- include("../_footer") -%>

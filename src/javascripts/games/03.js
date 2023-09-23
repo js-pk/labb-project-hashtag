@@ -43,21 +43,16 @@ function capture() {
   canvas.height = video.clientHeight*2;
   
   video.pause();
+  
   let top = window.getComputedStyle(video).getPropertyValue('top');
   canvas.getContext('2d').drawImage(video, 0, parseFloat(top), canvas.width, canvas.height);
-
-  let arImgData = renderer.domElement.toDataURL();
-  let img = new Image();
-  img.onload = function() {
-    const context = canvas.getContext('2d');
-    context.translate(canvas.width, 0);
-    context.scale(-1, 1);
-    context.drawImage(this, 0, 0, this.width, this.height, 0, 0, canvas.width, canvas.height);
-    // downloadImage(canvas);
-    uploadImage(canvas);
-    video.play();
-  }
-  img.src = arImgData;
+ 
+  let arImgData = document.querySelector('a-scene').components.screenshot.getCanvas('perspective');
+  canvas.getContext('2d').drawImage(arImgData,0, parseFloat(top), canvas.width, canvas.height);
+  // downloadImage(canvas);
+  uploadImage(canvas);
+  console.log("yo")
+  video.play();
 }
 
 function downloadImage(canvas) {
@@ -87,12 +82,20 @@ function uploadImage(canvas) {
       }
     } catch (error) {
       throw new Error(error);
+    } finally {
+      isCapturing = false;
     }
   });
 }
 
+function handleClick() {
+    console.log("wow")
+    if (!isCapturing) {
+        isCapturing = true;
+        capture();
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function() {
-  document.getElementById("capture").addEventListener("click", triggerCapture)
+  document.getElementById("capture").addEventListener("click", handleClick)
 })
-
-
