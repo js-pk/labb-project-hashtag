@@ -18,7 +18,7 @@ function capture() {
   canvas.getContext('2d').drawImage(arImgData,0, parseFloat(top), canvas.width, canvas.height);
   // downloadImage(canvas);
   uploadImage(canvas);
-  console.log("yo")
+  
   video.play();
 }
 
@@ -36,6 +36,7 @@ function downloadImage(canvas) {
 
 function uploadImage(canvas) {
   const formData = new FormData();
+  
   canvas.toBlob(async (b) => {
     try {
       formData.append("image", b, "filename.png");
@@ -45,7 +46,7 @@ function uploadImage(canvas) {
       });
       if (response && response.status === 200) {
         console.log("image uploaded!");
-        // console.log(getFileName());
+        common.completeStage('03');
       }
     } catch (error) {
       throw new Error(error);
@@ -56,9 +57,9 @@ function uploadImage(canvas) {
 }
 
 function handleClick() {
-    console.log("wow")
     if (!isCapturing) {
         isCapturing = true;
+        document.getElementById("capture-loading").style.display = "flex";
         capture();
     }
 }

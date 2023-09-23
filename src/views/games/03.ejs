@@ -18,7 +18,7 @@
        <a-asset-item id="corn" src="/assets/glasses.gltf"></a-asset-item>
         <a-asset-item id="beard" src="/assets/beard.gltf"></a-asset-item>
       </a-assets>
-      <a-camera active="false" look-controls-enabled="true" position="0 0 0"></a-camera>
+      <a-camera active="false" look-controls="enabled:false" position="0 0 0"></a-camera>
 <!-- head occluder -->
       <a-entity mindar-face-target="anchorIndex: 168">
         <a-gltf-model mindar-face-occluder position="0 -0.3 0.15"rotation="0 0 0" scale="0.065 0.065 0.065" src="#headModel"></a-gltf-model>
@@ -34,9 +34,11 @@
 <div class="bottom-bar">
   <button id="capture"></button>
 </div>
-<div class="capture-loading">
-  <div class="top-bar">옥수수 얼굴 데이터를 콘코인으로 변환 중입니다.</div>
-  <div class="bottom-bar">Now Loading...</div>
+<div id="capture-loading">
+  <div class="background">
+    <div class="top-bar">옥수수 얼굴 데이터를 콘코인으로 변환 중입니다.</div>
+    <div class="bottom-bar">Now Loading...</div>
+  </div>
 </div>
 
 <!--<main>-->
