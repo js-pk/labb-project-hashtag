@@ -40,6 +40,7 @@ export const common = {
     
     addPopup: function({ popupId, title, content, imgURL, buttons }, whilePopupVisible) {
         if (document.getElementById(popupId)) {
+            document.getElementById(popupId).style.visibility = "visible";
             return false;
         }
         

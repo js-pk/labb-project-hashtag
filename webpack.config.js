@@ -6,7 +6,8 @@ module.exports = {
     mode: isDev ? 'development' : 'production',
     entry: {
         pixi: ['/src/javascripts/games/01', '/src/javascripts/games/02'],
-        ar: ['/src/javascripts/games/03']
+        ar: ['/src/javascripts/games/03'],
+        actions: ['/src/javascripts/reward']
     },
     devtool: 'inline-source-map',
     devServer: {
