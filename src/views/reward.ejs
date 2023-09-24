@@ -1,0 +1,16 @@
+<%- include("_header") -%>
+<link rel="stylesheet" type="text/css" href="/styles/reward.css"></link>
+    <h3>축하합니다!!<br/>옥수수 마스터!!</h3>
+    <img class="coin" src="/images/misc/corn_coin.gif" />
+    <p>
+        이 콘 코인은 강냉이 한 봉지와 교환이 가능합니다.
+        <br/>
+        <br/>
+        랩삐 팩토리 앞으로 찾아가세요.
+    </p>
+    <% if (locals.reward_exchanged) { %>
+        <div class="button-disabled">교환 완료</div>
+    <% } else { %>
+        <button id="exchange-reward">교환 하기</button>
+    <% } %>
+<%- include("_footer") -%>
