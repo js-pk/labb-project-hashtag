@@ -58,7 +58,7 @@ body {
 }
 
 img#title {
-    width: 64px;
+    width: 88px;
     height: auto;
     margin-bottom: 24px;
 }
@@ -78,6 +78,11 @@ img#title {
     
     border: none;
     box-shadow: none;
+}
+
+.button.completed {
+    background-color: #333333;
+    text-decoration-line: line-through;
 }
 
 .button:hover {
