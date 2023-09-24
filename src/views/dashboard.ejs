@@ -9,10 +9,17 @@
     <div class="action-container">
         <img id="title" alt="원클릭 쓰리 강냉이" src="/images/misc/title.png" />
         <a class="button <%= locals.stage_01 ? "completed" : "" %>" href="/game/01">Level 1</a>
-        <a class="button <%= locals.stage_02 ? "completed" : "" %>" href="/game/02">Level 2</a>
-        <a class="button <%= locals.stage_03 ? "completed" : "" %>" href="/game/03">Level 3</a>
+        <% if (locals.stage_01) { %>
+            <a class="button <%= locals.stage_02 ? "completed" : "" %>" href="/game/02">Level 2</a>
+        <% } else { %>
+             <div class="button disabled">Level 2</div>
+        <% } %>
+        <% if (locals.stage_01 && locals.stage_02) { %>
+            <a class="button <%= locals.stage_03 ? "completed" : "" %>" href="/game/03">Level 3</a>
+        <% } else { %>
+             <div class="button disabled">Level 3</div>
+        <% } %>
         <a class="button" href="/reward">Reward</a>
-        <button class="button">Credit</button>
         <button class="button">환경설정</button>
         
         <form id="form" action="/user/logout" method="post">

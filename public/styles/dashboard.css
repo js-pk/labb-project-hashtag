@@ -81,8 +81,11 @@ img#title {
 }
 
 .button.completed {
-    background-color: #333333;
     text-decoration-line: line-through;
+}
+
+.button.disabled {
+    background-color: #333333;
 }
 
 .button:hover {
