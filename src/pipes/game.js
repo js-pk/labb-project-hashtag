@@ -92,10 +92,10 @@ exports.complete = function(req, res, next) {
             db.update("users", `${stageString}=?`, "id=?", [1, req.session.user.id]);
             // update session and redirect to next game
             req.session.user[stageString] = true;
-            if (["01", "02"].includes(stageNo)) {
-                res.redirect(`/game/0${Number(stageNo)+1}`);
-            } else if (stageNo === "03") {
-                res.redirect('/');
+            if (req.session.user.stage_01 === true && req.session.user.stage_02 === true && req.session.user.stage_03 === true ) {
+                res.redirect(`/reward`);
+            } else {
+                res.redirect(`/`);
             }
         } else {
             res.status(404).send("Server error");
@@ -104,3 +104,4 @@ exports.complete = function(req, res, next) {
         res.status(500).send("Server error");
     }   
 }
+

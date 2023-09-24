@@ -21,6 +21,7 @@ exports.login = async function(req, res) {
             stage_01: user.stage_01 === 0 ? false : true,
             stage_02: user.stage_02 === 0 ? false : true,
             stage_03: user.stage_03 === 0 ? false : true,
+            reward_exchanged: user.reward_exchanged === 0 ? false : true
         }
         res.redirect('/')
     } else {
@@ -58,12 +59,26 @@ exports.register = async function(req, res) {
                     email: email,
                     stage_01: false,
                     stage_02: false,
-                    stage_03: false
+                    stage_03: false,
+                    reward_exchanged: false
                 };
                 res.redirect('/game/01');
             }
             ).catch((err) => {
-                console.err(err.message)
+                console.err(err.message);
+                res.status(500).send("회원 가입 중에 에러가 발생했습니다.");
             })
     }  
+}
+
+exports.reward = async function(req, res) {
+    db.update("users", "reward_exchanged = 1", "email=?", [req.session.user.email])
+        .then(() => {
+            req.session.user.reward_exchanged = true;
+            res.redirect('/reward');
+        }).catch((err) => {
+            console.err(err.message);
+            res.status(500).send("리워드 교환 중에 에러가 발생했습니다.");
+        })
+    
 }

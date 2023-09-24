@@ -55,6 +55,7 @@ app.use(
 app.get("/", home.index);
 app.get("/register", home.register);
 app.get("/login", home.login);
+app.get("/reward", home.reward);
 
 app.get("/game/:stageNo", game.run);
 app.get("/game/complete/:stageNo", game.complete);
@@ -63,11 +64,8 @@ app.post("/game/upload", game.upload);
 app.post('/user/login', user.login);
 app.post('/user/logout', user.logout);
 app.post('/user/register', user.register);
+app.post('/user/reward', user.reward);
 
 app.get("/photos", photo.run);
-
-app.get("/init", (req, res) => {
-    res.render("init");
-})
 
 module.exports = app;
