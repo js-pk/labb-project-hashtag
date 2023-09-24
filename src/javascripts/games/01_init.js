@@ -32,7 +32,10 @@ app.renderer.view.style.display = "block";
 app.renderer.view.style.border = "2px solid #333";
 app.renderer.view.style.width="100%";
 
-document.getElementById('game1').appendChild(app.view);
+if (document.getElementById('game1')){
+    document.getElementById('game1').appendChild(app.view);
+}
+
 
 // Utility functions
 function debounce(func, wait) {

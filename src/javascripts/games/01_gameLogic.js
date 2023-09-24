@@ -3,6 +3,7 @@ import * as PIXI from 'pixi.js';
 import { app, Sprite, Graphics,resources,resolution } from './01_init.js';
 import {stageSentences} from './01_texts.js';
 import {createTutorial,startTutorial} from './01_tutorial.js';
+import {common} from '../common.js';
 
      let batContainer,toolboxContainer,items,stoneSprite,melon,rake,melonCounterText, wateringCan,seedPouch, batSize, cursorSprite,guideBox,guideText,successText;
      let wateringCanClicked = false;
@@ -521,8 +522,9 @@ function showButtons(){
     retryButton.on('pointerdown',restartGame);
     
     nextButton.interactive=true;
- //   nextButton.on('pointerdown',completeStage('01'));
-     // completeStage('01');
+    nextButton.on('pointerdown', common.completeStage('01'));
+    common.completeStage('01');
+    
    let retryText=new PIXI.Text('다시 하기', {fontFamily:'Arial', fontSize:24, fill: 0xffffff});
    let nextText=new PIXI.Text('LV.2 게임으로 이동!', {fontFamily:'Arial', fontSize:24, fill:0xffffff} );
    retryText.position.set((retryButton.width-retryText.width)/2, (retryButton.height-retryText.height)/2);

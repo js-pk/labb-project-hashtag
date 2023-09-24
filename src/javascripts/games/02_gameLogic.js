@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 
 import { app, Container, Sprite, TextureCache, Graphics,resources,resolution } from './02_init.js';
+import { common } from '../common.js';
 
    let countdownText,id,soils,bgSprites,batContainer,gameScene,gameOverScene, GameoverText,state, bg,cornfail;
     let countdownTime=100;
@@ -531,7 +532,7 @@ app.stage.addChild(NoButton);
 }
 function showButtons(){
     //show buttons
-  retryButton.position.set(app.screen.width / 2 - retryButton.width / 2, app.screen.height / 2);
+    retryButton.position.set(app.screen.width / 2 - retryButton.width / 2, app.screen.height / 2);
     exitButton.position.set(app.screen.width / 2 - exitButton.width / 2, retryButton.y + retryButton.height + 10);
 
     retryButton.visible = true;
@@ -549,6 +550,7 @@ function showYesorNoButtons(){
 
 function exitGame(){
     console.log("exitgame");
+    common.completeStage('02');
 }
 
 function end() {
@@ -577,7 +579,7 @@ function restartGame(){
     // Re-create any initial game objects or UI components
     createCountdown();
     createBat();
-  createRetryButtons();
+    createRetryButtons();
     createYesorNoButtons();
 
     createGameOverScene();

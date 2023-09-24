@@ -31,7 +31,10 @@ app.renderer.view.style.display = "block";
 app.renderer.view.style.border="2px solid #333";
 
 
-document.getElementById('game2').appendChild(app.view);
+if (document.getElementById('game2')) {
+    document.getElementById('game2').appendChild(app.view);
+}
+
 
 
 function debounce(func, wait) {

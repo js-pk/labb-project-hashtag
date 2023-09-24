@@ -26,5 +26,7 @@ function showExchangeRewardPopup() {
 };
 
 document.addEventListener("DOMContentLoaded", function() {
-  document.getElementById("exchange-reward").addEventListener("click", showExchangeRewardPopup)
+    if (document.getElementById("exchange-reward")) {
+        document.getElementById("exchange-reward").addEventListener("click", showExchangeRewardPopup)
+    }
 })
