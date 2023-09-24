@@ -17,7 +17,8 @@ const createUsers = `CREATE TABLE IF NOT EXISTS Users (
     email VARCHAR(100) NOT NULL UNIQUE,
     stage_01 INTEGER DEFAULT 0 NOT NULL,
     stage_02 INTEGER DEFAULT 0 NOT NULL,
-    stage_03 INTEGER DEFAULT 0 NOT NULL
+    stage_03 INTEGER DEFAULT 0 NOT NULL,
+    reward_exchanged INTEGER DEFAULT 0 NOT NULL
   );`;
 
 const createPhotos = `CREATE TABLE IF NOT EXISTS Photos (
