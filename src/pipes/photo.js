@@ -1,6 +1,5 @@
-'use strict'
-
 const Database = require('../../database/connection.js');
+
 const db = new Database();
 // const aws = require('aws-sdk');
 // const s3 = new aws.S3({
@@ -12,9 +11,9 @@ const db = new Database();
 
 exports.run = async (req, res, next) => {
   const recentPhotos = await db.all('photos', 'ORDER BY id DESC', [], 100);
-  res.render("photos", {
-    photos: recentPhotos
+  res.render('photos', {
+    photos: recentPhotos,
   });
-}
+};
 
-//TODO: photo deleting method for management
+// TODO: photo deleting method for management
