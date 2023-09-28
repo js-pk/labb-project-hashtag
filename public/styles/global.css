@@ -39,7 +39,7 @@ nav {
     align-items: center;
     justify-content: space-between;
     
-    padding: 16px;
+    padding: 8px;
     
 }
 
@@ -54,9 +54,9 @@ nav .menu-button {
     background-color: var(--blue-light);
     color: #818594;
     
-    padding: 8px 24px;
+    padding: 8px 16px;
     text-decoration: none;
-    margin-right: 16px;
+    margin-right: 12px;
     
     font-size: 16px;
     
@@ -64,6 +64,8 @@ nav .menu-button {
     box-shadow: 2px 2px 2px 0px rgba(124,124,153,0.3);
     -webkit-box-shadow: 2px 2px 2px 0px rgba(124,124,153,0.3);
     -moz-box-shadow: 2px 2px 2px 0px rgba(124,124,153,0.3);
+    
+    white-space: nowrap;
 }
 
 nav .menu-button.disabled {
@@ -75,8 +77,6 @@ nav .icon-button {
     background-color: var(--blue-light);
     color: #818594;
     
-    width: 40px;
-    height: 40px;
     padding: 8px;
     
     display: flex;
@@ -92,7 +92,7 @@ nav .icon-button {
 }
 
 nav .icon-button img {
-    /*width: 20px;*/
+    width: 20px;
     position: relative;
     top: -2px;
 }
