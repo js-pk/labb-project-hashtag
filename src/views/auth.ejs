@@ -1,0 +1,15 @@
+<div id="qrcode"></div>
+<script src="https://cdn.jsdelivr.net/npm/qrcanvas@3"></script>
+
+<script>
+    const canvas = qrcanvas.qrcanvas({
+      data: "<%= locals.url %>"
+    });
+    document.getElementById('qrcode').appendChild(canvas);
+    
+    window.onload = () => {
+        setTimeout(() => {
+          location.reload();
+        }, 60 * 1000);
+   }
+</script>

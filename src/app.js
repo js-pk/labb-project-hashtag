@@ -13,6 +13,7 @@ const home = require('./pipes/home');
 const user = require('./pipes/user');
 const game = require('./pipes/game');
 const photo = require('./pipes/photo');
+const auth = require('./pipes/auth');
 
 const app = express();
 
@@ -51,6 +52,9 @@ app.use(
     },
   }),
 );
+
+app.get('/auth/:token', auth.authenticate);
+app.get('/auth', auth.generate);
 
 app.get('/', home.index);
 app.get('/register', home.register);
