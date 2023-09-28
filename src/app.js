@@ -70,6 +70,8 @@ app.post('/user/logout', user.logout);
 app.post('/user/register', user.register);
 app.post('/user/reward', user.reward);
 
-app.get('/photos', photo.run);
+app.get('/photo', photo.run);
+app.get('/photo/admin', photo.admin);
+app.post('/photo/delete', photo.delete);
 
 module.exports = app;

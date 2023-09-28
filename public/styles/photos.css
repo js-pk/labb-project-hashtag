@@ -16,3 +16,27 @@ body {
     left: 0;
 }
 
+
+.photos-container {
+    width: 100%;
+    
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    
+    gap: 16px;
+}
+
+.admin-photo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.admin-photo {
+    width: 100px;
+    height: auto;
+    object-fit: contain;
+    margin-bottom: 16px;
+}
