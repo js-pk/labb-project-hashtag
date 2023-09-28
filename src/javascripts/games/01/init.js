@@ -49,7 +49,7 @@ function debounce(func, wait) {
 }
 
 export function resize() {
-  console.log('Resize function called!');
+  
 
   let w; let
     h;

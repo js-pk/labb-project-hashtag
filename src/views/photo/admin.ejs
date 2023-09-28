@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+    
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>어드민</title>
+        <script src="/scripts/common.js"></script>
+        <link rel="stylesheet" type="text/css" href="/styles/photos.css"></link>
+        <script>
+            function deletePhoto(photoKey) {
+                console.log(photoKey);
+                const form = document.createElement('form');
+                form.setAttribute('action', '/photo/delete');
+                form.setAttribute('method', 'POST');
+            
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'photoKey';
+                input.value = photoKey;
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        </script>
+    </head>
+    
+    <body>
+        <div class="photos-container">
+          <% for (let i=0; i<locals.photos.length; i++) { %>
+          <% const photo = locals.photos[i]; %>
+            <div class="admin-photo-container">
+                <img class='admin-photo' src='https://labb-photos.s3.ap-northeast-2.amazonaws.com/<%= photo.key %>.png' />
+                <button onclick="deletePhoto('<%= photo.key %>')">삭제</button>
+            </div>
+          <% } %>
+        </div>
+    </body>
+</html>

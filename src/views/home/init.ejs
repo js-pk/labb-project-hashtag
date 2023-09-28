@@ -1,10 +1,17 @@
-<%- include("_header") -%>
+<%- include("../_header") -%>
 <link rel="stylesheet" type="text/css" href="/styles/global.css"/>
 <link rel="stylesheet" type="text/css" href="/styles/init.css"/>
 
 <script>
-    function handleScreenClick(e) {
-        location='./register';
+    
+
+    function handleScreenClick(event) {
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+          get: (searchParams, prop) => searchParams.get(prop),
+        });
+        let token = params.token; 
+        
+        location=`./register?token=${token}`;
     }
 </script>
 <main onclick="handleScreenClick(event)">
@@ -14,4 +21,4 @@
     </div>
     
 </main>
-<%- include("_footer") -%>
+<%- include("../_footer") -%>

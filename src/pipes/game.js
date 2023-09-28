@@ -62,7 +62,7 @@ exports.run = function (req, res, next) {
 
   if (authorize(req)) {
     if (stageNo === '01') {
-      res.render(`games/${stageNo}`, {
+      res.render(`game/${stageNo}`, {
         email: user.email,
         url: req.url,
         stage_01: req.session.user.stage_01,
@@ -71,7 +71,7 @@ exports.run = function (req, res, next) {
       });
     } else if (stageNo === '02') {
       if (req.session.user.stage_01 === true) {
-        res.render(`games/${stageNo}`, {
+        res.render(`game/${stageNo}`, {
           email: user.email,
           url: req.url,
           stage_01: req.session.user.stage_01,
@@ -85,7 +85,7 @@ exports.run = function (req, res, next) {
       }
     } else if (stageNo === '03') {
       if (req.session.user.stage_01 === true && req.session.user.stage_02 === true) {
-        res.render(`games/${stageNo}`, {
+        res.render(`game/${stageNo}`, {
           email: user.email,
           url: req.url,
           stage_01: req.session.user.stage_01,

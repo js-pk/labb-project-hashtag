@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 
 import {
   app, Container, Sprite, TextureCache, Graphics, resources, resolution,
-} from './02_init.js';
+} from './init.js';
 import { common } from '../common.js';
 
 let countdownText; let id; let soils; let bgSprites; let batContainer; let gameScene; let gameOverScene; let GameoverText; let state; let bg; let cornfail;
@@ -26,7 +26,7 @@ batSize = baseBatSize * scale;
 
 let currentSpriteSheetIndex = 0;
 let accumulatedTime = 0;
-
+let numberOfCol=4; let numberOfRows=6; let cornSprites=[];
 export function setup() {
   bgSprites = resources['/images/sprites/2/bg-soil-glitch.json'].textures;
   cornSprite1 = resources['/images/sprites/2/corn01.png'].texture;
@@ -53,7 +53,6 @@ export function setup() {
   gameScene = new Container();
   app.stage.addChild(gameScene);
 
-  createCountdown();
 
   createBat();
 
@@ -66,23 +65,12 @@ export function setup() {
   app.ticker.add(gameLoop);
 }
 
-function createCountdown() {
-  if (countdownText) {
-    gameScene.removeChild(countdownText);
-    countdownText = null;
-  }
-  countdownText = new PIXI.Text('60', { fontFamily: 'Arial', fontSize: 36, fill: 'black' });
-  countdownText.x = (app.view.width / resolution) / 2;
-  countdownText.y = 30;
-  countdownText.anchor.set(0.5);
-  gameScene.addChild(countdownText);
-}
+
 
 function createBat() {
-  const numberOfCol = 4; const
-    numberOfRows = 6;
   const cornFrames = getCornFrames(cornSpriteSheets[currentSpriteSheetIndex]);
   batContainer = new Container();
+    cornSprites = new Array(numberOfCol).fill(null).map(() => new Array(numberOfRows).fill(null));
 
   for (let i = 0; i < numberOfCol; i++) {
     for (let j = 0; j < numberOfRows; j++) {
@@ -97,6 +85,7 @@ function createBat() {
       batContainer.addChild(batSpot);
 
       cornAni1 = new PIXI.AnimatedSprite(cornFrames);
+      
       cornAni1.isFilled = false;
       cornAni1.interactive = true;
       cornAni1.width = batSize;
@@ -114,12 +103,38 @@ function createBat() {
 
       cornAni1.isBottommost = (j === numberOfRows - 1);
       batContainer.addChild(cornAni1);
+      
+      cornSprites[i][j] = cornAni1; // populate the array with the corn sprite references
+
     }
   }
 
   batContainer.x = ((app.view.width / resolution) - batContainer.width) / 2;
   batContainer.y = ((app.view.height / resolution) - batContainer.height) / 2;
   gameScene.addChild(batContainer);
+    createCountdown();
+
+}
+function createCountdown() {
+  if (countdownText) {
+    gameScene.removeChild(countdownText);
+    countdownText = null;
+  }
+  let labelText=new PIXI.Text('Time Left: ', {fontFamily:'Arial', fontSize:36, fill: 'black'});
+  countdownText = new PIXI.Text('60', { fontFamily: 'Arial', fontSize: 36, fill: 'black' });
+// Set the x coordinate to the middle of the view
+  let x = (app.view.width / resolution) / 2;
+  
+  labelText.x = x - labelText.width / 2-100; // Center-align the label
+  countdownText.x = x + countdownText.width / 2; // Center-align the countdown number
+  
+  // Position the texts above the batContainer
+  labelText.y = batContainer.y - labelText.height - 30; // 30 is the margin between the label and the batContainer
+  countdownText.y = batContainer.y - countdownText.height - 30; // 30 is the margin between the countdown number and the batContainer
+
+  // Add the texts to the gameScene
+  gameScene.addChild(labelText);
+  gameScene.addChild(countdownText);
 }
 
 function getRandomWeed() {
@@ -145,8 +160,26 @@ function spawnWeed() {
   weed.height = batSize;
   weed.x = batSize * randomColumn;
   weed.y = batSize * randomRow;
+  
+  // Initialize a timer for this weed
+  weed.timer = 0;
+  weed.column = randomColumn;
+  weed.row = randomRow;
 
+  // Attach a listener to the weed to handle removals (when it's clicked).
+  weed.on('pointerdown', () => {
+    batContainer.removeChild(weed); // Remove the weed from the container when clicked
+  });
+  
   batContainer.addChild(weed);
+}
+
+function findCorrespondingCorn(column, row) {
+  if(column < 0 || column >= numberOfCol || row < 0 || row >= numberOfRows) {
+    console.error("Invalid column or row");
+    return null;
+  }
+  return cornSprites[column][row];
 }
 
 function switchToNextSpriteSheet() {
@@ -175,17 +208,7 @@ function getCornFrames(spriteSheetTexture) {
   return frames;
 }
 
-function resumeYes() {
-  ecoPoint--;
-  resume();
-}
-function resumeNo() {
-  ecoPoint++;
-  resume();
-}
-function resume() {
-  app.ticker.start();
-}
+
 function gameLoop(delta) {
   // Runs the current game `state` in a loop and renders the sprites
   play(delta);
@@ -229,28 +252,29 @@ function play(delta) {
 
   handleCollisions();
 
-  //   if(countdownTime <=20){
-  //       app.ticker.stop();
-  //       if(score >=40){
-  //           console.log("success");
-  //           let successText = new PIXI.Text('살충제를 살포할까요?', { fontFamily: 'Arial', fontSize: 32, fill: 0x00FF00 });
-  //         successText.x = (app.view.width - successText.width) / 2;  // centering the text
-  //         successText.y = (app.view.height - successText.height) / 2; // centering the text
-  //             gameScene.addChild(successText);
-  //           showYesorNoButtons();
-
-  //       }else{
-  //           console.log("fail. score is", score);
-  //           showButtons();
-  //       }
-  //   }
-
   accumulatedTime += deltaTime;
   if (accumulatedTime >= 20) {
     switchToNextSpriteSheet();
     accumulatedTime -= 20; // reset the accumulated time or subtract 20 from it
   }
+  
+  // Handle Weed timers
+  batContainer.children.forEach(child => {
+    if (child.timer !== undefined) {
+      child.timer += deltaTime;
+      if (child.timer > 1) {
+        let correspondingCorn = findCorrespondingCorn(child.column, child.row);
+        if (correspondingCorn) {
+          overlayGlitch(correspondingCorn, 'Corn_fail01@2x.png'); // For weed scenario
+          batContainer.removeChild(child);
+        }
+      }
+    }
+  });
 }
+
+
+
 
 function checkCollision(sprite, targetSprite) {
   if (!(sprite instanceof PIXI.Sprite) || !(targetSprite instanceof PIXI.Sprite)) {
@@ -267,7 +291,7 @@ function checkCollision(sprite, targetSprite) {
 }
 
 function handleCollisions() {
-  app.stage.children.forEach((child) => {
+   app.stage.children.forEach((child) => {
     if (child instanceof PIXI.Sprite && child.vx && child.vy) {
       let hasCollided = false;
 
@@ -276,21 +300,30 @@ function handleCollisions() {
         if (!currentCorn.isFilled
        && (currentCorn.isLeftmost || currentCorn.isRightmost || currentCorn.isUppermost || currentCorn.isBottommost)
        && checkCollision(child, currentCorn)) {
-          score -= 4;
-          console.log(score);
+          
           currentCorn.isFilled = true;
           hasCollided = true;
           child.vx = 0; // Stop sprite from moving in x direction
           child.vy = 0; // Stop sprite from moving in y direction
           child.isCollided = true;
 
-          overlayGlitch(currentCorn);
+          overlayGlitch(currentCorn,'Corn_fail02@2x.png');
           batContainer.removeChild(currentCorn); // Remove the corn sprite from the container
 
-          break; // since one random sprite should only collide with one cornSprite at most
+         
+          // Glitch effect after 2 seconds if still in contact
+          setTimeout(() => {
+            if (checkCollision(child, currentCorn)) {
+              currentCorn.isFilled = true;
+              overlayGlitch(currentCorn);
+              batContainer.removeChild(currentCorn);
+            }
+          }, 2000); 
+          break;
         }
       }
-
+      
+      // If no collision occurred, continue moving the sprite
       if (!hasCollided) {
         child.x += child.vx * child.speed;
         child.y += child.vy * child.speed;
@@ -299,19 +332,41 @@ function handleCollisions() {
   });
 }
 
-function overlayGlitch(cornSprite) {
-  const overlay = new Sprite(cornfail['Corn_fail02@2x.png']);
+function pushSpriteAway(event) {
+  const sprite = event.currentTarget;
+  sprite.interactive = true; // Re-enable interactivity
+  sprite.isCollided = false; // Reset collision flag
+
+  const interactionData = event.data;
+  const globalPosition = interactionData.global;
+
+  const dx = globalPosition.x - sprite.x;
+  const dy = globalPosition.y - sprite.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  const pushForce = 10; 
+  sprite.vx = -(dx / distance) * pushForce;
+  sprite.vy = -(dy / distance) * pushForce;
+}
+
+function overlayGlitch(cornSprite,textureName) {
+ // const overlay = new Sprite(cornfail['Corn_fail02@2x.png']);
+  const overlay=new Sprite(cornfail[textureName]);
   overlay.width = cornSprite.width;
   overlay.height = cornSprite.height;
   overlay.x = cornSprite.x;
   overlay.y = cornSprite.y;
 
   batContainer.addChild(overlay);
-  // cornSprite.interactive=false;
+  cornSprite.interactive=false;
+   score -= 4;
+  console.log("score:", score);
 }
 
 function generateBugs() {
   // randomly select which animation to use
+  
+  
   const randomBugAni = Math.random() < 0.5 ? beeFrames : mothFrames;
   // Get all frame names from the selected animation
   const frameNames = Object.keys(randomBugAni);
@@ -409,24 +464,8 @@ function generateAnimals() {
   return sprite;
 }
 
-function pushSpriteAway(event) {
-  const sprite = event.currentTarget;
-  const interactionData = event.data;
-  const globalPosition = interactionData.global;
 
-  // calculate direction from sprite to pointer position
-  const dx = globalPosition.x - sprite.x;
-  const dy = globalPosition.y - sprite.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
 
-  // Normalize the direction and set a push force
-  const pushForce = 10; // You can adjust this value
-  sprite.vx = -(dx / distance) * pushForce;
-  sprite.vy = -(dy / distance) * pushForce;
-
-  // You might want to reset the isCollided flag if you want further interactions
-  sprite.isCollided = false;
-}
 
 function createGameOverScene() {
   gameOverScene = new Container();
@@ -441,6 +480,71 @@ function createGameOverScene() {
   gameOverScene.addChild(GameoverText);
 }
 
+
+function exitGame() {
+  console.log('exitgame');
+  common.completeStage('02');
+}
+
+function end() {
+  app.ticker.remove(gameLoop);
+  gameScene.visible = false;
+  gameOverScene.visible = true;
+  GameoverText.visible = true;
+  console.log('Game OVER!');
+  app.ticker.stop();
+  setTimeout(() => {
+    restartGame();
+  }, 1000); // 1 second delay
+}
+
+function restartGame() {
+  console.log('restartGame');
+  // Clear the main game scene and the bat container
+  app.stage.removeChildren();
+  // Add gameScene and batContainer back to the stage if they aren't already
+  if (!app.stage.children.includes(gameScene)) {
+    app.stage.addChild(gameScene);
+  }
+  if (!gameScene.children.includes(batContainer)) {
+    gameScene.addChild(batContainer);
+  }
+  // Re-create any initial game objects or UI components
+  createCountdown();
+  createBat();
+  createRetryButtons();
+  createYesorNoButtons();
+
+  createGameOverScene();
+
+  // Reset the game timer
+  countdownTime = 100;
+
+  // Set the visibility of game scenes
+  gameScene.visible = true;
+  gameOverScene.visible = false;
+
+  // Reset the game state to the play function
+  state = play;
+
+  // Ensure gameLoop is removed from the ticker to prevent duplicate additions
+  app.ticker.remove(gameLoop);
+
+  // Add the game loop back and start the ticker
+  app.ticker.add(gameLoop);
+  app.ticker.start();
+}
+function resumeYes() {
+  ecoPoint--;
+  resume();
+}
+function resumeNo() {
+  ecoPoint++;
+  resume();
+}
+function resume() {
+  app.ticker.start();
+}
 function createRetryButtons() {
   retryButton = new PIXI.Graphics();
   exitButton = new PIXI.Graphics();
@@ -533,58 +637,4 @@ function showYesorNoButtons() {
 
   YesButton.visible = true;
   NoButton.visible = true;
-}
-
-function exitGame() {
-  console.log('exitgame');
-  common.completeStage('02');
-}
-
-function end() {
-  app.ticker.remove(gameLoop);
-  gameScene.visible = false;
-  gameOverScene.visible = true;
-  GameoverText.visible = true;
-  console.log('Game OVER!');
-  app.ticker.stop();
-  setTimeout(() => {
-    restartGame();
-  }, 1000); // 1 second delay
-}
-
-function restartGame() {
-  console.log('restartGame');
-  // Clear the main game scene and the bat container
-  app.stage.removeChildren();
-  // Add gameScene and batContainer back to the stage if they aren't already
-  if (!app.stage.children.includes(gameScene)) {
-    app.stage.addChild(gameScene);
-  }
-  if (!gameScene.children.includes(batContainer)) {
-    gameScene.addChild(batContainer);
-  }
-  // Re-create any initial game objects or UI components
-  createCountdown();
-  createBat();
-  createRetryButtons();
-  createYesorNoButtons();
-
-  createGameOverScene();
-
-  // Reset the game timer
-  countdownTime = 100;
-
-  // Set the visibility of game scenes
-  gameScene.visible = true;
-  gameOverScene.visible = false;
-
-  // Reset the game state to the play function
-  state = play;
-
-  // Ensure gameLoop is removed from the ticker to prevent duplicate additions
-  app.ticker.remove(gameLoop);
-
-  // Add the game loop back and start the ticker
-  app.ticker.add(gameLoop);
-  app.ticker.start();
 }

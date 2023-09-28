@@ -2,9 +2,9 @@ import * as PIXI from 'pixi.js';
 
 import {
   app, Sprite, Graphics, resources, resolution,
-} from './01_init.js';
-import { stageSentences } from './01_texts.js';
-import { createTutorial, startTutorial } from './01_tutorial.js';
+} from './init.js';
+import { stageSentences } from './texts.js';
+//import { createTutorial, startTutorial } from './01_tutorial.js';
 import { common } from '../common.js';
 
 let batContainer; let toolboxContainer; let items; let stoneSprite; let melon; let rake; let melonCounterText; let wateringCan; let seedPouch; let batSize; let cursorSprite; let guideBox; let guideText; let successText;
@@ -31,14 +31,14 @@ const baseBatSize = 60; // Original rectangle size
 batSize = baseBatSize * scale;
 
 export function setup() {
-  console.log('All image files loaded');
+ // console.log('All image files loaded');
 
   id = resources['/images/sprites/soils.json'].textures;
   items = resources['/images/sprites/tools.json'].textures;
   rocks = resources['/images/sprites/rock-soils.json'].textures;
 
   gameScene = new PIXI.Container();
-  gameScene.visible = false;
+ // gameScene.visible = false;
   app.stage.addChild(gameScene);
 
   createBat();
@@ -48,10 +48,10 @@ export function setup() {
   CreateGuideConsole();
   createSuccessScene();
 
-  createTutorial(app.stage);
-  startTutorial(() => {
-    gameScene.visible = true;
-  });
+  // createTutorial(app.stage);
+  // startTutorial(() => {
+  //   gameScene.visible = true;
+  // });
 
   app.ticker.add((delta) => gameLoop(delta));
 

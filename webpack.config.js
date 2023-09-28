@@ -5,8 +5,8 @@ const isDev = process.env.NODE_ENV === 'development';
 module.exports = {
     mode: isDev ? 'development' : 'production',
     entry: {
-        pixi: ['/src/javascripts/games/01', '/src/javascripts/games/02'],
-        ar: ['/src/javascripts/games/03'],
+        pixi: ['/src/javascripts/games/01/index', '/src/javascripts/games/02/index'],
+        ar: ['/src/javascripts/games/03/index'],
         actions: ['/src/javascripts/reward']
     },
     devtool: 'inline-source-map',

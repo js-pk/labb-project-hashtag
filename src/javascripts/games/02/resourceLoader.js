@@ -1,5 +1,5 @@
-import { setup } from './02_gameLogic.js';
-import { loader } from './02_init.js';
+import { setup } from './gameLogic.js';
+import { loader } from './init.js';
 
 export function loadResources() {
   loader.onProgress.add(loadProgressHandler);

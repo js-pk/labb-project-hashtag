@@ -1,10 +1,10 @@
 
-<%- include("_header") -%>
+<%- include("../_header") -%>
 <link rel="stylesheet" type="text/css" href="/styles/signup.css"/>
 <script>
     function submitForm(action){
         let form = document.getElementById("form");
-        if (validateEmail() && validateLocation()) {
+        if (validateEmail()) {
             form.action = action;
             form.method = 'POST';
             form.submit();
@@ -21,26 +21,13 @@
         }
     }
     
-    function validateLocation() {
-        if (isNearby) {
-            return true;
-        } else {
-            alert("국립현대미술관 내부에서 실행해주세요.");
-        }
-    }
-    
-    function handleLocationPopupClick() {
-        if (isNearby) {
-            hideAllPopup();
-        } 
-    }
-    let isNearby;
-    window.onload = async() => {
-        isNearby = await isNearbyMuseum();
-        if (!isNearby) {
-            showPopup("location-popup");
-        }
+    function redirectToSignup(event) {
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+          get: (searchParams, prop) => searchParams.get(prop),
+        });
+        let token = params.token; 
         
+        location=`./?token=${token}`;
     }
 </script>
 <main>
@@ -64,23 +51,10 @@
                 onclick="submitForm('/user/login')" 
                 value="로그인" 
             />
-            <a class="guiding-text" href="/">새로 시작하기</a>
+            <a class="guiding-text" onclick="redirectToSignup(event)">새로 시작하기</a>
         </fieldset>
     </form>
-    <div id="location-popup" class="popup" style="visibility:hidden">
-        <p class="content">
-            게임 <원클릭 쓰리강냉이>는
-            국립현대미술관 서울관 내부에서만 플레이가 가능합니다.
-            <br/>
-            <br/>
-            2023.11.2.-2024.4.2. 기간동안 
-            ‘프로젝트 해시태그 2023’ 전시실에서 실행하세요.
-            <br/>
-            <br/>
-            labB
-        </p>
-        <button onclick="handleLocationPopupClick()">확인</button>
-    </div>
+
     <% if (locals.status) { %>
     <div id="error-popup" class="popup">
         <p class="content">
@@ -93,4 +67,4 @@
     <% } %>
 </main>
 
-<%- include("_footer") -%>
+<%- include("../_footer") -%>

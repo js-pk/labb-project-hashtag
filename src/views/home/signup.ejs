@@ -1,11 +1,11 @@
 
-<%- include("_header") -%>
+<%- include("../_header") -%>
 <link rel="stylesheet" type="text/css" href="/styles/signup.css"/>
 <script>
     
     function submitForm(action){
         let form = document.getElementById("form");
-        if (validateName() && validateEmail() && validateCheckbox() && validateLocation()) {
+        if (validateName() && validateEmail() && validateCheckbox()) {
             form.action = action;
             form.method = 'POST';
             form.submit();
@@ -40,28 +40,16 @@
         }
     }
     
-    function validateLocation() {
-        if (isNearby) {
-            return true;
-        } else {
-            alert("국립현대미술관 내부에서 실행해주세요.");
-        }
+    function redirectToLogin(event) {
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+          get: (searchParams, prop) => searchParams.get(prop),
+        });
+        let token = params.token; 
+        
+        location=`./login?token=${token}`;
     }
     
-    function handleLocationPopupClick() {
-        if (isNearby) {
-            hideAllPopup();
-        } 
-    }
-    let isNearby;
-    window.onload = async() => {
-        isNearby = await isNearbyMuseum();
-        if (!isNearby) {
-            showPopup("location-popup");
-        }
-        
-    }
-
+    
 </script>
 <main>
     <img id="title" alt="원클릭 쓰리 강냉이" src="/images/misc/title.png" />
@@ -111,28 +99,14 @@
                 value="시작"
             />
             
-            <a class="guiding-text" href="/login">이전에 게임을 진행하셨었나요?<br/> -> 로그인 하러가기 -></a>
+            <a class="guiding-text" onclick="redirectToLogin(event)">이전에 게임을 진행하셨었나요?<br/> -> 로그인 하러가기 -></a>
             
             <% if (locals.status && ["USER_EXPIRED", "USER_EXISTS"].includes(locals.status.type)) { %>
             <!-- <input type="button" onclick="submitForm('/user/login')" value="로그인" />            -->
             <% } %>
         </fieldset>
     </form>
-    <div id="location-popup" class="popup" style="visibility:hidden">
-        <p class="content">
-            게임 <원클릭 쓰리강냉이>는
-            국립현대미술관 서울관 내부에서만 플레이가 가능합니다.
-            <br/>
-            <br/>
-            2023.11.2.-2024.4.2. 기간동안 
-            ‘프로젝트 해시태그 2023’ 전시실에서 실행하세요.
-            <br/>
-            <br/>
-            labB
-        </p>
-        <button onclick="handleLocationPopupClick()">확인</button>
-    </div>
-    
+
     <% if (locals.status) { %>
     <div id="error-popup" class="popup">
         <p class="content">
@@ -144,4 +118,4 @@
     </div>
     <% } %>
 </main>
-<%- include("_footer") -%>
+<%- include("../_footer") -%>

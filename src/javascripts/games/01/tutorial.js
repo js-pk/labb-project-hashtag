@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { app, loader } from './01_init.js';
+import { app, loader } from './init.js';
 
 let tutorialScene; let tutorialContainer; let tutorialText; let tutorialSprite; let
   tutorialStepIndex;

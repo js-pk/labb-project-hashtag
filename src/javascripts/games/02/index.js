@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
-import './02_init.js';
+import './init.js';
 
-import { loadResources } from './02_resourceLoader.js';
+import { loadResources } from './resourceLoader.js';
 
 if (document.getElementById('game2')) {
   loadResources();
