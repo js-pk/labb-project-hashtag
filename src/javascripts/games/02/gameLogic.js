@@ -3,7 +3,7 @@ import * as PIXI from 'pixi.js';
 import {
   app, Container, Sprite, TextureCache, Graphics, resources, resolution,
 } from './init.js';
-import { common } from '../common.js';
+import { common } from '../../common.js';
 
 let countdownText; let id; let soils; let bgSprites; let batContainer; let gameScene; let gameOverScene; let GameoverText; let state; let bg; let cornfail;
 let countdownTime = 100;

@@ -4,8 +4,7 @@ import {
   app, Sprite, Graphics, resources, resolution,
 } from './init.js';
 import { stageSentences } from './texts.js';
-//import { createTutorial, startTutorial } from './01_tutorial.js';
-import { common } from '../common.js';
+import { common } from '../../common.js';
 
 let batContainer; let toolboxContainer; let items; let stoneSprite; let melon; let rake; let melonCounterText; let wateringCan; let seedPouch; let batSize; let cursorSprite; let guideBox; let guideText; let successText;
 let wateringCanClicked = false;
@@ -28,7 +27,7 @@ numberOfRows = 6;
 
 const baseBatSize = 60; // Original rectangle size
 
-batSize = baseBatSize * scale;
+batSize = baseBatSize * scale / resolution;
 
 export function setup() {
  // console.log('All image files loaded');
@@ -63,7 +62,7 @@ function createBat() {
   batPlain.width = batSize * numberOfCol;
   batPlain.height = batSize * numberOfRows;
   batPlain.x = ((app.view.width / resolution) - batPlain.width) / 2;
-  batPlain.y = ((app.view.height / resolution) - batPlain.height) / 2 + 50; // 처음 밭플레인, 올리려면 50 숫자 줄임.
+  batPlain.y = ((app.view.height / resolution) - batPlain.height) / 2 + 25; // 처음 밭플레인, 올리려면 50 숫자 줄임.
   gameScene.addChild(batPlain);
 
   batContainer = new PIXI.Container();
@@ -99,6 +98,7 @@ function createBat() {
   stoneSprite.visible = false;
   gameScene.addChild(stoneSprite);
 }
+
 function CreateToolBox() {
   // let spacing = 20; // Adjust as per your need
   const toolWidth = batSize;
@@ -163,14 +163,14 @@ function CreateToolBox() {
   melon.on('pointerdown', melonClick);
   toolboxContainer.addChild(melon);
 
-  melonCounterText = new PIXI.Text(melonClicks, { fontFamily: 'Arial', fontSize: 12, fill: 'black' });
+  melonCounterText = new PIXI.Text(melonClicks, { fontFamily: 'Neo둥근모', fontSize: 12, fill: 'black' });
   melonCounterText.x = melon.x + 5;
   melonCounterText.y = melon.y - 5;
   toolboxContainer.addChild(melonCounterText);
 
   // Position the toolboxContainer
   toolboxContainer.x = ((app.view.width / resolution) - toolboxContainer.width) / 2;
-  toolboxContainer.y = (app.view.height / resolution) - toolboxContainer.height - 30;
+  toolboxContainer.y = (app.view.height / resolution) - toolboxContainer.height - 12;
 
   gameScene.addChild(toolboxContainer);
 }
@@ -187,17 +187,17 @@ function CreateGuideConsole() {
   }
   guideBox = new PIXI.Graphics();
   guideBox.beginFill(0xFFFFFF);
-  guideBox.drawRoundedRect(0, 0, batContainer.width * 1.3, (app.view.height / resolution) / 8, 40);
+  guideBox.drawRoundedRect(0, 0, batContainer.width * 1.5, (app.view.height / resolution) / 8, 16);
   guideBox.endFill();
   guideBox.x = ((app.view.width / resolution) - guideBox.width) / 2;
   guideBox.y = (app.view.height / resolution) / 10;
   gameScene.addChild(guideBox);
 
-  const baseSize = 50; // This is your base font size for a known screen size, e.g., 800px width
+  const baseSize = 40; // This is your base font size for a known screen size, e.g., 800px width
   const baseScreenWidth = 800; // The screen width you designed for
   const currentScreenWidth = window.innerWidth; // Get current screen (viewport) width
   const dynamicFontSize = (currentScreenWidth / baseScreenWidth) * baseSize;
-  guideText = new PIXI.Text(sentences[0], { fontFamily: 'Arial', fontSize: dynamicFontSize, fill: '#000000' });
+  guideText = new PIXI.Text(sentences[0], { fontFamily: "Neo둥근모", fontSize: dynamicFontSize, fill: '#000000', wordWrap: true, wordWrapWidth: batContainer.width * 1.3 });
   guideText.anchor.set(0.5);
   guideText.x = guideBox.width / 2;
   guideText.y = guideBox.height / 2;
@@ -255,14 +255,12 @@ function continueGuideMessages() {
   }, 2500);
 }
 function CreateHealthBar() {
-  MaxHealthValue = app.view.height * 0.6;
-  console.log(MaxHealthValue);
+  MaxHealthValue = app.view.height * 0.6 / resolution;
   health = MaxHealthValue;
-
   healthBar = new PIXI.Container();
 
   // Set the position to the left side and vertically centered
-  healthBar.position.set((app.view.width / 20), (app.view.height - MaxHealthValue) / 2);
+  healthBar.position.set((app.view.width / resolution / 12), (app.view.height / resolution / 4));
 
   gameScene.addChild(healthBar);
 
@@ -479,7 +477,7 @@ function createSuccessScene() {
 
   successScene = new PIXI.Container();
   app.stage.addChild(successScene);
-  const successText = new PIXI.Text(text, { fontFamily: 'Arial', fontSize: 20, fill: 'white' });
+  const successText = new PIXI.Text(text, { fontFamily: 'Neo둥근모', fontSize: 20, fill: 'white' });
   successText.x = app.view.width / 2 - successText.width / 2;
   successText.y = app.view.height / 2;
   successScene.addChild(successText);
@@ -503,8 +501,8 @@ function showButtons() {
   nextButton.interactive = true;
   nextButton.on('pointerdown', common.completeStage('01'));
 
-  const retryText = new PIXI.Text('다시 하기', { fontFamily: 'Arial', fontSize: 24, fill: 0xffffff });
-  const nextText = new PIXI.Text('LV.2 게임으로 이동!', { fontFamily: 'Arial', fontSize: 24, fill: 0xffffff });
+  const retryText = new PIXI.Text('다시 하기', { fontFamily: 'Neo둥근모', fontSize: 24, fill: 0xffffff });
+  const nextText = new PIXI.Text('LV.2 게임으로 이동!', { fontFamily: 'Neo둥근모', fontSize: 24, fill: 0xffffff });
   retryText.position.set((retryButton.width - retryText.width) / 2, (retryButton.height - retryText.height) / 2);
   nextText.position.set((nextButton.width - nextText.width) / 2, (nextButton.height - nextText.height) / 2);
   retryButton.position.set(app.screen.width / 2 - retryButton.width / 2, app.screen.height / 2);
@@ -524,7 +522,7 @@ function CreateGameOverScene() {
   gameOverScene.visible = false;
   GameoverText = new PIXI.Text(
     '벌써 지친건가요? 체력이 모두 떨어기 전에 잠시 쉬어주세요',
-    { fontFamily: 'Arial', fontSize: 50, fill: 'white' },
+    { fontFamily: 'Neo둥근모', fontSize: 50, fill: 'white' },
   );
   GameoverText.x = app.view.width / 2 - GameoverText.width / 2;
   GameoverText.y = app.view.height / 2;

@@ -1,4 +1,4 @@
-import { common } from '../common';
+import { common } from '../../common';
 
 let isCapturing = false;
 

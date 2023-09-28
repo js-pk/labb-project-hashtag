@@ -4,12 +4,10 @@ import * as PIXI from 'pixi.js';
 export const { Application } = PIXI;
 export const loader = PIXI.Loader.shared;
 export const { resources } = PIXI.Loader.shared;
-export const { TextureCache } = PIXI.utils;
 export const { Sprite } = PIXI;
-export const { Rectangle } = PIXI;
 export const { Graphics } = PIXI;
 
-export const resolution = 1; // Hardcoded resolution to 1
+export const resolution = 2; // Hardcoded resolution to 2
 export const width = window.innerWidth;
 export const height = window.innerHeight;
 
@@ -29,7 +27,7 @@ app.renderer.view.setAttribute('will-read-frequently', 'true');
 
 app.renderer.view.style.position = 'absolute';
 app.renderer.view.style.display = 'block';
-app.renderer.view.style.border = '2px solid #333';
+// app.renderer.view.style.border = '2px solid #333';
 app.renderer.view.style.width = '100%';
 
 if (document.getElementById('game1')) {
