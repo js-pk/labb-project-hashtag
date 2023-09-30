@@ -26,7 +26,7 @@
 },
 "rake_false2x.png":
 {
-	"frame": {"x":0,"y":74,"w":74,"h":74},
+	"frame": {"x":222,"y":0,"w":74,"h":74},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":74,"h":74},
@@ -34,7 +34,15 @@
 },
 "rake_true2x.png":
 {
-	"frame": {"x":74,"y":74,"w":74,"h":74},
+	"frame": {"x":296,"y":0,"w":74,"h":74},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":74,"h":74},
+	"sourceSize": {"w":74,"h":74}
+},
+"rock_true2x.png":
+{
+	"frame": {"x":370,"y":0,"w":74,"h":74},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":74,"h":74},
@@ -42,7 +50,7 @@
 },
 "seeds_false2x.png":
 {
-	"frame": {"x":148,"y":74,"w":74,"h":74},
+	"frame": {"x":444,"y":0,"w":74,"h":74},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":74,"h":74},
@@ -50,7 +58,7 @@
 },
 "seeds_true2x.png":
 {
-	"frame": {"x":0,"y":148,"w":74,"h":74},
+	"frame": {"x":518,"y":0,"w":74,"h":74},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":74,"h":74},
@@ -58,7 +66,7 @@
 },
 "water_false2x.png":
 {
-	"frame": {"x":74,"y":148,"w":74,"h":74},
+	"frame": {"x":592,"y":0,"w":74,"h":74},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":74,"h":74},
@@ -66,7 +74,7 @@
 },
 "water_true2x.png":
 {
-	"frame": {"x":148,"y":148,"w":74,"h":74},
+	"frame": {"x":666,"y":0,"w":74,"h":74},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":74,"h":74},
@@ -77,8 +85,8 @@
 	"version": "1.0",
 	"image": "items.png",
 	"format": "RGBA8888",
-	"size": {"w":222,"h":222},
+	"size": {"w":740,"h":74},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:d70755d525045ff1164662ece9665d01:c7fe55e72465e230349f2dd32959b26f:110e074689c9edd2c54833ce2e4d9270$"
+	"smartupdate": "$TexturePacker:SmartUpdate:65070f034091675e78541f8cb38c9b6c:b6392f4a95b231e1371afbcdcfcc4a12:110e074689c9edd2c54833ce2e4d9270$"
 }
 }
