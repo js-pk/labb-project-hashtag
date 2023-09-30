@@ -22,6 +22,12 @@
       height: 100%;
     }
     
+    .flipped {
+      -moz-transform: scale(-1, 1);
+      -webkit-transform: scale(-1, 1); -o-transform: scale(-1, 1);
+      transform: scale(-1, 1); 
+    }
+    
     .bottom-bar {
         position: fixed;
         height: 88px;
@@ -49,6 +55,21 @@
     
     .bottom-bar button#capture:focus {
       background-color: #eeeeee;
+    }
+    
+    .bottom-bar #switch-camera-button {
+      position: absolute;
+      right: 16px;
+      background-color: #777;
+      padding: 12px;
+      width: 48px;
+      height: 48px;
+      border-radius: 64px;
+      border: none;
+    }
+    
+    .bottom-bar #switch-camera-button:focus {
+      background-color: #333;
     }
     
    #capture-loading {

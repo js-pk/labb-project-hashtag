@@ -64,15 +64,41 @@ function handleClick() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('capture').addEventListener('click', handleClick);
   
   const sceneEl = document.querySelector('a-scene');
-  let arSystem;
+  let arSystem, canvas, video;
+  
   sceneEl.addEventListener('loaded', function () {
 	  arSystem = sceneEl.systems["mindar-face-system"];
 	});
+	
+	screnEl.addEventListender('camera-set-active', function () {
+	  canvas = document.querySelector('canvas');
+	  video = document.querySelector('video');
+	  
+	  document.getElementById('capture').addEventListener('click', handleClick);
+	  
+	  if (arSystem.shouldFaceUser) {
+	    video.classList.add('flipped');
+	    canvas.classList.add('flipped');
+	  } else {
+	    video.classList.remove('flipped');
+	    canvas.classList.remove('flipped');
+	  }
+	});
+	
+
 	const switchCameraButton = document.querySelector("#switch-camera-button");
 	switchCameraButton.addEventListener('click', () => {
 	  arSystem.switchCamera();
+	  if (arSystem.shouldFaceUser) {
+	    video.classList.add('flipped');
+	    canvas.classList.add('flipped');
+	  } else {
+	    video.classList.remove('flipped');
+	    canvas.classList.remove('flipped');
+	  }
 	});
+	
+	
 });

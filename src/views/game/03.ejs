@@ -3,6 +3,7 @@
 <link rel="stylesheet" type="text/css" href="/styles/ar.css"></link>
 <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-face-aframe.prod.js"></script>
+<script src="/scripts/ar.js"></script>
 
 <div class="ar-container">
     <a-scene 
@@ -13,6 +14,7 @@
       vr-mode-ui="enabled: false" 
       device-orientation-permission-ui="enabled: false"
       loading-screen="enabled: false"
+      class="flipped"
     >
       <a-assets>
         <a-asset-item id="headModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.2/examples/face-tracking/assets/sparkar/headOccluder.glb"></a-asset-item>
@@ -34,7 +36,7 @@
 </div>
 <div class="bottom-bar">
   <button id="capture"></button>
-  <button id="switch-camera-button">switch</button>
+  <button id="switch-camera-button"><img src= '/images/misc/switch.svg' /></button>
 </div>
 <div id="capture-loading">
   <div class="background">
@@ -42,7 +44,4 @@
     <div class="bottom-bar">Now Loading...</div>
   </div>
 </div>
-
-<script src="/scripts/ar.js"></script>
-
 <%- include("../_footer") -%>
