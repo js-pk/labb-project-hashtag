@@ -45,7 +45,6 @@ function uploadImage(canvas) {
         body: formData,
       });
       if (response && response.status === 200) {
-        console.log('image uploaded!');
         common.completeStage('03');
       }
     } catch (error) {
@@ -66,4 +65,14 @@ function handleClick() {
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('capture').addEventListener('click', handleClick);
+  
+  const sceneEl = document.querySelector('a-scene');
+  let arSystem;
+  sceneEl.addEventListener('loaded', function () {
+	  arSystem = sceneEl.systems["mindar-face-system"];
+	});
+	const switchCameraButton = document.querySelector("#switch-camera-button");
+	switchCameraButton.addEventListener('click', () => {
+	  arSystem.switchCamera();
+	});
 });
