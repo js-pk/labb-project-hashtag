@@ -26,6 +26,10 @@ img.coin {
     width: 50%;
 }
 
+img.coin.expired {
+    filter: grayscale(1);
+}
+
 p {
     padding: 24px 0;
     fon-size: 16px;
