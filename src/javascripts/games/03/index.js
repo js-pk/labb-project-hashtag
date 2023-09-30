@@ -66,24 +66,25 @@ function handleClick() {
 document.addEventListener('DOMContentLoaded', () => {
   
   const sceneEl = document.querySelector('a-scene');
-  let arSystem, canvas, video;
+  let arSystem;
   
   sceneEl.addEventListener('loaded', function () {
 	  arSystem = sceneEl.systems["mindar-face-system"];
 	});
 	
-	screnEl.addEventListender('camera-set-active', function () {
-	  canvas = document.querySelector('canvas');
-	  video = document.querySelector('video');
-	  
+	sceneEl.addEventListener('arReady', function () {
 	  document.getElementById('capture').addEventListener('click', handleClick);
 	  
+	 // canvas = document.querySelector('canvas');
+	 // arSystem = sceneEl.systems["mindar-face-system"];
+	 // console.log(arSystem.video);
+	 // console.log(video);
 	  if (arSystem.shouldFaceUser) {
-	    video.classList.add('flipped');
-	    canvas.classList.add('flipped');
+	    arSystem.video.className = 'flipped';
+	    sceneEl.className = 'flipped';
 	  } else {
-	    video.classList.remove('flipped');
-	    canvas.classList.remove('flipped');
+	    arSystem.video.className = '';
+	    sceneEl.className = '';
 	  }
 	});
 	
@@ -92,11 +93,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	switchCameraButton.addEventListener('click', () => {
 	  arSystem.switchCamera();
 	  if (arSystem.shouldFaceUser) {
-	    video.classList.add('flipped');
-	    canvas.classList.add('flipped');
+	    arSystem.video.className = 'flipped';
+	    sceneEl.className = 'flipped';
 	  } else {
-	    video.classList.remove('flipped');
-	    canvas.classList.remove('flipped');
+	    arSystem.video.className = '';
+	    sceneEl.className = '';
 	  }
 	});
 	
