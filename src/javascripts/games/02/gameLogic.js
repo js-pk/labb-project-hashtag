@@ -3,17 +3,19 @@ import * as PIXI from 'pixi.js';
 import {
   app, Container, Sprite, TextureCache, Graphics, resources, resolution,
 } from './init.js';
+import { stageSentences } from './texts.js';
+
 import { common } from '../../common.js';
 
 let countdownText; let id; let soils; let bgSprites; let batContainer; let gameScene; let gameOverScene; let GameoverText; let state; let bg; let cornfail;
 let countdownTime = 100;
 let lastTime = Date.now();
 let cornSprite1; let cornSprite2; let cornSprite3; let cornSprite4; let cornSprite5; let cornAni1; let cornSpriteSheets; let beeFrames; let mothFrames; let walkingRightTextures1; let walkingRightTextures2; let walkingRightTextures3; let walkingLeftTextures1; let walkingLeftTextures2; let walkingLeftTextures3;
-let scale; let batSize; let retryButton; let exitButton; let YesButton; let NoButton; let weeds; let
-  weedKeys;
+let scale; let batSize; let weeds; let weedKeys; let guideBox; let guideText; let gameStage=1;
 // 밭 한칸당 4점 x 24 = 96점
 let score = 96;
 let ecoPoint = 0;
+let previousGameStage = null; // Initializing to null as there is no previous stage at the start.
 
 // Assuming your 750px wide window fits 4 columns with 60 spacing in portrait
 const baseWindowWidth = 750 / 2;
@@ -27,6 +29,13 @@ batSize = baseBatSize * scale;
 let currentSpriteSheetIndex = 0;
 let accumulatedTime = 0;
 let numberOfCol=4; let numberOfRows=6; let cornSprites=[];
+
+const currentMessage = {
+  type: 'guide',
+  index: 0,
+  interval: null,
+};
+
 export function setup() {
   bgSprites = resources['/images/sprites/2/bg-soil-glitch.json'].textures;
   cornSprite1 = resources['/images/sprites/2/corn01.png'].texture;
@@ -55,23 +64,80 @@ export function setup() {
 
 
   createBat();
-
+  CreateGuideConsole();
+  createCountdown();
   createGameOverScene();
-
-  createRetryButtons();
-  createYesorNoButtons();
+  
   state = play;
 
   app.ticker.add(gameLoop);
 }
 
+function CreateGuideConsole(){
+    if (!stageSentences[gameStage]) {
+    console.error(`no sentences found for stage ${gameStage}`);
+    return;
+  }
+  const sentences = stageSentences[gameStage];
+  if (guideBox) {
+    gameScene.removeChild(guideBox);
+    guideBox = null;
+  }
+  guideBox=new PIXI.Graphics();
+  guideBox.beginFill(0xFFFFFF);
+  guideBox.drawRoundedRect(0, 0, batContainer.width * 1.2, (app.view.height / resolution) / 10, 20);
+  guideBox.endFill();
+  guideBox.x = ((app.view.width / resolution) - guideBox.width) / 2;
+  guideBox.y = (app.view.height / resolution) / 10;
+  guideBox.zIndex=1;
+  gameScene.addChild(guideBox);
+  gameScene.children.sort((a, b) => a.zIndex - b.zIndex); // Sort after adding a new child
 
+  
+   const baseSize = 40; // This is your base font size for a known screen size, e.g., 800px width
+  const baseScreenWidth = 800; // The screen width you designed for
+  const currentScreenWidth = window.innerWidth; // Get current screen (viewport) width
+  const dynamicFontSize = (currentScreenWidth / baseScreenWidth) * baseSize;
+  guideText = new PIXI.Text(sentences[0], { fontFamily: "Neo둥근모", fontSize: dynamicFontSize, fill: '#000000', wordWrap: true, wordWrapWidth: batContainer.width * 1.3 });
+  guideText.anchor.set(0.5);
+  guideText.x = guideBox.width / 2;
+  guideText.y = guideBox.height / 2;
+  guideBox.addChild(guideText);
+  const currentStageAtStart = gameStage;
+  // Display each sentence sequentially every second
+  let index = 1; // starting from the second sentence since the first one is already displayed
+  const interval = setInterval(() => {
+    if (gameStage != currentStageAtStart) { // If the game stage has changed, stop the loop and exit
+      clearInterval(interval);
+      return;
+    }
+    guideText.text = sentences[index];
+    index++;
+
+    if (index >= sentences.length) {
+      if (gameStage === 0) {
+        clearInterval(interval);
+        gameStage = 1;
+        CreateGuideConsole();
+      } else if (gameStage === 1 || gameStage === 2 || gameStage === 3) {
+        index = 0;
+      }
+    }
+  }, 2000);
+}
 
 function createBat() {
+ 
+  
   const cornFrames = getCornFrames(cornSpriteSheets[currentSpriteSheetIndex]);
   batContainer = new Container();
-    cornSprites = new Array(numberOfCol).fill(null).map(() => new Array(numberOfRows).fill(null));
+  cornSprites = new Array(numberOfCol).fill(null).map(() => new Array(numberOfRows).fill(null));
 
+   const batPlain=new Sprite(soils['soil_plain03@3x.png']);
+  batPlain.width=batSize *numberOfCol;
+  batPlain.height=batSize*numberOfRows;
+  batContainer.addChild(batPlain);
+  
   for (let i = 0; i < numberOfCol; i++) {
     for (let j = 0; j < numberOfRows; j++) {
       const batSpot = new Sprite(soils['soils03@3x.png']);
@@ -88,6 +154,7 @@ function createBat() {
       
       cornAni1.isFilled = false;
       cornAni1.interactive = true;
+      cornAni1.isFailed=false;
       cornAni1.width = batSize;
       cornAni1.height = batSize;
       cornAni1.x = batSpot.x;
@@ -110,9 +177,9 @@ function createBat() {
   }
 
   batContainer.x = ((app.view.width / resolution) - batContainer.width) / 2;
-  batContainer.y = ((app.view.height / resolution) - batContainer.height) / 2;
+  batContainer.y = ((app.view.height / resolution) - batContainer.height) / 2+45;
   gameScene.addChild(batContainer);
-    createCountdown();
+ 
 
 }
 function createCountdown() {
@@ -120,21 +187,29 @@ function createCountdown() {
     gameScene.removeChild(countdownText);
     countdownText = null;
   }
-  let labelText=new PIXI.Text('Time Left: ', {fontFamily:'Arial', fontSize:36, fill: 'black'});
-  countdownText = new PIXI.Text('60', { fontFamily: 'Arial', fontSize: 36, fill: 'black' });
-// Set the x coordinate to the middle of the view
-  let x = (app.view.width / resolution) / 2;
-  
-  labelText.x = x - labelText.width / 2-100; // Center-align the label
-  countdownText.x = x + countdownText.width / 2; // Center-align the countdown number
-  
-  // Position the texts above the batContainer
-  labelText.y = batContainer.y - labelText.height - 30; // 30 is the margin between the label and the batContainer
-  countdownText.y = batContainer.y - countdownText.height - 30; // 30 is the margin between the countdown number and the batContainer
+   const circle = new PIXI.Graphics();
+    circle.beginFill(0x58bfff); 
+    circle.drawCircle(0, 0, 60); // Change 40 to the radius you desire
+    circle.endFill();
+    
+     // Position the circle
+    circle.x = (app.view.width / resolution) * 0.8;
+    circle.y = (app.view.height / resolution) / 10;
+    
+  let labelText=new PIXI.Text('Time Left: ', {fontFamily:'Neo둥근모', fontSize:36, fill: 'black'});
+  countdownText = new PIXI.Text('100', { fontFamily: 'Neo둥근모', fontSize: 50, fill: 'white' });
 
-  // Add the texts to the gameScene
-  gameScene.addChild(labelText);
-  gameScene.addChild(countdownText);
+  
+  labelText.x= ((app.view.width / resolution) - batContainer.width) / 2;
+  countdownText.x=(app.view.width / resolution)*0.8;
+  labelText.y =((app.view.height / resolution) - batContainer.height) / 2
+  countdownText.y =(app.view.height / resolution)/10;
+  circle.zIndex=2;
+  countdownText.zIndex=2;
+  gameScene.addChild(circle);
+   gameScene.addChild(countdownText);   
+   gameScene.children.sort((a, b) => a.zIndex - b.zIndex); // Sort after adding new children
+
 }
 
 function getRandomWeed() {
@@ -182,32 +257,6 @@ function findCorrespondingCorn(column, row) {
   return cornSprites[column][row];
 }
 
-function switchToNextSpriteSheet() {
-  currentSpriteSheetIndex = (currentSpriteSheetIndex + 1) % cornSpriteSheets.length;
-  // update frames for all cornAni1 instances on the stage.
-  batContainer.children.forEach((child) => {
-    if (child instanceof PIXI.AnimatedSprite) {
-      const frames = getCornFrames(cornSpriteSheets[currentSpriteSheetIndex]);
-      child.textures = frames;
-      child.gotoAndPlay(0);
-    }
-  });
-}
-
-function getCornFrames(spriteSheetTexture) {
-  const totalFrames = 2;
-  const singleFrameWidth = spriteSheetTexture.baseTexture.width / totalFrames;
-  const frames = [];
-
-  for (let i = 0; i < totalFrames; i++) {
-    const frame = new PIXI.Rectangle(singleFrameWidth * i, 0, singleFrameWidth, spriteSheetTexture.baseTexture.height);
-    const textureFrame = new PIXI.Texture(spriteSheetTexture.baseTexture, frame);
-    frames.push(textureFrame);
-  }
-
-  return frames;
-}
-
 
 function gameLoop(delta) {
   // Runs the current game `state` in a loop and renders the sprites
@@ -216,6 +265,7 @@ function gameLoop(delta) {
   if (countdownTime <= 0) {
     end();
   }
+  
 }
 
 function play(delta) {
@@ -232,30 +282,30 @@ function play(delta) {
 
   lastTime = currentTime;
 
-  if (countdownTime <= 100 && countdownTime >= 70) {
-    if (Math.random() < 0.01) { // 1% chance every frame
-      spawnWeed();
+ // Update gameStage based on countdownTime
+    if (countdownTime <= 100 && countdownTime >= 70) gameStage = 1;
+    else if (countdownTime <= 70 && countdownTime >= 30) gameStage = 2;
+    else if (countdownTime <= 30 && countdownTime >= 0) gameStage = 3;
+    
+      // Handle stage change
+    if (previousGameStage !== gameStage) {
+        handleStageChange(previousGameStage, gameStage);
+        previousGameStage = gameStage; // Update previousGameStage after handling the change
     }
-  }
-
-  if (countdownTime <= 70 && countdownTime >= 30) {
-    if (Math.random() < 0.03) {
-      generateBugs();
-    }
-  }
-
-  if (countdownTime <= 30 && countdownTime >= 0) {
-    if (Math.random() < 0.03) {
-      generateAnimals();
-    }
-  }
+     // Continue with other game logics like handling collisions, spawning entities, etc.
+    handleCollisions();
+    accumulatedTime += deltaTime;
+    
+      if (gameStage === 1 && Math.random() < 0.01) spawnWeed();
+    if (gameStage === 2 && Math.random() < 0.03) generateBugs();
+    if (gameStage === 3 && Math.random() < 0.03) generateAnimals();
 
   handleCollisions();
 
   accumulatedTime += deltaTime;
-  if (accumulatedTime >= 20) {
+  if (accumulatedTime >= 40) {
     switchToNextSpriteSheet();
-    accumulatedTime -= 20; // reset the accumulated time or subtract 20 from it
+    accumulatedTime -= 40; // reset the accumulated time or subtract 20 from it
   }
   
   // Handle Weed timers
@@ -265,15 +315,34 @@ function play(delta) {
       if (child.timer > 1) {
         let correspondingCorn = findCorrespondingCorn(child.column, child.row);
         if (correspondingCorn) {
-          overlayGlitch(correspondingCorn, 'Corn_fail01@2x.png'); // For weed scenario
-          batContainer.removeChild(child);
+         // Create new failed corn sprite
+        const failedCorn = new Sprite(cornfail['Corn_fail01@2x.png']);
+        
+        failedCorn.x = correspondingCorn.x;
+        failedCorn.y = correspondingCorn.y;
+        failedCorn.width = correspondingCorn.width;
+        failedCorn.height = correspondingCorn.height;
+        failedCorn.isFailed=true;  // <-- HERE, marking the newly created failed corn sprite as failed
+        
+        // Remove old corn sprite and add the new one
+        batContainer.removeChild(correspondingCorn);
+        batContainer.addChild(failedCorn);
+        cornSprites[child.column][child.row] = failedCorn;  // Update the reference in cornSprites array
+        
+        batContainer.removeChild(child);  // Remove the weed
         }
       }
     }
   });
+  
+  
 }
 
-
+function handleStageChange(fromStage, toStage) {
+    // Here, perform any setup or teardown needed when the game stage changes.
+    // For example, you might want to reset timers, or clear entities, or update the guide console, etc.
+    CreateGuideConsole(); // For example, updating the Guide Console when the stage changes.
+}
 
 
 function checkCollision(sprite, targetSprite) {
@@ -294,33 +363,42 @@ function handleCollisions() {
    app.stage.children.forEach((child) => {
     if (child instanceof PIXI.Sprite && child.vx && child.vy) {
       let hasCollided = false;
-
-      for (let i = batContainer.children.length - 1; i >= 0; i--) {
-        const currentCorn = batContainer.children[i];
-        if (!currentCorn.isFilled
-       && (currentCorn.isLeftmost || currentCorn.isRightmost || currentCorn.isUppermost || currentCorn.isBottommost)
-       && checkCollision(child, currentCorn)) {
+      
+      // Assuming cornSprites is a 2D array holding all your corn sprites.
+      for (let i = 0; i < cornSprites.length; i++) {
+        for (let j = 0; j < cornSprites[i].length; j++) {
+          const currentCorn = cornSprites[i][j];
           
-          currentCorn.isFilled = true;
-          hasCollided = true;
-          child.vx = 0; // Stop sprite from moving in x direction
-          child.vy = 0; // Stop sprite from moving in y direction
-          child.isCollided = true;
+        
+              if (!currentCorn.isFailed && !currentCorn.isFilled && checkCollision(child, currentCorn)) {
 
-          overlayGlitch(currentCorn,'Corn_fail02@2x.png');
-          batContainer.removeChild(currentCorn); // Remove the corn sprite from the container
 
-         
-          // Glitch effect after 2 seconds if still in contact
-          setTimeout(() => {
-            if (checkCollision(child, currentCorn)) {
               currentCorn.isFilled = true;
-              overlayGlitch(currentCorn);
-              batContainer.removeChild(currentCorn);
-            }
-          }, 2000); 
-          break;
+              hasCollided = true;
+              
+              // Stop sprite from moving
+              child.vx = 0; 
+              child.vy = 0; 
+              child.isCollided = true;
+              
+              cornFail(currentCorn, 'Corn_fail02@2x.png');
+              
+              // Remove the corn sprite from the container
+              batContainer.removeChild(currentCorn); 
+              
+              // If still in contact after 2 seconds, apply cornFail again
+              setTimeout(() => {
+                if (checkCollision(child, currentCorn)) {
+                  currentCorn.isFilled = true;
+                  cornFail(currentCorn); 
+                  batContainer.removeChild(currentCorn);
+                }
+              }, 2000); 
+              
+              break;
+          }
         }
+        if(hasCollided) break; // exit the outer loop as well if a collision has been detected
       }
       
       // If no collision occurred, continue moving the sprite
@@ -330,6 +408,20 @@ function handleCollisions() {
       }
     }
   });
+}
+
+function cornFail(cornSprite,textureName) {
+  const replace=new Sprite(cornfail[textureName]);
+  replace.width = cornSprite.width;
+  replace.height = cornSprite.height;
+  replace.x = cornSprite.x;
+  replace.y = cornSprite.y;
+
+  batContainer.addChild(replace);
+  cornSprite.interactive=false;
+  cornSprite.isFailed=true;
+   score -= 4;
+ // console.log("score:", score);
 }
 
 function pushSpriteAway(event) {
@@ -349,19 +441,7 @@ function pushSpriteAway(event) {
   sprite.vy = -(dy / distance) * pushForce;
 }
 
-function overlayGlitch(cornSprite,textureName) {
- // const overlay = new Sprite(cornfail['Corn_fail02@2x.png']);
-  const overlay=new Sprite(cornfail[textureName]);
-  overlay.width = cornSprite.width;
-  overlay.height = cornSprite.height;
-  overlay.x = cornSprite.x;
-  overlay.y = cornSprite.y;
 
-  batContainer.addChild(overlay);
-  cornSprite.interactive=false;
-   score -= 4;
-  console.log("score:", score);
-}
 
 function generateBugs() {
   // randomly select which animation to use
@@ -441,7 +521,7 @@ function generateAnimals() {
 
   const frames = Object.keys(animationTextures).map((name) => animationTextures[name]);
   const sprite = new PIXI.AnimatedSprite(frames);
-  sprite.animationSpeed = 0.1;
+  sprite.animationSpeed = 0.3;
   sprite.play();
   sprite.isCollided = false;
 
@@ -460,12 +540,47 @@ function generateAnimals() {
 
   sprite.interactive = true;
   sprite.on('pointerdown', pushSpriteAway);
-
+  
+    if(!walkingRight){
+    console.log('left-moving',sprite);
+  }
+  
+  
   return sprite;
+  
+
 }
 
 
+function switchToNextSpriteSheet() {
+  if (currentSpriteSheetIndex < cornSpriteSheets.length - 1) {
+    currentSpriteSheetIndex++;
 
+    // update frames for all cornAni1 instances on the stage.
+    batContainer.children.forEach((child) => {
+      if (child instanceof PIXI.AnimatedSprite) {
+        const frames = getCornFrames(cornSpriteSheets[currentSpriteSheetIndex]);
+        child.textures = frames;
+        child.gotoAndPlay(0); // restarts the animation from the first frame
+      }
+    });
+  }
+}
+
+
+function getCornFrames(spriteSheetTexture) {
+  const totalFrames = 2;
+  const singleFrameWidth = spriteSheetTexture.baseTexture.width / totalFrames;
+  const frames = [];
+
+  for (let i = 0; i < totalFrames; i++) {
+    const frame = new PIXI.Rectangle(singleFrameWidth * i, 0, singleFrameWidth, spriteSheetTexture.baseTexture.height);
+    const textureFrame = new PIXI.Texture(spriteSheetTexture.baseTexture, frame);
+    frames.push(textureFrame);
+  }
+
+  return frames;
+}
 
 function createGameOverScene() {
   gameOverScene = new Container();
@@ -473,7 +588,7 @@ function createGameOverScene() {
   gameOverScene.visible = false;
   GameoverText = new PIXI.Text(
     'Game Over!',
-    { fontFamily: 'Arial', fontSize: 50, fill: 'black' },
+    { fontFamily: 'Neo둥근모', fontSize: 50, fill: 'black' },
   );
   GameoverText.x = app.view.width / 2 - GameoverText.width / 2;
   GameoverText.y = app.view.height / 2;
@@ -512,8 +627,7 @@ function restartGame() {
   // Re-create any initial game objects or UI components
   createCountdown();
   createBat();
-  createRetryButtons();
-  createYesorNoButtons();
+
 
   createGameOverScene();
 
@@ -533,108 +647,4 @@ function restartGame() {
   // Add the game loop back and start the ticker
   app.ticker.add(gameLoop);
   app.ticker.start();
-}
-function resumeYes() {
-  ecoPoint--;
-  resume();
-}
-function resumeNo() {
-  ecoPoint++;
-  resume();
-}
-function resume() {
-  app.ticker.start();
-}
-function createRetryButtons() {
-  retryButton = new PIXI.Graphics();
-  exitButton = new PIXI.Graphics();
-
-  retryButton.beginFill(0xFF3300); // color of the button
-  retryButton.drawRoundedRect(0, 0, 150, 50, 10); // width, height, and corner radius of the button
-  retryButton.endFill();
-
-  exitButton.beginFill(0xFF3300); // color of the button
-  exitButton.drawRoundedRect(0, 0, 150, 50, 10); // width, height, and corner radius of the button
-  exitButton.endFill();
-
-  retryButton.interactive = true;
-  retryButton.buttonMode = true;
-  retryButton.on('pointerdown', restartGame);
-
-  exitButton.interactive = true;
-  exitButton.buttonMode = true;
-  exitButton.on('pointerdown', exitGame);
-
-  // Optionally add text labels to the buttons
-  const retryText = new PIXI.Text('Retry', { fontFamily: 'Arial', fontSize: 24, fill: 0xffffff });
-  const exitText = new PIXI.Text('Exit', { fontFamily: 'Arial', fontSize: 24, fill: 0xffffff });
-
-  retryText.position.set((retryButton.width - retryText.width) / 2, (retryButton.height - retryText.height) / 2);
-  exitText.position.set((exitButton.width - exitText.width) / 2, (exitButton.height - exitText.height) / 2);
-
-  retryButton.addChild(retryText);
-  exitButton.addChild(exitText);
-
-  // Initially set them invisible
-  retryButton.visible = false;
-  exitButton.visible = false;
-
-  // Add them to your stage
-  app.stage.addChild(retryButton);
-  app.stage.addChild(exitButton);
-}
-
-function createYesorNoButtons() {
-  YesButton = new PIXI.Graphics();
-  NoButton = new PIXI.Graphics();
-
-  YesButton.beginFill(0xFF3300); // color of the button
-  YesButton.drawRoundedRect(0, 0, 150, 50, 10); // width, height, and corner radius of the button
-  YesButton.endFill();
-
-  NoButton.beginFill(0xFF3300); // color of the button
-  NoButton.drawRoundedRect(0, 0, 150, 50, 10); // width, height, and corner radius of the button
-  NoButton.endFill();
-
-  YesButton.interactive = true;
-  YesButton.buttonMode = true;
-  YesButton.on('pointerdown', resumeYes);
-
-  NoButton.interactive = true;
-  NoButton.buttonMode = true;
-  NoButton.on('pointerdown', resumeNo);
-
-  // Optionally add text labels to the buttons
-  const YesText = new PIXI.Text('네', { fontFamily: 'Arial', fontSize: 24, fill: 0xffffff });
-  const NoText = new PIXI.Text('아니오', { fontFamily: 'Arial', fontSize: 24, fill: 0xffffff });
-
-  YesText.position.set((YesButton.width - YesText.width) / 2, (YesButton.height - YesText.height) / 2);
-  NoText.position.set((NoButton.width - NoText.width) / 2, (NoButton.height - NoText.height) / 2);
-
-  YesButton.addChild(YesText);
-  NoButton.addChild(NoText);
-
-  // Initially set them invisible
-  YesButton.visible = false;
-  NoButton.visible = false;
-
-  // Add them to your stage
-  app.stage.addChild(YesButton);
-  app.stage.addChild(NoButton);
-}
-function showButtons() {
-  // show buttons
-  retryButton.position.set(app.screen.width / 2 - retryButton.width / 2, app.screen.height / 2);
-  exitButton.position.set(app.screen.width / 2 - exitButton.width / 2, retryButton.y + retryButton.height + 10);
-
-  retryButton.visible = true;
-  exitButton.visible = true;
-}
-
-function showYesorNoButtons() {
-  YesButton.position.set(app.screen.width / 2 - YesButton.width / 2, app.screen.height / 2);
-  NoButton.position.set(app.screen.width / 2 - NoButton.width / 2, YesButton.y + YesButton.height + 10);
-
-  YesButton.visible = true;
-  NoButton.visible = true;
 }

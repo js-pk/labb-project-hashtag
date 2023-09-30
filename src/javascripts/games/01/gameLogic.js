@@ -6,14 +6,15 @@ import {
 import { stageSentences } from './texts.js';
 import { common } from '../../common.js';
 
-let batContainer; let toolboxContainer; let items; let stoneSprite; let melon; let rake; let melonCounterText; let wateringCan; let seedPouch; let batSize; let cursorSprite; let guideBox; let guideText; let successText;
+let batContainer; let toolboxContainer; let items; let melon; let rake; let melonCounterText; let wateringCan; let seedPouch; let batSize; let cursorSprite; let guideBox; let guideText;
 let wateringCanClicked = false;
 let seedPouchClicked = false;
 let rakeClicked = false;
-let state; let id; let rocks; let healthBar; let outerBar; let redBar; let innerBar; let GameoverText; let gameScene; let gameOverScene; let successScene; let health; let MaxHealthValue; let numberOfCol; let numberOfRows; let scale;
+let state; let id; let rocks; let healthBar; let outerBar; let redBar; let innerBar; let gameScene; let gameOverScene; let health; let MaxHealthValue; let numberOfCol; let numberOfRows; let scale;
+let isGamePaused=false; let melonState='melon';
 let gameStage = 0;
 const bat1Array = [];
-let melonClicks = 2;
+
 const currentMessage = {
   type: 'guide',
   index: 0,
@@ -33,24 +34,16 @@ export function setup() {
  // console.log('All image files loaded');
 
   id = resources['/images/sprites/soils.json'].textures;
-  items = resources['/images/sprites/tools.json'].textures;
+  items = resources['/images/sprites/items.json'].textures;
   rocks = resources['/images/sprites/rock-soils.json'].textures;
 
   gameScene = new PIXI.Container();
- // gameScene.visible = false;
   app.stage.addChild(gameScene);
 
   createBat();
-  CreateGameOverScene();
   CreateToolBox();
   CreateHealthBar();
   CreateGuideConsole();
-  createSuccessScene();
-
-  // createTutorial(app.stage);
-  // startTutorial(() => {
-  //   gameScene.visible = true;
-  // });
 
   app.ticker.add((delta) => gameLoop(delta));
 
@@ -58,7 +51,7 @@ export function setup() {
 }
 
 function createBat() {
-  const batPlain = new Sprite(id['soil_plain@3x.png']);
+  const batPlain = new Sprite(id['soil_plain01@3x.png']);
   batPlain.width = batSize * numberOfCol;
   batPlain.height = batSize * numberOfRows;
   batPlain.x = ((app.view.width / resolution) - batPlain.width) / 2;
@@ -92,15 +85,9 @@ function createBat() {
   batContainer.x = batPlain.x;
   batContainer.y = batPlain.y;
   gameScene.addChild(batContainer);
-
-  stoneSprite = new PIXI.Sprite(items['items_0000_Stone.png']);
-  stoneSprite.scale.set(scale);
-  stoneSprite.visible = false;
-  gameScene.addChild(stoneSprite);
 }
 
 function CreateToolBox() {
-  // let spacing = 20; // Adjust as per your need
   const toolWidth = batSize;
   const toolHeight = batSize;
 
@@ -108,7 +95,7 @@ function CreateToolBox() {
   toolboxContainer = new PIXI.Container();
 
   // Create and add rake to the container
-  rake = new Sprite(items['tool_true2x.png']);
+  rake = new Sprite(items['rake_true2x.png']);
   rake.anchor.set(0.5);
   rake.width = toolWidth;
   rake.height = toolHeight;
@@ -163,16 +150,159 @@ function CreateToolBox() {
   melon.on('pointerdown', melonClick);
   toolboxContainer.addChild(melon);
 
-  melonCounterText = new PIXI.Text(melonClicks, { fontFamily: 'Neo둥근모', fontSize: 12, fill: 'black' });
-  melonCounterText.x = melon.x + 5;
-  melonCounterText.y = melon.y - 5;
-  toolboxContainer.addChild(melonCounterText);
-
   // Position the toolboxContainer
   toolboxContainer.x = ((app.view.width / resolution) - toolboxContainer.width) / 2;
   toolboxContainer.y = (app.view.height / resolution) - toolboxContainer.height - 12;
 
   gameScene.addChild(toolboxContainer);
+}
+
+function melonClick() {
+  // let popupSound=new Howl({
+  //   src: ['/sound/S_popup.mp3'],
+  // });
+  
+  if(melonState==='rock'){
+    health+=10;
+    console.log('rock clicked, health incremented to: ', health);
+    //return;// If you don’t want to show a popup when the rock is clicked, return here
+  }
+  
+  health += 100;
+  let popupTitle = '';
+  let IMG = '';
+  
+  switch(melonState){
+    case 'melon':
+      popupTitle='시원하고 달콤한 수박화채가 활력을 채워줍니다';
+      IMG:'/images/popup/4-2-1_energy.png';
+      break;
+    case 'noodle':
+      popupTitle='매콤한 국수를 새참으로 먹으며 힘을 보충합니다';
+      IMG:'/images/popup/4-2-2_energy.png';
+      break;
+    case 'coffee':
+      popupTitle='차가운 아메리카노가 피로를 풀어줍니다';
+      IMG:'/images/popup/4-2-3_energy.png';
+      break;
+    default:
+    console.error(`Unexpected melonState: ${melonState}`);
+    return;
+  }
+  
+ common.addPopup({
+   popupId: 'energyPopup',
+   title: popupTitle,
+   content: null,
+   imgURL:IMG,
+   buttons:[{
+     title:"먹기",
+     onclick:(event) => {
+       deactivateItem(melon);
+       common.hideAllPopup();
+        //resume the game
+       isGamePaused=false;
+       console.log('먹기 button clicked');
+     }
+   }]
+ }, () =>{
+       // Code to execute when the popup is opened.
+       isGamePaused=true;
+ });
+}
+
+function deactivateItem(item) {
+ if(item != melon){
+    if (item === rake) {
+    item.texture = items['rake_false2x.png'];
+    // item.width = batSize;
+    // item.height = batSize;
+  }
+  if (item === wateringCan) {
+    item.texture = items['water_false2x.png'];
+    // item.width = batSize;
+    // item.height = batSize;
+  }
+  if (item === seedPouch) {
+    item.texture = items['seeds_false2x.png'];
+    // item.width = batSize;
+    // item.height = batSize;
+  }
+  return;
+ }
+ 
+ switch(melonState){
+   case 'melon':
+     item.texture=items['noodles_true2x.png'];
+     melonState='noodle';
+     break;
+   case 'noodle':
+     item.texture=items['coffee_true2x.png'];
+     melonState='coffee';
+     break;
+  case 'coffee':
+    item.texture=items['rock_true2x.png'];
+    melonState='rock';
+    break;
+ }
+ 
+  item.width=batSize;
+  item.height=batSize;
+}
+
+function gameLoop(delta) {
+  // Runs the current game `state` in a loop and renders the sprites
+  state(delta);
+}
+function play(delta) {
+  if(isGamePaused) return; // Stops the execution of play function when the game is paused
+  
+  // Increase health over time
+  health += 0.05 * delta;
+
+  // Ensure health doesn't exceed maximum
+  if (health > MaxHealthValue) {
+    health = MaxHealthValue;
+  }
+
+  const healthPercentage = (health / MaxHealthValue) * 100;
+  const isLandscape = app.view.width > app.view.height;
+
+  if (isLandscape) {
+    if (healthPercentage > 50) {
+      outerBar.width = health;
+      redBar.width = 0; // Hide red bar when green bar is dominant
+    } else {
+      redBar.width = health;
+      outerBar.width = 0;
+    }
+
+    // Horizontal positioning
+    outerBar.x = MaxHealthValue - outerBar.width;
+    redBar.x = outerBar.x - redBar.width;
+  } else {
+    if (healthPercentage > 50) {
+      outerBar.height = health;
+      redBar.height = 0; // Hide red bar when green bar is dominant
+    } else {
+      redBar.height = health;
+      outerBar.height = 0;
+    }
+
+    // Vertical positioning
+    outerBar.y = MaxHealthValue - outerBar.height;
+    redBar.y = outerBar.y - redBar.height;
+  }
+
+  if (health <= 0) {
+    state = end;
+    end();
+  }
+
+  if (health < 30) {
+    currentMessage.type = 'warning';
+    displayWarning('벌써 지친건가요? 체력이 모두 떨어기 전에 잠시 쉬어주세요', 3000); // 5 seconds warning duration
+  }
 }
 
 function CreateGuideConsole() {
@@ -283,72 +413,6 @@ function CreateHealthBar() {
   healthBar.addChild(redBar);
 }
 
-function play(delta) {
-  // Increase health over time
-  health += 0.05 * delta;
-
-  // Ensure health doesn't exceed maximum
-  if (health > MaxHealthValue) {
-    health = MaxHealthValue;
-  }
-
-  const healthPercentage = (health / MaxHealthValue) * 100;
-  const isLandscape = app.view.width > app.view.height;
-
-  if (isLandscape) {
-    if (healthPercentage > 50) {
-      outerBar.width = health;
-      redBar.width = 0; // Hide red bar when green bar is dominant
-    } else {
-      redBar.width = health;
-      outerBar.width = 0;
-    }
-
-    // Horizontal positioning
-    outerBar.x = MaxHealthValue - outerBar.width;
-    redBar.x = outerBar.x - redBar.width;
-  } else {
-    if (healthPercentage > 50) {
-      outerBar.height = health;
-      redBar.height = 0; // Hide red bar when green bar is dominant
-    } else {
-      redBar.height = health;
-      outerBar.height = 0;
-    }
-
-    // Vertical positioning
-    outerBar.y = MaxHealthValue - outerBar.height;
-    redBar.y = outerBar.y - redBar.height;
-  }
-
-  if (health <= 0) {
-    state = end;
-  }
-
-  if (health < 30) {
-    currentMessage.type = 'warning';
-    displayWarning('벌써 지친건가요? 체력이 모두 떨어기 전에 잠시 쉬어주세요', 3000); // 5 seconds warning duration
-  }
-}
-
-function deactivateItem(item) {
-  if (item === rake) {
-    item.texture = items['tool_false2x.png'];
-    item.width = batSize;
-    item.height = batSize;
-  }
-  if (item === wateringCan) {
-    item.texture = items['water_false2x.png'];
-    item.width = batSize;
-    item.height = batSize;
-  }
-  if (item === seedPouch) {
-    item.texture = items['seeds_false2x.png'];
-    item.width = batSize;
-    item.height = batSize;
-  }
-}
-
 function checkTransition() {
   const clickedCount = Array.from(batContainer.children).filter((sprite) => sprite.isFilled).length;
   const soilCount = Array.from(batContainer.children).filter((sprite) => sprite.texture === id['soils02@3x.png']).length;
@@ -364,6 +428,30 @@ function checkTransition() {
     SuccessScene();
   }
 }
+function transitionToStage2() {
+  gameStage = 2;
+  console.log('transitioned to stage 2');
+  wateringCan.visible = true;
+  wateringCan.interactive = true;
+  // reset isFilled for all spots for stage 2
+  Array.from(batContainer.children).forEach((sprite) => {
+    sprite.isFilled = false;
+  });
+}
+
+function transitionToStage3() {
+  gameStage = 3;
+  console.log('transitioned to stage 3');
+
+  seedPouch.visible = true;
+  seedPouch.interactive = true;
+  // reset isFilled for all spots for stage 2
+  Array.from(batContainer.children).forEach((sprite) => {
+    sprite.isFilled = false;
+  });
+}
+
+
 
 function onClick() {
   if (this.texture === rocks['soils0-1.png'] || this.texture === rocks['soils0-2.png'] || this.texture === rocks['soils0-3.png']) {
@@ -434,121 +522,46 @@ function onClick() {
   }
 }
 
-function transitionToStage2() {
-  gameStage = 2;
-  console.log('transitioned to stage 2');
-  wateringCan.visible = true;
-  wateringCan.interactive = true;
-  // reset isFilled for all spots for stage 2
-  Array.from(batContainer.children).forEach((sprite) => {
-    sprite.isFilled = false;
-  });
-}
 
-function transitionToStage3() {
-  gameStage = 3;
-  console.log('transitioned to stage 3');
+function end() {
 
-  seedPouch.visible = true;
-  seedPouch.interactive = true;
-  // reset isFilled for all spots for stage 2
-  Array.from(batContainer.children).forEach((sprite) => {
-    sprite.isFilled = false;
-  });
-}
-function gameLoop(delta) {
-  // Runs the current game `state` in a loop and renders the sprites
-  state(delta);
-}
-
-function melonClick() {
-  health += 100;
-  melonClicks--;
-  melonCounterText.text = melonClicks;
-
-  if (melonClicks == 0) {
-    melon.visible = false;
-    melon.interactive = false;
-    melon.off('pointerdown', melonClick);
-  }
-}
-function createSuccessScene() {
-  const text = "해냈군요! \n\n당신이 클릭 한 번으로 밭을 갈고 \n\n옥수수를 심는다고 해서, \n\n그게 진짜 농사보다 덜 중요한 건 아니에요. \n\n디지털 세계에서도 '노동'이라는 것은 존재하거든요. ▶\n\n이것을 ‘놀이노동’이라고 해요.";
-
-  successScene = new PIXI.Container();
-  app.stage.addChild(successScene);
-  const successText = new PIXI.Text(text, { fontFamily: 'Neo둥근모', fontSize: 20, fill: 'white' });
-  successText.x = app.view.width / 2 - successText.width / 2;
-  successText.y = app.view.height / 2;
-  successScene.addChild(successText);
-  successScene.visible = false;
-}
-
-function showButtons() {
-  const retryButton = new PIXI.Graphics();
-  const nextButton = new PIXI.Graphics();
-  retryButton.beginFill(0xFF3300);
-  retryButton.drawRoundedRect(0, 0, 100, 50, 50, 5);
-  retryButton.endFill();
-
-  // nextButton.beginFill(0x8A2BE2);
-  // nextButton.drawRoundedRect(0,0,100,50,50,5);
-  // nextButton.endFill();
-
-  retryButton.interactive = true;
-  retryButton.on('pointerdown', restartGame);
-
-  nextButton.interactive = true;
-  nextButton.on('pointerdown', common.completeStage('01'));
-
-  const retryText = new PIXI.Text('다시 하기', { fontFamily: 'Neo둥근모', fontSize: 24, fill: 0xffffff });
-  const nextText = new PIXI.Text('LV.2 게임으로 이동!', { fontFamily: 'Neo둥근모', fontSize: 24, fill: 0xffffff });
-  retryText.position.set((retryButton.width - retryText.width) / 2, (retryButton.height - retryText.height) / 2);
-  nextText.position.set((nextButton.width - nextText.width) / 2, (nextButton.height - nextText.height) / 2);
-  retryButton.position.set(app.screen.width / 2 - retryButton.width / 2, app.screen.height / 2);
-  nextButton.position.set(app.screen.width / 2 - nextButton.width / 2, retryButton.y - 50 - retryButton.height);
-  retryButton.addChild(retryText);
-  nextButton.addChild(nextText);
-  retryButton.visible = true;
-  nextButton.visible = true;
-  app.stage.addChild(retryButton);
-  //  app.stage.addChild(nextButton);
-}
-
-function CreateGameOverScene() {
-  // create gameover scene
-  gameOverScene = new PIXI.Container();
-  app.stage.addChild(gameOverScene);
-  gameOverScene.visible = false;
-  GameoverText = new PIXI.Text(
-    '벌써 지친건가요? 체력이 모두 떨어기 전에 잠시 쉬어주세요',
-    { fontFamily: 'Neo둥근모', fontSize: 50, fill: 'white' },
-  );
-  GameoverText.x = app.view.width / 2 - GameoverText.width / 2;
-  GameoverText.y = app.view.height / 2;
-  gameOverScene.addChild(GameoverText);
+  common.addPopup({
+                    popupId: 'failGamePopup',
+                title: '에너지를 소진했습니다. 적절히 쉬는 것도 중요해요!',
+                content: null,
+                imgURL: '/images/popup/4-3_fail.png',
+                buttons: [{
+                    title: "다시하기",
+                    onclick: (event) => {
+                      common.hideAllPopup();
+                      restartGame();
+                    }
+                }]    
+            }, () => {
+		 isGamePaused=true;
+});
 }
 
 function SuccessScene() {
-  console.log('success');
-  gameScene.visible = false;
-  successScene.visible = true;
-  // completeStage('01');
-  setTimeout(() => {
-    showButtons();
-  }, 3000);
+
+   common.addPopup({
+                popupId: 'successGamePopup',
+                title: '성공! 마침내 쓸만한 땅을 만들어냈군요!',
+                content: null,
+                imgURL: '/images/popup/4-3_success.png',
+                buttons: [{
+                    title: "다음 단계로 이동",
+                    onclick: (event) =>{
+                     common.completeStage('01');
+                      common.hideAllPopup();
+                    } 
+                }]    
+            }, () => {
+		// 팝업 열렸을때 실행시키고 싶은 함수
+		 isGamePaused=true;
+});
 }
 
-function end() {
-  gameScene.visible = false;
-  gameOverScene.visible = true;
-  GameoverText.visible = true;
-  console.log('Game OVER!');
-  app.ticker.stop();
-  setTimeout(() => {
-    restartGame();
-  }, 1000); // 1 second delay
-}
 
 function restartGame() {
   gameStage = 1;
@@ -570,10 +583,10 @@ function restartGame() {
   }
 
   createBat();
-  createSuccessScene();
+ 
   CreateToolBox();
   CreateGuideConsole();
-  CreateGameOverScene();
+
   CreateHealthBar();
 
   gameScene.visible = true;

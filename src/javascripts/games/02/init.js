@@ -28,7 +28,7 @@ export const app = new PIXI.Application({
 
 app.renderer.view.style.position = 'absolute';
 app.renderer.view.style.display = 'block';
-app.renderer.view.style.border = '2px solid #333';
+//app.renderer.view.style.border = '2px solid #333';
 
 if (document.getElementById('game2')) {
   document.getElementById('game2').appendChild(app.view);

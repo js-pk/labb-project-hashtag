@@ -4,7 +4,7 @@ import { setup } from './gameLogic.js';
 import { loader } from './init.js';
 
 export function loadResources() {
-  loader.onProgress.add(loadProgressHandler);
+ // loader.onProgress.add(loadProgressHandler);
   loader.add('/images/sprites/2/bg-soil-glitch.json')
     .add('/images/sprites/2/corn01.png')
     .add('/images/sprites/2/corn02.png')
