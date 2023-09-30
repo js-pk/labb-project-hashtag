@@ -100,9 +100,12 @@ nav .icon-button img {
 footer {
     text-align: center;
     position: fixed;
-    bottom: 12px;
+    bottom: 0px;
+    right: 4px;
     
-    font-size: 12px;
+    font-size: 10px;
+    
+    opacity: 0.5;
 }
 
 .popup {
@@ -122,9 +125,9 @@ footer {
     align-items: center;
     justify-content: center;
     
-    box-shadow: 0px 0px 0px 100vh rgba(0,0,0,0.5);
-    -webkit-box-shadow: 0px 0px 0px 100vh rgba(0,0,0,0.5);
-    -moz-box-shadow: 0px 0px 0px 100vh rgba(0,0,0,0.5);
+    box-shadow: 0px 0px 0px 100vh rgba(0,0,0,0.7);
+    -webkit-box-shadow: 0px 0px 0px 100vh rgba(0,0,0,0.7);
+    -moz-box-shadow: 0px 0px 0px 100vh rgba(0,0,0,0.7);
     
     pointerEvents: auto;
     overflow: hidden;
