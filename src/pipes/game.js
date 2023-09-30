@@ -56,14 +56,52 @@ const authorize = function (req) {
   return req.session.user;
 };
 
-exports.run = function (req, res, next) {
+exports.showTutorial = function(req, res, next) {
+  const stageNo = req.params.stageNo || '01';
+  const { user } = req.session;
+
+  if (authorize(req)) {
+    if (stageNo === '01') {
+      res.render(`game/tutorial`, {
+        name: user.name,
+        stageNo: stageNo
+      });
+    } else if (stageNo === '02') {
+      if (req.session.user.stage_01 === true) {
+        res.render(`game/tutorial`, {
+          name: user.name,
+          stageNo: stageNo
+        });
+      } else {
+        res.render('denied', {
+          message: 'Level 1을 먼저 완료하세요!',
+        });
+      }
+    } else if (stageNo === '03') {
+      if (req.session.user.stage_01 === true && req.session.user.stage_02 === true) {
+        res.render(`game/tutorial`, {
+          name: user.name,
+          stageNo: stageNo
+        });
+      } else {
+        res.render('denied', {
+          message: 'Level 1 Level 2를 먼저 완료하세요!',
+        });
+      }
+    }
+  } else {
+    res.redirect('/');
+  }
+;}
+
+exports.showGame = function (req, res, next) {
   const stageNo = req.params.stageNo || '01';
   const { user } = req.session;
 
   if (authorize(req)) {
     if (stageNo === '01') {
       res.render(`game/${stageNo}`, {
-        email: user.email,
+        name: user.name,
         url: req.url,
         stage_01: req.session.user.stage_01,
         stage_02: req.session.user.stage_02,
@@ -72,7 +110,7 @@ exports.run = function (req, res, next) {
     } else if (stageNo === '02') {
       if (req.session.user.stage_01 === true) {
         res.render(`game/${stageNo}`, {
-          email: user.email,
+          name: user.name,
           url: req.url,
           stage_01: req.session.user.stage_01,
           stage_02: req.session.user.stage_02,
@@ -86,7 +124,7 @@ exports.run = function (req, res, next) {
     } else if (stageNo === '03') {
       if (req.session.user.stage_01 === true && req.session.user.stage_02 === true) {
         res.render(`game/${stageNo}`, {
-          email: user.email,
+          name: user.name,
           url: req.url,
           stage_01: req.session.user.stage_01,
           stage_02: req.session.user.stage_02,

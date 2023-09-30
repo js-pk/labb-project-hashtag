@@ -61,7 +61,8 @@ app.get('/register', home.register);
 app.get('/login', home.login);
 app.get('/reward', home.reward);
 
-app.get('/game/:stageNo', game.run);
+app.get('/tutorial/:stageNo', game.showTutorial);
+app.get('/game/:stageNo', game.showGame);
 app.get('/game/complete/:stageNo', game.complete);
 app.post('/game/upload', game.upload);
 

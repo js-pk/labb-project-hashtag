@@ -1,0 +1,163 @@
+#tutorial {
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow:hidden; 
+    /*background-color:#EFDFBE; */
+    /*background-image:url('/images/tutorial/03/bg_01.png'); */
+    background-size: contain;
+    background-position: center; 
+    background-repeat: no-repeat; 
+    width:100vw; 
+    height:100vh; 
+    display:flex; 
+    flex-direction:column; 
+    align-items:center; 
+    padding: 0 16px;
+}
+
+#tutorial #textbox {
+    position: relative;
+    background-color:var(--blue-light); 
+    width: 100%; 
+    max-width: 480px; 
+    padding:20px 24px 16px 24px; 
+    border-radius: 16px; 
+    margin-top: 64px; 
+    font-size: 20px;
+    
+    min-height: 88px;
+}
+
+#tutorial #textbox:before {
+  content: "";
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  border-left: 24px solid var(--blue-light);
+  border-right: 24px solid transparent;
+  border-top: 12px solid var(--blue-light);
+  border-bottom: 20px solid transparent;
+  left: 24px;
+  bottom: -24px;
+}
+
+#tutorial #character {
+    position:fixed; 
+    bottom: 48px;
+    max-height: 300px;
+}
+
+.background-01-01 {
+    background-image: url('/images/tutorial/01/bg_01.png');
+}
+
+.background-01-03 {
+    background-image: url('/images/tutorial/01/bg_01.png');
+}
+
+.check-01-04-01 {
+    background-color: #FFFFCC;
+    background-image: url("/images/tutorial/01/check_01.png");
+}
+
+.check-01-04-02 {
+    background-color: #CC66FF;
+    background-image: url("/images/tutorial/01/check_02.png");
+}
+
+.check-01-04-03 {
+    background-color: #CCCCCC;
+    background-image: url("/images/tutorial/01/check_03.png");
+}
+
+.check-01-04-04 {
+    background-color: #99CCCC;
+    background-image: url("/images/tutorial/01/check_04.png");
+}
+
+
+.background-02-01 {
+    background-image: url('/images/tutorial/02/bg_01.png');
+}
+
+.background-02-02 {
+    background-image: url('/images/tutorial/02/bg_02.png');
+}
+
+.background-02-03 {
+    background-image: url('/images/tutorial/02/bg_03.png');
+}
+
+.check-02-04-01 {
+    background-color: #669999;
+    background-image: url('/images/tutorial/02/check_01.png');
+}
+
+.check-02-04-02 {
+    background-color: #CCCCCC;
+    background-image: url('/images/tutorial/02/check_02.png');
+}
+
+.check-02-04-03 {
+    background-color: #00CC33;
+    background-image: url('/images/tutorial/02/check_03.png');
+}
+
+.check-02-04-04 {
+    background-color: #33FFFF;
+    background-image: url('/images/tutorial/02/check_04.png');
+}
+
+.check-02-04-05 {
+    background-color: #FFCCFF;
+    background-image: url('/images/tutorial/02/check_05.png');
+}
+
+.background-02-05 {
+    background-image: url('/images/tutorial/02/bg_01.png');
+}
+
+.background-03-01 {
+    background-color: #EFDFBE;
+    background-image: url('/images/tutorial/03/bg_01.png');
+}
+
+.background-03-02 {
+    background: rgb(162,255,255);
+    background: -webkit-linear-gradient(bottom, rgba(162,255,255,1) 0%, rgba(255,168,255,1) 100%);
+    background: -moz-linear-gradient(bottom, rgba(162,255,255,1) 0%, rgba(255,168,255,1) 100%);
+    background: -o-linear-gradient(bottom, rgba(162,255,255,1) 0%, rgba(255,168,255,1) 100%);
+    background: linear-gradient(to top, rgba(162,255,255,1) 0%, rgba(255,168,255,1) 100%);
+}
+
+#checklist {
+    position: fixed;
+    z-index: 9;
+    
+    width: 100vw;
+    height: 100vh;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    background-size: contain;
+    background-position: center; 
+    background-repeat: no-repeat; 
+}
+
+#action-box {
+    position: fixed;
+    bottom: 48px;
+    
+    width: 60vw;
+    max-width:480px;
+    
+    padding: 24px;
+    background-color: #ffffff;
+    border: 4px solid #000000;
+    
+    text-align: center;
+    font-size: 24px;
+}

@@ -46,7 +46,7 @@ exports.register = async function (req, res) {
       email,
       status: {
         type: 'USER_EXISTS',
-        message: '이미 사용된 이메일입니다.',
+        message: '이미 사용된 이메일입니다. 이전에 게임을 플레이하셨다면 로그인하세요',
       },
     });
   } else {
@@ -61,7 +61,7 @@ exports.register = async function (req, res) {
           stage_03: false,
           reward_exchanged: false,
         };
-        res.redirect('/game/01');
+        res.redirect('/tutorial/01');
       }).catch((err) => {
         console.err(err.message);
         res.status(500).send('회원 가입 중에 에러가 발생했습니다.');
