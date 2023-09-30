@@ -3,6 +3,11 @@
 <link rel="stylesheet" type="text/css" href="/styles/signup.css"/>
 <script>
     
+    const token = '<%= locals.token %>';
+    if (token != '') {
+        window.history.replaceState(null, null, `${window.location.pathname}?token=${token}`);
+    }
+    
     function submitForm(action){
         let form = document.getElementById("form");
         if (validateName() && validateEmail() && validateCheckbox()) {
@@ -46,7 +51,7 @@
         });
         let token = params.token; 
         
-        location=`./login?token=${token}`;
+        location=`/login/?token=${token}`;
     }
     
     

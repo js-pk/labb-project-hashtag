@@ -2,6 +2,13 @@
 <%- include("../_header") -%>
 <link rel="stylesheet" type="text/css" href="/styles/signup.css"/>
 <script>
+
+    const token = '<%= locals.token %>';
+    if (token != '') {
+        window.history.replaceState(null, null, `${window.location.pathname}?token=${token}`);
+    }
+    
+    
     function submitForm(action){
         let form = document.getElementById("form");
         if (validateEmail()) {
@@ -27,7 +34,7 @@
         });
         let token = params.token; 
         
-        location=`./?token=${token}`;
+        location=`/register/?token=${token}`;
     }
 </script>
 <main>

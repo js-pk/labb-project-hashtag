@@ -1,6 +1,9 @@
 const Database = require('../../database/connection.js');
-
 const db = new Database();
+
+const twoFactor = require("node-2fa");
+const secret = process.env.APP_SECRET;
+const token = twoFactor.generateToken(secret).token;
 
 exports.logout = function (req, res) {
   req.session.destroy(() => {
@@ -24,8 +27,9 @@ exports.login = async function (req, res) {
     };
     res.redirect('/');
   } else {
-    res.render('login', {
+    res.render('home/login', {
       email,
+      token: token,
       status: {
         type: 'LOGIN_FAILED',
         message: '존재하지 않는 이메일입니다.',
@@ -41,9 +45,10 @@ exports.register = async function (req, res) {
 
   const user = await db.first('users', 'WHERE email=?', [email]);
   if (user) {
-    res.render('signup', {
+    res.render('home/signup', {
       name,
       email,
+      token: token,
       status: {
         type: 'USER_EXISTS',
         message: '이미 사용된 이메일입니다. 이전에 게임을 플레이하셨다면 로그인하세요',
