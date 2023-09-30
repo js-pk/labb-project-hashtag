@@ -64,14 +64,14 @@ exports.showTutorial = function(req, res, next) {
     if (stageNo === '01') {
       res.render(`game/tutorial`, {
         name: user.name,
-        nav_title: '튜토리얼 01',
+        nav_title: '튜토리얼 1',
         game_index: 0
       });
     } else if (stageNo === '02') {
       if (req.session.user.stage_01 === true) {
         res.render(`game/tutorial`, {
           name: user.name,
-          nav_title: '튜토리얼 02'
+          nav_title: '튜토리얼 2'
         });
       } else {
         res.render('denied', {
@@ -83,7 +83,7 @@ exports.showTutorial = function(req, res, next) {
       if (req.session.user.stage_01 === true && req.session.user.stage_02 === true) {
         res.render(`game/tutorial`, {
           name: user.name,
-          nav_title: '튜토리얼 01',
+          nav_title: '튜토리얼 3',
           game_index: 2
         });
       } else {
@@ -105,13 +105,13 @@ exports.showGame = function (req, res, next) {
     if (stageNo === '01') {
       res.render(`game/${stageNo}`, {
         name: user.name,
-        nav_title: '농사 레벨 01'
+        nav_title: '농사 레벨 1'
       });
     } else if (stageNo === '02') {
       if (req.session.user.stage_01 === true) {
         res.render(`game/${stageNo}`, {
           name: user.name,
-          nav_title: '농사 레벨 02'
+          nav_title: '농사 레벨 2'
         });
       } else {
         res.render('denied', {
@@ -122,7 +122,7 @@ exports.showGame = function (req, res, next) {
       if (req.session.user.stage_01 === true && req.session.user.stage_02 === true) {
         res.render(`game/${stageNo}`, {
           name: user.name,
-          nav_title: '농사 레벨 03'
+          nav_title: '농사 레벨 3'
         });
       } else {
         res.render('denied', {
