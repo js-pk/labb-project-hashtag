@@ -64,24 +64,27 @@ exports.showTutorial = function(req, res, next) {
     if (stageNo === '01') {
       res.render(`game/tutorial`, {
         name: user.name,
-        stageNo: stageNo
+        nav_title: '튜토리얼 01',
+        game_index: 0
       });
     } else if (stageNo === '02') {
       if (req.session.user.stage_01 === true) {
         res.render(`game/tutorial`, {
           name: user.name,
-          stageNo: stageNo
+          nav_title: '튜토리얼 02'
         });
       } else {
         res.render('denied', {
           message: 'Level 1을 먼저 완료하세요!',
+          game_index: 1
         });
       }
     } else if (stageNo === '03') {
       if (req.session.user.stage_01 === true && req.session.user.stage_02 === true) {
         res.render(`game/tutorial`, {
           name: user.name,
-          stageNo: stageNo
+          nav_title: '튜토리얼 01',
+          game_index: 2
         });
       } else {
         res.render('denied', {
@@ -102,19 +105,13 @@ exports.showGame = function (req, res, next) {
     if (stageNo === '01') {
       res.render(`game/${stageNo}`, {
         name: user.name,
-        url: req.url,
-        stage_01: req.session.user.stage_01,
-        stage_02: req.session.user.stage_02,
-        stage_03: req.session.user.stage_03,
+        nav_title: '농사 레벨 01'
       });
     } else if (stageNo === '02') {
       if (req.session.user.stage_01 === true) {
         res.render(`game/${stageNo}`, {
           name: user.name,
-          url: req.url,
-          stage_01: req.session.user.stage_01,
-          stage_02: req.session.user.stage_02,
-          stage_03: req.session.user.stage_03,
+          nav_title: '농사 레벨 02'
         });
       } else {
         res.render('denied', {
@@ -125,10 +122,7 @@ exports.showGame = function (req, res, next) {
       if (req.session.user.stage_01 === true && req.session.user.stage_02 === true) {
         res.render(`game/${stageNo}`, {
           name: user.name,
-          url: req.url,
-          stage_01: req.session.user.stage_01,
-          stage_02: req.session.user.stage_02,
-          stage_03: req.session.user.stage_03,
+          nav_title: '농사 레벨 03'
         });
       } else {
         res.render('denied', {

@@ -1,29 +1,59 @@
 <link rel="stylesheet" type="text/css" href="/styles/dashboard.css"></link>
 <script src="/scripts/actions.js"></script>
+<script>
+    function showCredit() {
+        if (document.getElementById('credit')) {
+            showPopup("credit")
+        } else {
+            addPopup({
+                popupId: "credit",
+                content: "<원클릭 쓰리 강냉이>\n제작 크레딧\n\n 총기획\n 시나리오\n 레벨디자인\n 2D 그래픽\n 3D 그래픽\n 콘코인 제작\n 2D 게임 개발\n AR 게임 개발\n 벡엔드 개발\n 후원",
+                buttons: [
+                    {
+                        title: "확인",
+                        onclick: hideAllPopup
+                    }
+                ]
+            })
+        }
+    }
+</script>
 <%- include("../_header") -%>
 
     <div id="cloud"></div>
     <div id="home"></div>
     <img id="scarecrow" src="/images/misc/scarecrow.png"/>
     
-    <div class="action-container">
-        <img id="title" alt="원클릭 쓰리 강냉이" src="/images/misc/title.png" />
-        <a class="button <%= locals.stage_01 ? "completed" : "" %>" href="/tutorial/01">Level 1</a>
-        <% if (locals.stage_01) { %>
-            <a class="button <%= locals.stage_02 ? "completed" : "" %>" href="/tutorial/02">Level 2</a>
-        <% } else { %>
-             <div class="button disabled">Level 2</div>
-        <% } %>
-        <% if (locals.stage_01 && locals.stage_02) { %>
-            <a class="button <%= locals.stage_03 ? "completed" : "" %>" href="/tutorial/03">Level 3</a>
-        <% } else { %>
-             <div class="button disabled">Level 3</div>
-        <% } %>
-        <a class="button" href="/reward">Reward</a>
-        <button class="button">환경설정</button>
-        
-        <form id="form" action="/user/logout" method="post">
-            <input type="submit" value="로그아웃" /> 
-        </form>
+    <% if (locals.stage_01 && locals.stage_02 && locals.stage_03) { %>
+        <a class="reward-container" href="/reward">
+            <img class="corn-coin" alt="원클릭 쓰리 강냉이" src="/images/misc/corn_coin.gif" />
+            <div class="button reward">보상 받기</div>
+        </a>
+    <% } else { %>
+        <div class="title-container">
+            <img class="title" alt="원클릭 쓰리 강냉이" src="/images/misc/title.png" />
+        </div>
+    <% } %>
+    
+    <div class="bottom-container">
+        <div class="menu-container">
+            <form id="form" class="button" action="/user/logout" method="post">
+                <input type="submit" value="로그아웃" /> 
+            </form>
+            <button onclick="showCredit()" class="button">크레딧</button>
+        </div>
+        <div class="levels-container">
+            <a class="button <%= locals.stage_01 ? "completed" : "" %>" href="/tutorial/01">Level 1</a>
+            <% if (locals.stage_01) { %>
+                <a class="button <%= locals.stage_02 ? "completed" : "" %>" href="/tutorial/02">Level 2</a>
+            <% } else { %>
+                 <div class="button disabled">Level 2</div>
+            <% } %>
+            <% if (locals.stage_01 && locals.stage_02) { %>
+                <a class="button <%= locals.stage_03 ? "completed" : "" %>" href="/tutorial/03">Level 3</a>
+            <% } else { %>
+                 <div class="button disabled">Level 3</div>
+            <% } %>
+        </div>
     </div>
 <%- include("../_footer") -%>

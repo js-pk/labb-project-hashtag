@@ -1,5 +1,5 @@
 <%- include("../_header") -%>
-<%- include("../_tutorial_nav") -%>
+<%- include("../_nav") -%>
 <link rel="stylesheet" type="text/css" href="/styles/tutorial.css"></link>
 <script>
 
@@ -221,7 +221,7 @@
     }
     
     window.onload = () => {
-        currentTutorialIndex = <%= locals.stageNo - 1 %>;
+        currentTutorialIndex = <%= locals.game_index %>;
         initTutorial(currentTutorialIndex);
         setTutorial(0);
         document.body.onclick = onClickTutorial;

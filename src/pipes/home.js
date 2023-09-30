@@ -20,7 +20,7 @@ exports.index = function (req, res, next) {
     res.render('home/dashboard', {
       stage_01: req.session.user.stage_01,
       stage_02: req.session.user.stage_02,
-      stage_03: req.session.user.stage_03,
+      stage_03: req.session.user.stage_03
     });
   } else {
     if (verifyIsInMeuseum(req)) {
@@ -39,6 +39,7 @@ exports.reward = function (req, res, next) {
     if (req.session.user.stage_01 && req.session.user.stage_02 && req.session.user.stage_03) {
       res.render('home/reward', {
         reward_exchanged: req.session.user.reward_exchanged,
+        nav_title: 'reward'
       });
     } else {
       res.render('home/denied', {
