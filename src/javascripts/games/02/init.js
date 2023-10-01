@@ -10,8 +10,8 @@ export const { Rectangle } = PIXI;
 export const { Graphics } = PIXI;
 
 const maxPixelRatio = 2; // Adjust to preference
-export const resolution = Math.min(window.devicePixelRatio, maxPixelRatio);
-// const resolution=1;
+// export const resolution = Math.min(window.devicePixelRatio, maxPixelRatio);
+export const resolution = 2;
 export const width = window.innerWidth;
 export const height = window.innerHeight;
 

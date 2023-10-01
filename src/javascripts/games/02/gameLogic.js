@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js';
-
 import {
   app, Container, Sprite, TextureCache, Graphics, resources, resolution,
 } from './init.js';
@@ -11,20 +10,20 @@ let countdownText; let id; let soils; let bgSprites; let batContainer; let gameS
 let countdownTime = 100;
 let lastTime = Date.now();
 let cornSprite1; let cornSprite2; let cornSprite3; let cornSprite4; let cornSprite5; let cornAni1; let cornSpriteSheets; let beeFrames; let mothFrames; let walkingRightTextures1; let walkingRightTextures2; let walkingRightTextures3; let walkingLeftTextures1; let walkingLeftTextures2; let walkingLeftTextures3;
-let scale; let batSize; let weeds; let weedKeys; let guideBox; let guideText; let gameStage=1;
+let scale; let batSize; let weeds; let weedKeys; let guideBox; let guideText; let gameStage=1; let isPopupGenerated=false;
 // 밭 한칸당 4점 x 24 = 96점
 let score = 96;
 let ecoPoint = 0;
 let previousGameStage = null; // Initializing to null as there is no previous stage at the start.
-
+let isGamePaused=false;
 // Assuming your 750px wide window fits 4 columns with 60 spacing in portrait
 const baseWindowWidth = 750 / 2;
 
 scale = app.view.width / baseWindowWidth;
 
-const baseBatSize = 30; // Original rectangle size
+const baseBatSize = 60; // Original rectangle size
 
-batSize = baseBatSize * scale;
+batSize = baseBatSize * scale / resolution;
 
 let currentSpriteSheetIndex = 0;
 let accumulatedTime = 0;
@@ -37,7 +36,7 @@ const currentMessage = {
 };
 
 export function setup() {
-  bgSprites = resources['/images/sprites/2/bg-soil-glitch.json'].textures;
+  // bgSprites = resources['/images/sprites/2/bg-soil-glitch.json'].textures;
   cornSprite1 = resources['/images/sprites/2/corn01.png'].texture;
   cornSprite2 = resources['/images/sprites/2/corn02.png'].texture;
   cornSprite3 = resources['/images/sprites/2/corn03.png'].texture;
@@ -85,20 +84,20 @@ function CreateGuideConsole(){
   }
   guideBox=new PIXI.Graphics();
   guideBox.beginFill(0xFFFFFF);
-  guideBox.drawRoundedRect(0, 0, batContainer.width * 1.2, (app.view.height / resolution) / 10, 20);
+  guideBox.drawRoundedRect(0, 0, batContainer.width * 1.5, (app.view.height / resolution) / 8, 16);
   guideBox.endFill();
   guideBox.x = ((app.view.width / resolution) - guideBox.width) / 2;
   guideBox.y = (app.view.height / resolution) / 10;
-  guideBox.zIndex=1;
+  guideBox.zIndex = 99;
   gameScene.addChild(guideBox);
   gameScene.children.sort((a, b) => a.zIndex - b.zIndex); // Sort after adding a new child
 
   
-   const baseSize = 40; // This is your base font size for a known screen size, e.g., 800px width
+  const baseSize = 40; // This is your base font size for a known screen size, e.g., 800px width
   const baseScreenWidth = 800; // The screen width you designed for
   const currentScreenWidth = window.innerWidth; // Get current screen (viewport) width
   const dynamicFontSize = (currentScreenWidth / baseScreenWidth) * baseSize;
-  guideText = new PIXI.Text(sentences[0], { fontFamily: "Neo둥근모", fontSize: dynamicFontSize, fill: '#000000', wordWrap: true, wordWrapWidth: batContainer.width * 1.3 });
+  guideText = new PIXI.Text(sentences[0], { fontFamily: "Neo둥근모", fontSize: dynamicFontSize*2, fill: '#000000', wordWrap: true, wordWrapWidth: batContainer.width * 1.1 });
   guideText.anchor.set(0.5);
   guideText.x = guideBox.width / 2;
   guideText.y = guideBox.height / 2;
@@ -127,8 +126,6 @@ function CreateGuideConsole(){
 }
 
 function createBat() {
- 
-  
   const cornFrames = getCornFrames(cornSpriteSheets[currentSpriteSheetIndex]);
   batContainer = new Container();
   cornSprites = new Array(numberOfCol).fill(null).map(() => new Array(numberOfRows).fill(null));
@@ -189,26 +186,26 @@ function createCountdown() {
   }
    const circle = new PIXI.Graphics();
     circle.beginFill(0x58bfff); 
-    circle.drawCircle(0, 0, 60); // Change 40 to the radius you desire
+    circle.drawCircle(0, 0, 45); // Change 40 to the radius you desire
     circle.endFill();
     
      // Position the circle
-    circle.x = (app.view.width / resolution) * 0.8;
-    circle.y = (app.view.height / resolution) / 10;
+    circle.x = (app.view.width / resolution) * 0.9;
+    circle.y = (app.view.height / resolution) / 6.1;
     
   let labelText=new PIXI.Text('Time Left: ', {fontFamily:'Neo둥근모', fontSize:36, fill: 'black'});
   countdownText = new PIXI.Text('100', { fontFamily: 'Neo둥근모', fontSize: 50, fill: 'white' });
 
   
   labelText.x= ((app.view.width / resolution) - batContainer.width) / 2;
-  countdownText.x=(app.view.width / resolution)*0.8;
+  countdownText.x=(app.view.width / resolution)*0.865;
   labelText.y =((app.view.height / resolution) - batContainer.height) / 2
-  countdownText.y =(app.view.height / resolution)/10;
-  circle.zIndex=2;
-  countdownText.zIndex=2;
+  countdownText.y =(app.view.height / resolution)/6.8;
+  circle.zIndex=999;
+  countdownText.zIndex=9999;
   gameScene.addChild(circle);
-   gameScene.addChild(countdownText);   
-   gameScene.children.sort((a, b) => a.zIndex - b.zIndex); // Sort after adding new children
+  gameScene.addChild(countdownText);   
+  gameScene.children.sort((a, b) => a.zIndex - b.zIndex); // Sort after adding new children
 
 }
 
@@ -269,6 +266,8 @@ function gameLoop(delta) {
 }
 
 function play(delta) {
+    if(isGamePaused) return; // Stops the execution of play function when the game is paused
+
   // All the game logic goes here
   const currentTime = Date.now();
   const deltaTime = (currentTime - lastTime) / 1000;
@@ -296,7 +295,11 @@ function play(delta) {
     handleCollisions();
     accumulatedTime += deltaTime;
     
-      if (gameStage === 1 && Math.random() < 0.01) spawnWeed();
+    if (gameStage===2&& countdownTime <70 && !isPopupGenerated){
+      generateNongYakPopup();
+      isPopupGenerated=true;
+    }
+    if (gameStage === 1 && Math.random() < 0.01) spawnWeed();
     if (gameStage === 2 && Math.random() < 0.03) generateBugs();
     if (gameStage === 3 && Math.random() < 0.03) generateAnimals();
 
@@ -334,8 +337,53 @@ function play(delta) {
       }
     }
   });
-  
-  
+}
+
+function generateNongYakPopup(){
+  common.addPopup({
+                popupId: 'nongyakPopup',
+                title: '제초제를 살포할까요? 밭에 잡초가 나지 않습니다.',
+                content: null,
+                imgURL: '/images/popup/5-2-1_success.png',
+                buttons: [
+                  {
+                    title: "예",
+                    onclick: (event) => {
+                      
+                     generateWormPopup();
+                    }
+                },
+                {
+                  title: "아니오",
+                  onclick: (event) => {
+                    common.hideAllPopup();
+                    isGamePaused=false;
+                  }
+                }]    
+            }, () => {
+		 isGamePaused=true;
+});
+}
+
+function generateWormPopup(){
+  common.addPopup({
+                popupId: 'WormPopup',
+                title: '지렁이는 터전을 잃었습니다.',
+                content: null,
+                imgURL: '/images/popup/earthworm_popup.png',
+                buttons: [
+                  {
+                    title: "확인",
+                    onclick: (event) => {
+                      
+                      common.hideAllPopup();
+                      //resume the game
+                     isGamePaused=false;
+                    }
+                }]
+  },() => {
+    isGamePaused=true;
+  });
 }
 
 function handleStageChange(fromStage, toStage) {
@@ -445,8 +493,6 @@ function pushSpriteAway(event) {
 
 function generateBugs() {
   // randomly select which animation to use
-  
-  
   const randomBugAni = Math.random() < 0.5 ? beeFrames : mothFrames;
   // Get all frame names from the selected animation
   const frameNames = Object.keys(randomBugAni);
@@ -500,7 +546,6 @@ function generateBugs() {
 }
 
 function generateAnimals() {
-  console.log('animal time!');
   const walkingRight = Math.random() < 0.5;
   const randomAnimalIndex = Math.floor(Math.random() * 3);
 
@@ -524,31 +569,26 @@ function generateAnimals() {
   sprite.animationSpeed = 0.3;
   sprite.play();
   sprite.isCollided = false;
-
+  
+  sprite.y = Math.random() * (app.view.height/2 - sprite.height) + guideBox.y/2;
+  sprite.speed = Math.random() * 3 + 2;
+  
   if (walkingRight) {
-    sprite.x = 0;
-    sprite.vx = 1; // Move right
+    sprite.x = 0 - sprite.width/2;
+    // sprite.vx = 1 // Move right
+
   } else {
-    sprite.x = app.view.width - sprite.width;
+    sprite.x = app.view.width/2 - sprite.width/2;
     sprite.vx = -1; // Move left
   }
-  sprite.y = Math.random() * (app.view.height - sprite.height);
-
-  sprite.speed = Math.random() * 3 + 2;
+  
 
   app.stage.addChild(sprite);
 
   sprite.interactive = true;
   sprite.on('pointerdown', pushSpriteAway);
-  
-    if(!walkingRight){
-    console.log('left-moving',sprite);
-  }
-  
-  
-  return sprite;
-  
 
+  return sprite;
 }
 
 
@@ -633,7 +673,7 @@ function restartGame() {
 
   // Reset the game timer
   countdownTime = 100;
-
+  isPopupGenerated=false;
   // Set the visibility of game scenes
   gameScene.visible = true;
   gameOverScene.visible = false;

@@ -6,12 +6,12 @@ import {
 import { stageSentences } from './texts.js';
 import { common } from '../../common.js';
 
-let batContainer; let toolboxContainer; let items; let melon; let rake; let melonCounterText; let wateringCan; let seedPouch; let batSize; let cursorSprite; let guideBox; let guideText;
+let batContainer; let toolboxContainer; let items; let melon; let rake; let wateringCan; let seedPouch; let batSize; let cursorSprite; let guideBox; let guideText;
 let wateringCanClicked = false;
 let seedPouchClicked = false;
 let rakeClicked = false;
 let state; let id; let rocks; let healthBar; let outerBar; let redBar; let innerBar; let gameScene; let gameOverScene; let health; let MaxHealthValue; let numberOfCol; let numberOfRows; let scale;
-let isGamePaused=false; let melonState='melon';
+let isGamePaused=false; let melonState='melon'; let niceFace; let faces; let notbadFace; let badFace; let currentStageAtStart; 
 let gameStage = 0;
 const bat1Array = [];
 
@@ -32,19 +32,19 @@ batSize = baseBatSize * scale / resolution;
 
 export function setup() {
  // console.log('All image files loaded');
-
   id = resources['/images/sprites/soils.json'].textures;
   items = resources['/images/sprites/items.json'].textures;
   rocks = resources['/images/sprites/rock-soils.json'].textures;
-
+ faces=resources['/images/sprites/faces.json'].textures;
+  
   gameScene = new PIXI.Container();
   app.stage.addChild(gameScene);
-
+ 
   createBat();
   CreateToolBox();
   CreateHealthBar();
   CreateGuideConsole();
-
+  createFaceStatus();
   app.ticker.add((delta) => gameLoop(delta));
 
   state = play;
@@ -216,18 +216,12 @@ function deactivateItem(item) {
  if(item != melon){
     if (item === rake) {
     item.texture = items['rake_false2x.png'];
-    // item.width = batSize;
-    // item.height = batSize;
   }
   if (item === wateringCan) {
     item.texture = items['water_false2x.png'];
-    // item.width = batSize;
-    // item.height = batSize;
   }
   if (item === seedPouch) {
     item.texture = items['seeds_false2x.png'];
-    // item.width = batSize;
-    // item.height = batSize;
   }
   return;
  }
@@ -246,11 +240,38 @@ function deactivateItem(item) {
     melonState='rock';
     break;
  }
- 
   item.width=batSize;
   item.height=batSize;
 }
 
+function CreateHealthBar() {
+  MaxHealthValue = app.view.height * 0.5 / resolution;
+  health = MaxHealthValue;
+  healthBar = new PIXI.Container();
+
+  // Set the position to the left side and vertically centered
+  healthBar.position.set((app.view.width / resolution / 12), (app.view.height / resolution / 2)-100);
+
+  gameScene.addChild(healthBar);
+
+  innerBar = new Graphics();
+  innerBar.beginFill(0x000000);
+  innerBar.drawRoundedRect(0, 0, 7 * scale, MaxHealthValue, 20);
+  innerBar.endFill();
+  healthBar.addChild(innerBar);
+
+  outerBar = new Graphics();
+  outerBar.beginFill(0x00FF00);
+  outerBar.drawRoundedRect(0, 0, 7 * scale, MaxHealthValue, 20);
+  outerBar.endFill();
+  healthBar.addChild(outerBar);
+
+  redBar = new Graphics();
+  redBar.beginFill(0xFF3300);
+  redBar.drawRoundedRect(0, 0, 7 * scale, MaxHealthValue, 20);
+  redBar.endFill();
+  healthBar.addChild(redBar);
+}
 function gameLoop(delta) {
   // Runs the current game `state` in a loop and renders the sprites
   state(delta);
@@ -267,21 +288,7 @@ function play(delta) {
   }
 
   const healthPercentage = (health / MaxHealthValue) * 100;
-  const isLandscape = app.view.width > app.view.height;
-
-  if (isLandscape) {
-    if (healthPercentage > 50) {
-      outerBar.width = health;
-      redBar.width = 0; // Hide red bar when green bar is dominant
-    } else {
-      redBar.width = health;
-      outerBar.width = 0;
-    }
-
-    // Horizontal positioning
-    outerBar.x = MaxHealthValue - outerBar.width;
-    redBar.x = outerBar.x - redBar.width;
-  } else {
+ 
     if (healthPercentage > 50) {
       outerBar.height = health;
       redBar.height = 0; // Hide red bar when green bar is dominant
@@ -293,7 +300,7 @@ function play(delta) {
     // Vertical positioning
     outerBar.y = MaxHealthValue - outerBar.height;
     redBar.y = outerBar.y - redBar.height;
-  }
+  
 
   if (health <= 0) {
     state = end;
@@ -302,20 +309,93 @@ function play(delta) {
 
   if (health < 30) {
     currentMessage.type = 'warning';
-    displayWarning('벌써 지친건가요? 체력이 모두 떨어기 전에 잠시 쉬어주세요', 3000); // 5 seconds warning duration
+    displayWarning('힘들면 쉬어도 괜찮아요.', 3000); // 5 seconds warning duration
+  }
+  // determine which face to show
+  if (healthPercentage > 66) {
+    niceFace.visible = true;
+    notbadFace.visible = false;
+    badFace.visible = false;
+  } else if (healthPercentage > 33) {
+    niceFace.visible = false;
+    notbadFace.visible = true;
+    badFace.visible = false;
+  } else {
+    niceFace.visible = false;
+    notbadFace.visible = false;
+    badFace.visible = true;
   }
 }
 
+
+function createFaceStatus(){
+  
+  niceFace = new Sprite(faces['1niceface.png']);
+   notbadFace= new Sprite(faces['2notbadface.png']);
+   badFace=new Sprite(faces['3badface.png']);
+   // set position for each face above the health bar
+   const faceYPos = healthBar.y - niceFace.height - 10; // 10 is the padding between face and health bar
+   
+   niceFace.position.set(healthBar.x-(niceFace.width/3), faceYPos);
+   notbadFace.position.set(healthBar.x-(notbadFace.width/3), faceYPos);
+   badFace.position.set(healthBar.x-(badFace.width/3), faceYPos);
+   
+   // Initially set visibility to false
+   niceFace.visible = false;
+   notbadFace.visible = false;
+   badFace.visible = false;
+   
+   // Add to the game scene
+   gameScene.addChild(niceFace);
+   gameScene.addChild(notbadFace);
+   gameScene.addChild(badFace);
+}
+
+
 function CreateGuideConsole() {
-  if (!stageSentences[gameStage]) {
-    console.error('no sentences found for stage ${currentStage}');
+  if (gameStage === 0) {
+    initializeGuideBox(['START']); // Pass ['START'] as a placeholder sentence
+    guideText.text = 'START';
+    // Make 'START' text interactive
+    guideText.interactive = true;
+    guideText.buttonMode = true;
+    guideText.on('pointerdown', onStartTextClick); // Assign a click event handler to 'START' text
     return;
   }
-  const sentences = stageSentences[gameStage];
-  if (guideBox) {
-    gameScene.removeChild(guideBox);
-    guideBox = null;
+  
+  if (!stageSentences[gameStage]) {
+    console.error(`No sentences found for stage ${gameStage}`);
+    return;
   }
+
+  const sentences = stageSentences[gameStage];
+  initializeGuideBox(sentences); // Pass sentences for the current game stage
+  guideText.text = sentences[0];
+  startSentenceDisplayInterval(sentences);
+}
+
+function onStartTextClick() {
+  let startSound = new Howl({
+    src: ['/sound/S_levelStart.mp3'],
+  });
+  startSound.play(); // Play sound after a user gesture (click)
+
+  guideText.interactive = false;
+  guideText.buttonMode = false;
+  guideText.off('pointerdown', onStartTextClick); // Remove the click event after it's clicked
+  
+  setTimeout(() => {
+    gameStage = 1; // Set gameStage to 1 after displaying 'START'
+    if (stageSentences[1] && stageSentences[1].length > 0) {
+      guideText.text = stageSentences[1][0];
+      startSentenceDisplayInterval(stageSentences[1]); // Start displaying the sentences
+    } else {
+      console.error('No sentences found for stage 1');
+    }
+  }, 2000);
+}
+
+function initializeGuideBox(sentences){
   guideBox = new PIXI.Graphics();
   guideBox.beginFill(0xFFFFFF);
   guideBox.drawRoundedRect(0, 0, batContainer.width * 1.5, (app.view.height / resolution) / 8, 16);
@@ -328,30 +408,28 @@ function CreateGuideConsole() {
   const baseScreenWidth = 800; // The screen width you designed for
   const currentScreenWidth = window.innerWidth; // Get current screen (viewport) width
   const dynamicFontSize = (currentScreenWidth / baseScreenWidth) * baseSize;
+  //  const dynamicFontSize = (window.innerWidth / 800) * 40; // Example calculation
+
   guideText = new PIXI.Text(sentences[0], { fontFamily: "Neo둥근모", fontSize: dynamicFontSize, fill: '#000000', wordWrap: true, wordWrapWidth: batContainer.width * 1.3 });
   guideText.anchor.set(0.5);
   guideText.x = guideBox.width / 2;
   guideText.y = guideBox.height / 2;
   guideBox.addChild(guideText);
+}
 
-  const currentStageAtStart = gameStage;
-  // Display each sentence sequentially every second
-  let index = 1; // starting from the second sentence since the first one is already displayed
+
+function startSentenceDisplayInterval(sentences) {
+  let index = 0;
   const interval = setInterval(() => {
-    if (gameStage != currentStageAtStart) { // If the game stage has changed, stop the loop and exit
+    if (gameStage != currentStageAtStart) {
       clearInterval(interval);
       return;
     }
     guideText.text = sentences[index];
     index++;
-
     if (index >= sentences.length) {
-      if (gameStage === 0) {
-        clearInterval(interval);
-        gameStage = 1;
-        CreateGuideConsole();
-      } else if (gameStage === 1 || gameStage === 2 || gameStage === 3) {
-        index = 0;
+      if (gameStage === 1 || gameStage === 2 || gameStage === 3) {
+        index = 0; // Restart loop for stages 1-3
       }
     }
   }, 2000);
@@ -385,34 +463,7 @@ function continueGuideMessages() {
     }
   }, 2500);
 }
-function CreateHealthBar() {
-  MaxHealthValue = app.view.height * 0.6 / resolution;
-  health = MaxHealthValue;
-  healthBar = new PIXI.Container();
 
-  // Set the position to the left side and vertically centered
-  healthBar.position.set((app.view.width / resolution / 12), (app.view.height / resolution / 4));
-
-  gameScene.addChild(healthBar);
-
-  innerBar = new Graphics();
-  innerBar.beginFill(0x000000);
-  innerBar.drawRoundedRect(0, 0, 7 * scale, MaxHealthValue, 20);
-  innerBar.endFill();
-  healthBar.addChild(innerBar);
-
-  outerBar = new Graphics();
-  outerBar.beginFill(0x00FF00);
-  outerBar.drawRoundedRect(0, 0, 7 * scale, MaxHealthValue, 20);
-  outerBar.endFill();
-  healthBar.addChild(outerBar);
-
-  redBar = new Graphics();
-  redBar.beginFill(0xFF3300);
-  redBar.drawRoundedRect(0, 0, 7 * scale, MaxHealthValue, 20);
-  redBar.endFill();
-  healthBar.addChild(redBar);
-}
 
 function checkTransition() {
   const clickedCount = Array.from(batContainer.children).filter((sprite) => sprite.isFilled).length;
@@ -527,13 +578,14 @@ function onClick() {
 function end() {
 
   common.addPopup({
-                    popupId: 'failGamePopup',
+                popupId: 'failGamePopup',
                 title: '에너지를 소진했습니다. 적절히 쉬는 것도 중요해요!',
                 content: null,
                 imgURL: '/images/popup/4-3_fail.png',
                 buttons: [{
                     title: "다시하기",
                     onclick: (event) => {
+                      
                       common.hideAllPopup();
                       restartGame();
                     }
@@ -564,49 +616,40 @@ function SuccessScene() {
 }
 
 
+
 function restartGame() {
   gameStage = 1;
   wateringCan.visible = false;
+  melon.interactive = true;
+  isGamePaused = false; // Ensure game is not paused when restarted
+
+  // Removing children from the containers
   batContainer.removeChildren();
   toolboxContainer.removeChildren();
-
-  app.stage.removeChildren();
-
-  // Add gameScene and batContainer back to the stage if they aren't already
-  if (!app.stage.children.includes(gameScene)) {
-    app.stage.addChild(gameScene);
-  }
-  if (!gameScene.children.includes(batContainer)) {
-    gameScene.addChild(batContainer);
-  }
-  if (cursorSprite) {
-    cursorSprite.removeChildren();
-  }
-
+  if (cursorSprite) cursorSprite.removeChildren();
+  
+  // Recreate elements and add them back to their parent containers
   createBat();
- 
   CreateToolBox();
   CreateGuideConsole();
-
-  CreateHealthBar();
-
-  gameScene.visible = true;
-  gameOverScene.visible = false;
-
-  melon.interactive = true;
-  melonClicks = 2;
-  melonCounterText.text = melonClicks;
-
-  state = play;
-
-  // Ensure gameLoop is removed from the ticker to prevent duplicate additions
-  app.ticker.remove(gameLoop);
-  app.ticker.add(gameLoop);
-
-  app.ticker.start();
+  createFaceStatus();
+  startSentenceDisplayInterval();
+  // Reset health and the health bar graphics to their initial state
   health = MaxHealthValue;
-
   outerBar.height = health;
   outerBar.y = MaxHealthValue - health;
+  redBar.height = 0; // As the health is full, the redBar height should be 0
+  
+  // Ensure that gameScene and batContainer are added back to the stage
+  if (!app.stage.children.includes(gameScene)) app.stage.addChild(gameScene);
+  if (!gameScene.children.includes(batContainer)) gameScene.addChild(batContainer);
+  
+  // Reset the game state to play and restart the ticker if it was stopped
+  state = play;
+  if (!app.ticker.started) app.ticker.start();
+
   rakeClicked = false;
+  // Possibly other variables that need to be reset
 }
+
+

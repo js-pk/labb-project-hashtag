@@ -6,6 +6,7 @@ export function loadResources() {
   loader.add('/images/sprites/soils.json')
     .add('/images/sprites/items.json')
     .add('/images/sprites/rock-soils.json')
+    .add('/images/sprites/faces.json')
     .load(setup);
 }
 
