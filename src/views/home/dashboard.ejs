@@ -2,6 +2,9 @@
 <script src="/scripts/actions.js"></script>
 <script>
     function showCredit() {
+        let popupSound = new Howl({src: ['/sound/S_popup.mp3']});
+        popupSound.play();
+        
         if (document.getElementById('credit')) {
             showPopup("credit")
         } else {
@@ -11,11 +14,19 @@
                 buttons: [
                     {
                         title: "확인",
-                        onclick: hideAllPopup
+                        onclick: () => {
+                            let yesSound = new Howl({src: ['/sound/yes.mp3']});
+                            yesSound.play();
+                            hideAllPopup();
+                        }
                     }
                 ]
             })
         }
+    }
+    
+    function playCoinSound() {
+        redirectWithSound('/sound/coin.mp3', '/reward');
     }
 </script>
 <%- include("../_header") -%>
@@ -25,7 +36,7 @@
     <img id="scarecrow" src="/images/misc/scarecrow.png"/>
     
     <% if (locals.stage_01 && locals.stage_02 && locals.stage_03) { %>
-        <a class="reward-container" href="/reward">
+        <a class="reward-container" onclick="playCoinSound()">
             <img class="corn-coin" alt="원클릭 쓰리 강냉이" src="/images/misc/corn_coin.gif" />
             <div class="button reward">보상 받기</div>
         </a>
@@ -43,14 +54,14 @@
             <button onclick="showCredit()" class="button">크레딧</button>
         </div>
         <div class="levels-container">
-            <a class="button <%= locals.stage_01 ? "completed" : "" %>" href="/tutorial/01">Level 1</a>
+            <a class="button <%= locals.stage_01 ? "completed" : "" %>" onclick="redirectWithSound('sound/levelStart.mp3', '/tutorial/01')">Level 1</a>
             <% if (locals.stage_01) { %>
-                <a class="button <%= locals.stage_02 ? "completed" : "" %>" href="/tutorial/02">Level 2</a>
+                <a class="button <%= locals.stage_02 ? "completed" : "" %>" onclick="redirectWithSound('sound/levelStart.mp3', '/tutorial/02')">Level 2</a>
             <% } else { %>
                  <div class="button disabled">Level 2</div>
             <% } %>
             <% if (locals.stage_01 && locals.stage_02) { %>
-                <a class="button <%= locals.stage_03 ? "completed" : "" %>" href="/tutorial/03">Level 3</a>
+                <a class="button <%= locals.stage_03 ? "completed" : "" %>" onclick="redirectWithSound('sound/levelStart.mp3', '/tutorial/03')">Level 3</a>
             <% } else { %>
                  <div class="button disabled">Level 3</div>
             <% } %>

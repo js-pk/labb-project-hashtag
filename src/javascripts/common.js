@@ -84,4 +84,14 @@ export const common = {
 
     document.body.appendChild(popup);
   },
+  
+  redirectWithSound(soundUrl, redirectUrl) {
+      let startSound = new Howl({
+          src: [soundUrl],
+          onend: () => {
+              window.location.href = redirectUrl;
+          }
+      });
+      startSound.play();
+  }
 };

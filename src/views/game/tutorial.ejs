@@ -171,6 +171,9 @@
     }
     
     function onClickTutorial() {
+        let yesSound = new Howl({src: ['/sound/yes.mp3']});
+        let popupSound = new Howl({src: ['/sound/S_popup.mp3']});
+    
         const currentStage = stages[currentStageIndex];
         
         if (!currentStage) {
@@ -178,6 +181,7 @@
         }
         
         if (currentStage.mode == 'talk') {
+            yesSound.play();
             const textbox = document.getElementById('textbox');
             
             if (currentTextIndex < currentStage.texts.length - 1) {
@@ -187,6 +191,7 @@
                 setTutorial(currentStageIndex + 1);
             }
         } else if (currentStage.mode == 'check') {
+            yesSound.play();
             const checklist = document.getElementById('checklist');
             const actionBox = document.getElementById('action-box');
             if (currentActionIndex < currentStage.actions.length - 1) {
@@ -198,6 +203,7 @@
                 setTutorial(currentStageIndex + 1);
             }
         } else if (currentStage.mode == 'popup') {
+            popupSound.play();
             addPopup({
                 popupId: currentStage.popupId,
                 title: currentStage.popupTitle,
@@ -206,6 +212,7 @@
                     {
                         title: currentStage.popupButtonTitle,
                         onclick: () => {
+                            yesSound.play();
                             setTutorial(currentStageIndex + 1);
                             hideAllPopup();
                         }

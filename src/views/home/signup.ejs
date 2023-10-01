@@ -11,9 +11,15 @@
     function submitForm(action){
         let form = document.getElementById("form");
         if (validateName() && validateEmail() && validateCheckbox()) {
-            form.action = action;
-            form.method = 'POST';
-            form.submit();
+            let startSound = new Howl({
+                src: ['/sound/levelStart.mp3'],
+                onend: () => {
+                    form.action = action;
+                    form.method = 'POST';
+                    form.submit();
+                }
+            });
+            startSound.play();
         }
     }
 
@@ -51,10 +57,20 @@
         });
         let token = params.token; 
         
-        location=`/login/?token=${token}`;
+        let yesSound = new Howl({
+            src: ['/sound/yes.mp3'],
+            onend: () => {
+                location=`/login?token=${token}`;
+            }
+        });
+        yesSound.play();
     }
     
-    
+    function handlePopupClick() {
+        let yesSound = new Howl({src: ['/sound/yes.mp3']});
+        yesSound.play();
+        hideAllPopup();
+    }
 </script>
 <main>
     <img id="title" alt="원클릭 쓰리 강냉이" src="/images/misc/title.png" />
@@ -118,7 +134,7 @@
             <%= locals.status.message %>
         </p>
         <div class="button-container">
-            <button onclick="hideAllPopup()">확인</button>
+            <button onclick="handlePopupClick()">확인</button>
         </div>
     </div>
     <% } %>

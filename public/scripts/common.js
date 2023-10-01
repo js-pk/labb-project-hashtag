@@ -154,3 +154,13 @@ function addPopup({ popupId, title, content, imgURL, buttons }, whilePopupVisibl
     
     document.body.appendChild(popup);
 }
+
+function redirectWithSound(soundUrl, redirectUrl) {
+    let startSound = new Howl({
+        src: [soundUrl],
+        onend: () => {
+            window.location.href = redirectUrl;
+        }
+    });
+    startSound.play();
+}

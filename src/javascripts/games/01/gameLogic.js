@@ -158,9 +158,9 @@ function CreateToolBox() {
 }
 
 function melonClick() {
-  // let popupSound=new Howl({
-  //   src: ['/sound/S_popup.mp3'],
-  // });
+  let popupSound=new Howl({
+    src: ['/sound/S_popup.mp3'],
+  });
   
   if(melonState==='rock'){
     health+=10;
@@ -208,6 +208,7 @@ function melonClick() {
  }, () =>{
        // Code to execute when the popup is opened.
        isGamePaused=true;
+      popupSound.play();
  });
 }
 

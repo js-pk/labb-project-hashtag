@@ -1,17 +1,20 @@
 <%- include("../_header") -%>
-<link rel="stylesheet" type="text/css" href="/styles/global.css"/>
 <link rel="stylesheet" type="text/css" href="/styles/init.css"/>
-
 <script>
-    
-
     function handleScreenClick(event) {
         const params = new Proxy(new URLSearchParams(window.location.search), {
           get: (searchParams, prop) => searchParams.get(prop),
         });
         let token = params.token; 
         
-        location=`./register?token=${token}`;
+        let yesSound = new Howl({
+            src: ['/sound/yes.mp3'],
+            onend: () => {
+                location=`./register?token=${token}`;
+            }
+        });
+        yesSound.play();
+        
     }
 </script>
 <main onclick="handleScreenClick(event)">

@@ -4,16 +4,10 @@
     <h3>축하합니다!!<br/>옥수수 마스터!!</h3>
     <% if (locals.reward_exchanged) { %>
         <img class="coin expired" src="/images/misc/corn_coin.gif" />
+        <p>이 콘 코인은 이미 사용되었습니다. </p>
+        <div class="button-disabled">교환 완료</div>
     <% } else { %>
         <img class="coin" id="exchange-reward" src="/images/misc/corn_coin.gif" />
-    <% } %>
-    <p>
-        이 콘 코인은 강냉이 한 봉지와 교환이 가능합니다.
-        <br/>
-        <br/>
-        랩삐 팩토리 앞으로 찾아가세요.
-    </p>
-    <% if (locals.reward_exchanged) { %>
-        <div class="button-disabled">교환 완료</div>
+        <p>이 콘 코인은 강냉이 한 봉지와 교환이 가능합니다.<br/><br/>랩삐 팩토리 앞으로 찾아가세요.</p>
     <% } %>
 <%- include("../_footer") -%>

@@ -1,6 +1,11 @@
 import { common } from '../../common';
 
 let isCapturing = false;
+let cameraSound = new Howl({src: ['/sound/camera.mp3']});
+let popcornSound = new Howl({
+  src: ['/sound/popcorn.mp3'],
+  loop: true
+});
 
 function capture() {
   const canvas = document.createElement('canvas');
@@ -36,7 +41,9 @@ function downloadImage(canvas) {
 
 function uploadImage(canvas) {
   const formData = new FormData();
-
+  popcornSound.loop = true;
+  popcornSound.play();
+    
   canvas.toBlob(async (b) => {
     try {
       formData.append('image', b, 'filename.png');
@@ -45,7 +52,10 @@ function uploadImage(canvas) {
         body: formData,
       });
       if (response && response.status === 200) {
-        common.completeStage('03');
+        setTimeout(() => {
+          common.completeStage('03');
+        }, 2000)
+        
       }
     } catch (error) {
       throw new Error(error);
@@ -56,6 +66,7 @@ function uploadImage(canvas) {
 }
 
 function handleClick() {
+  cameraSound.play();
   if (!isCapturing) {
     isCapturing = true;
     document.getElementById('capture-loading').style.display = 'flex';
