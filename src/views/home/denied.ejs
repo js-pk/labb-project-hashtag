@@ -1,3 +1,12 @@
-<h3><%= locals.message %></h3>
-
+<%- include("../_header") -%>
+<link rel="stylesheet" type="text/css" href="/styles/init.css"/>
+    
+    <main>
+        <div class="title-container">
+            <img id="title" alt="원클릭 쓰리 강냉이" src="/images/misc/title.png"/>
+        </div>
+        <div id="error-popup" class="popup">
+            <p class="content"><%=locals.message %></p>
+        </div>
+    </main>
 <%- include("../_footer") -%>
