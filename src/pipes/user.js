@@ -9,7 +9,7 @@ exports.logout = function (req, res) {
   req.session.destroy(() => {
     req.session;
   });
-  res.redirect('/');
+  res.redirect(`/?token=${token}`);
 };
 
 exports.login = async function (req, res) {

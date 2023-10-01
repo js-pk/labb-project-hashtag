@@ -71,12 +71,12 @@ exports.showTutorial = function(req, res, next) {
       if (req.session.user.stage_01 === true) {
         res.render(`game/tutorial`, {
           name: user.name,
-          nav_title: '튜토리얼 2'
+          nav_title: '튜토리얼 2',
+          game_index: 1
         });
       } else {
         res.render('denied', {
-          message: 'Level 1을 먼저 완료하세요!',
-          game_index: 1
+          message: 'Level 1을 먼저 완료하세요!'
         });
       }
     } else if (stageNo === '03') {

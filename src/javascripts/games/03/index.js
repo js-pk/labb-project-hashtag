@@ -85,11 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	
 	sceneEl.addEventListener('arReady', function () {
 	  document.getElementById('capture').addEventListener('click', handleClick);
-	  
-	 // canvas = document.querySelector('canvas');
-	 // arSystem = sceneEl.systems["mindar-face-system"];
-	 // console.log(arSystem.video);
-	 // console.log(video);
 	  if (arSystem.shouldFaceUser) {
 	    arSystem.video.className = 'flipped';
 	    sceneEl.className = 'flipped';
