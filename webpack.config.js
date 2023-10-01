@@ -1,5 +1,4 @@
 const webpack = require('webpack');
-const TerserPlugin = require("terser-webpack-plugin");
 const isDev = process.env.NODE_ENV === 'development';
 
 module.exports = {
@@ -20,5 +19,8 @@ module.exports = {
     output: {
         filename: 'scripts/[name].js',
         path: __dirname + '/public/'
+    },
+    optimization: {
+        minimize: false
     }
 };
