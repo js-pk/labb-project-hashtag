@@ -2,7 +2,6 @@
 <%- include("../_header") -%>
 <link rel="stylesheet" type="text/css" href="/styles/signup.css"/>
 <script>
-    
     const token = '<%= locals.token %>';
     if (token != '') {
         window.history.replaceState(null, null, `${window.location.pathname}?token=${token}`);

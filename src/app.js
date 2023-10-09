@@ -42,7 +42,7 @@ app.use(cookieParser());
 const maxAge = 1000 * 60 * 60 * 12; // 12hours
 app.use(
   session({
-    secret: 'aaa', // temp
+    secret: process.env.SESSEION_SECRET,
     resave: false,
     saveUninitialized: true,
     store: new MemoryStore({ checkPeriod: maxAge }),

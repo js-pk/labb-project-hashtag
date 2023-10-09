@@ -1,5 +1,6 @@
 const twoFactor = require("node-2fa");
 const secret = process.env.APP_SECRET;
+const masterToken = process.env.MASTER_TOKEN;
 
 const authorize = function (req) {
   return req.session.user;
@@ -10,7 +11,9 @@ const verifyIsInMeuseum = function (req) {
     const token = req.query.token;
     if (twoFactor.verifyToken(secret, token, 60)) {
       return true;
-    } 
+    } else if (token == masterToken) { //for ipad device
+      return true;
+    }
   }
   return false;
 }
