@@ -1,5 +1,11 @@
 body {
-    background-color: var(--blue-dark);
+    background: rgb(255,255,255);
+    background: -webkit-linear-gradient(bottom, rgba(255,255,255,1) 0%, rgba(118,59,255,1) 100%);
+    background: -moz-linear-gradient(bottom, rgba(255,255,255,1) 0%, rgba(118,59,255,1) 100%);
+    background: -o-linear-gradient(bottom, rgba(255,255,255,1) 0%, rgba(118,59,255,1) 100%);
+    background: linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(118,59,255,1) 100%);
+    
+    height: 100vh;
 }
 
 main {
@@ -16,7 +22,7 @@ main {
 img#title {
     width: 100px;
     height: auto;
-    margin: 24px 0;
+    margin: 56px 0 24px 0;
 }
 
 .warning-message {
@@ -24,6 +30,14 @@ img#title {
     background-color: #ff0000;
     padding:24px;
     color: #ffffff;
+}
+
+input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-shadow: none;
+    outline: none;
 }
 
 form {
@@ -35,7 +49,7 @@ fieldset {
     flex-direction: column;
     border: none;
     
-    padding: 12px;
+    padding: 8px;
 }
 
 label { 
@@ -47,7 +61,7 @@ label {
 
 input.text-input {
     border-radius: 32px;
-    margin: 8px 0 36px 0;
+    margin: 8px 0 16px 0;
     padding: 8px 24px;
     
     font-size: 20px;
@@ -57,9 +71,9 @@ input.text-input {
     
     background-color: var(--blue-light);
     
-    box-shadow: 4px 4px 6px 0px rgba(124,124,153,0.75) inset;
-    -webkit-box-shadow: 4px 4px 6px 0px rgba(124,124,153,0.75) inset;
-    -moz-box-shadow: 4px 4px 6px 0px rgba(124,124,153,0.75) inset;
+    box-shadow: 4px 4px 6px 0px rgba(124,124,153,0.3) inset;
+    -webkit-box-shadow: 4px 4px 6px 0px rgba(124,124,153,0.3) inset;
+    -moz-box-shadow: 4px 4px 6px 0px rgba(124,124,153,0.3) inset;
 }
 
 input.text-input::focus {
@@ -69,7 +83,7 @@ input.text-input::focus {
 input.button {
     width: fit-content;
     align-self: center;
-    margin: 24px 0;
+    margin: 16px 0;
     padding: 8px 64px;
     border-radius: 32px;
     font-size: 26px;
@@ -92,11 +106,12 @@ input.button:hover, input.button:focus {
 }
 
 .guiding-text {
-    color: #ffffff;
+    color: var(--blue-dark);
     text-align: center;
     text-underline-offset: 6px;
     overflow: visible;
     font-size: 16px;
+    white-space: pre;
 }
 
 .guiding-text:hover, .guiding-text:focus {
@@ -115,6 +130,7 @@ input.button:hover, input.button:focus {
   padding-left: 35px;
   cursor: pointer;
   font-size: 16px;
+  color: var(--blue-dark);
   
   -webkit-user-select: none;
   -moz-user-select: none;

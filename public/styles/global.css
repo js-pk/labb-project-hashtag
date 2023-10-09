@@ -1,6 +1,12 @@
 :root {
-  --blue-dark: #3333cc;
+  --blue-dark: #763BFF;
+  --blue-gray: #818594;
   --blue-light: #e1e8f5;
+  --white: #ffffff;
+  --black: #000000;
+  --shadow: rgba(124,124,153,0.3);
+  --popup-shadow: rgba(0,0,0,0.7);
+  
 }
 
 * {
@@ -32,7 +38,7 @@ nav {
     left: 0;
     z-index:9;
     
-    width: 100%;
+    width: 100vw;
     
     display: flex;
     flex-direction: row;
@@ -51,8 +57,8 @@ nav .game-container {
 }
 
 nav .menu-button {
-    background-color: var(--blue-light);
-    color: #818594;
+    background-color: var(--blue-light) !important;
+    color: var(--blue-gray);
     
     padding: 8px 16px;
     text-decoration: none;
@@ -60,21 +66,21 @@ nav .menu-button {
     font-size: 16px;
     
     border-radius: 32px;
-    box-shadow: 2px 2px 2px 0px rgba(124,124,153,0.3);
-    -webkit-box-shadow: 2px 2px 2px 0px rgba(124,124,153,0.3);
-    -moz-box-shadow: 2px 2px 2px 0px rgba(124,124,153,0.3);
+    box-shadow: 2px 2px 2px 0px var(--shadow);
+    -webkit-box-shadow: 2px 2px 2px 0px var(--shadow);
+    -moz-box-shadow: 2px 2px 2px 0px var(--shadow);
     
     white-space: nowrap;
 }
 
 nav .menu-button.disabled {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--black);
+    color: var(--white);
 }
 
 nav .icon-button {
     background-color: var(--blue-light);
-    color: #818594;
+    color: var(--blue-gray);
     
     padding: 8px;
     
@@ -85,9 +91,9 @@ nav .icon-button {
     position: relative;
     
     border-radius: 32px;
-    box-shadow: 2px 2px 2px 0px rgba(124,124,153,0.3);
-    -webkit-box-shadow: 2px 2px 2px 0px rgba(124,124,153,0.3);
-    -moz-box-shadow: 2px 2px 2px 0px rgba(124,124,153,0.3);
+    box-shadow: 2px 2px 2px 0px var(--shadow);
+    -webkit-box-shadow: 2px 2px 2px 0px var(--shadow);
+    -moz-box-shadow: 2px 2px 2px 0px var(--shadow);
 }
 
 nav .icon-button img {
@@ -124,9 +130,9 @@ footer {
     align-items: center;
     justify-content: center;
     
-    box-shadow: 0px 0px 0px 100vh rgba(0,0,0,0.7);
-    -webkit-box-shadow: 0px 0px 0px 100vh rgba(0,0,0,0.7);
-    -moz-box-shadow: 0px 0px 0px 100vh rgba(0,0,0,0.7);
+    box-shadow: 0px 0px 0px 100vh --popup-shadow;
+    -webkit-box-shadow: 0px 0px 0px 100vh --popup-shadow;
+    -moz-box-shadow: 0px 0px 0px 100vh --popup-shadow;
     
     pointerEvents: auto;
     overflow: hidden;
@@ -136,8 +142,8 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--black);
+    color: var(--white);
     padding: 20px 16px;
     text-align: center;
     width: 100%;
@@ -170,8 +176,8 @@ footer {
 }
 
 .popup button {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--black);
+    color: var(--white);
     font-size: 24px;
     
     flex: 1;
@@ -182,4 +188,27 @@ footer {
     box-shadow: none;
     
     cursor: pointer;
+}
+
+
+.language-button {
+    position: fixed;
+    top: 16px;
+    
+    background-color: var(--blue-light);
+    opacity: 0.9;
+    color: var(--black);
+    
+    padding: 8px 16px;
+    text-decoration: none;
+    text-align: center;
+    
+    font-size: 18px;
+    
+    border-radius: 32px;
+    box-shadow: 2px 2px 2px 0px var(--shadow);
+    -webkit-box-shadow: 2px 2px 2px 0px var(--shadow);
+    -moz-box-shadow: 2px 2px 2px 0px var(--shadow);
+    
+    white-space: nowrap;
 }

@@ -6,11 +6,11 @@ body {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    background: rgb(150,224,218);
-    background: -webkit-linear-gradient(bottom, rgba(150,224,218,1) 0%, rgba(106,147,240,1) 100%);
-    background: -moz-linear-gradient(bottom, rgba(150,224,218,1) 0%, rgba(106,147,240,1) 100%);
-    background: -o-linear-gradient(bottom, rgba(150,224,218,1) 0%, rgba(106,147,240,1) 100%);
-    background: linear-gradient(to top, rgba(150,224,218,1) 0%, rgba(106,147,240,1) 100%);
+    background: rgb(126,206,244);
+    background: -webkit-linear-gradient(rgba(126,206,244,1) 0%, rgba(235,255,253,1) 100%);
+    background: -moz-linear-gradient(rgba(126,206,244,1) 0%, rgba(235,255,253,1) 100%);
+    background: -o-linear-gradient(rgba(126,206,244,1) 0%, rgba(235,255,253,1) 100%);
+    background: linear-gradient(rgba(126,206,244,1) 0%, rgba(235,255,253,1) 100%);
 }
 
 #container {
@@ -45,8 +45,8 @@ body {
 #scarecrow {
     position: fixed;
     bottom: 0;
-    right: 5%;
-    width: 65%;
+    right: 10%;
+    width: 55%;
     max-width:320px;
     
 }
@@ -57,7 +57,7 @@ input {
 
 .bottom-container {
     position: fixed;
-    bottom: 32px;
+    bottom: 8px;
     left: 0;
     
     display: flex;
@@ -97,7 +97,7 @@ input {
     align-items: center;
     
     position: fixed;
-    top: 48px;
+    top: 72px;
     
     border-radius: 24px;
 }
@@ -108,8 +108,14 @@ input {
     padding: 12px;
     
     width: 128px;
+    height: 128px;
     position: fixed;
-    top: 48px;
+    top: 72px;
+    
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 }
 
 img.corn-coin {
@@ -118,7 +124,7 @@ img.corn-coin {
 }
 
 img.title {
-    width: 100%;
+    width: 96%;
     height: auto;
 }
 
@@ -140,7 +146,20 @@ img.title {
 }
 
 .button.completed {
-    text-decoration-line: line-through;
+    position: relative;
+}
+
+.button.completed:after {
+    content: '';
+    position: absolute;
+    right: 0px;
+    top: -13px;
+    width: 15px;
+    height: 40px;
+    background-image: url('/images/misc/minicoin.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
 .button.disabled {
