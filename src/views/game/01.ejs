@@ -5,9 +5,29 @@
 <main>
     <div id="game1" class="gameContainer"></div>
     
-    <!--<button onclick="completeStage('01')">게임 완료</button>-->
 </main>
-<script type="module" src="/scripts/pixi.js"></script>
+<script>
+    let translation = {};
+    translation.GAME_01_01 = '<%= translation.GAME_01_01 %>'.split(',')
+    translation.GAME_01_SENTENCES = {
+        1: translation.GAME_01_01, 
+        2: ['<%= translation.GAME_01_02 %>'], 
+        3: ['<%= translation.GAME_01_03 %>']
+    };
+    translation.GAME_01_WARNING_01 = '<%= translation.GAME_01_WARNING_01 %>';
+    translation.GAME_01_WARNING_02 = '<%= translation.GAME_01_WARNING_02 %>';
+    translation.GAME_01_ALMOST_COMPLETE = '<%= translation.GAME_01_ALMOST_COMPLETE %>';
+    translation.GAME_01_POPUP_WATERMELON = '<%= translation.GAME_01_POPUP_WATERMELON %>';
+    translation.GAME_01_POPUP_NOODLE = '<%= translation.GAME_01_POPUP_NOODLE %>';
+    translation.GAME_01_POPUP_AMERICANO = '<%= translation.GAME_01_POPUP_AMERICANO %>';
+    translation.GAME_01_POPUP_REST = '<%= translation.GAME_01_POPUP_REST %>';
+    translation.GAME_01_REST = '<%= translation.GAME_01_REST %>';
+    translation.GAME_01_RETRY = '<%= translation.GAME_01_RETRY %>';
+    translation.GAME_01_EAT = '<%= translation.GAME_01_EAT %>';
+    translation.GAME_01_POPUP_SUCCESS = '<%= translation.GAME_01_POPUP_SUCCESS %>';
+    translation.GAME_01_POPUP_MOVE = '<%= translation.GAME_01_POPUP_MOVE %>';
+</script>
+<script type="module" src="/scripts/game01.js"></script>
 
 
 <%- include("../_footer") -%>

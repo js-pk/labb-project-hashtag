@@ -1,26 +1,30 @@
 <%- include("../_header") -%>
 <link rel="stylesheet" type="text/css" href="/styles/init.css"/>
 <script>
-    function handleScreenClick(event) {
-        const params = new Proxy(new URLSearchParams(window.location.search), {
-          get: (searchParams, prop) => searchParams.get(prop),
-        });
-        let token = params.token; 
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+    let token = params.token; 
         
+    function handleScreenClick(event) {
         let yesSound = new Howl({
             src: ['/sound/yes.mp3'],
             onend: () => {
-                location=`./register?token=${token}`;
+                location=`./register?clang=<%= lang %>&token=${token}`;
             }
         });
         yesSound.play();
-        
+    }
+    
+    function switchLanguage() {
+        location=`/?clang=<%= lang=='ko' ? 'en' : 'ko'%>&token=${token}`;
     }
 </script>
 <main onclick="handleScreenClick(event)">
     <div class="title-container">
-        <img id="title" alt="원클릭 쓰리 강냉이" src="/images/misc/title.png"/>
+        <img id="title" alt="<%= translation.TITLE %>" src="/images/misc/title<%= lang=='en' ? '_en' : ''%>.png"/>
         <img class="click" src="/images/misc/click.svg"/>
     </div>
+    <a class="language-button" onclick="switchLanguage()"><%= lang=='ko' ? 'SWITCH TO ENGLISH' : '한국어로 보기'%></a>
 </main>
 <%- include("../_footer") -%>

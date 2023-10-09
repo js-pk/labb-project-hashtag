@@ -32,7 +32,7 @@ exports.login = async function (req, res) {
       token: token,
       status: {
         type: 'LOGIN_FAILED',
-        message: '존재하지 않는 이메일입니다.',
+        message_code: 'EMAIL_NOT_EXISTS',
       },
     });
   }
@@ -51,7 +51,7 @@ exports.register = async function (req, res) {
       token: token,
       status: {
         type: 'USER_EXISTS',
-        message: '이미 사용된 이메일입니다. 이전에 게임을 플레이하셨다면 로그인하세요',
+        message_code: 'EMAIL_ALREADY_EXISTS',
       },
     });
   } else {

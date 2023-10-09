@@ -4,7 +4,34 @@
 <main>
     <div id="game2" class="gameContainer"></div>
 </main>
-<button onclick="completeStage('02')">게임 완료</button>
-<script src="/scripts/pixi.js"></script>
+
+<script>
+    let translation = {};
+    translation.GAME_02_SENTENCES = {
+        1: ['<%= translation.GAME_02_01 %>'],
+        2: ['<%= translation.GAME_02_02 %>'],
+        3: ['<%= translation.GAME_02_03 %>']
+    };
+    translation.GAME_02_FAIL_01 = '<%= translation.GAME_02_FAIL_01 %>';
+    translation.GAME_02_FAIL_02 = '<%= translation.GAME_02_FAIL_02 %>';
+    translation.GAME_02_FAIL_03 = '<%= translation.GAME_02_FAIL_03 %>';
+    
+    translation.GAME_02_POPUP_POISON = '<%= translation.GAME_02_POPUP_POISON %>';
+    translation.GAME_02_POPUP_WORM = '<%= translation.GAME_02_POPUP_WORM %>';
+    translation.GAME_02_POPUP_BUGKILLER = '<%= translation.GAME_02_POPUP_BUGKILLER %>';
+    translation.GAME_02_POPUP_BEE = '<%= translation.GAME_02_POPUP_BEE %>';
+    
+    translation.GAME_02_SUCCESS = '<%= translation.GAME_02_SUCCESS %>';
+    translation.GAME_02_SUCCESS_ORGANIC = '<%= translation.GAME_02_SUCCESS_ORGANIC %>';
+    translation.GAME_02_HARVEST = '<%= translation.GAME_02_HARVEST %>';
+    
+    translation.GAME_02_YES = '<%= translation.GAME_02_YES %>';
+    translation.GAME_02_NO = '<%= translation.GAME_02_NO %>';
+    translation.CONFIRM = '<%= translation.CONFIRM %>';
+    translation.GAME_02_RETRY = '<%= translation.GAME_02_RETRY %>';
+    
+    console.log(translation)
+</script>
+<script src="/scripts/game02.js"></script>
 
 <%- include("../_footer") -%>

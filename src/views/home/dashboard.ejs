@@ -1,70 +1,65 @@
+<%- include("../_header") -%>
 <link rel="stylesheet" type="text/css" href="/styles/dashboard.css"></link>
-<script src="/scripts/actions.js"></script>
 <script>
     function showCredit() {
         let popupSound = new Howl({src: ['/sound/S_popup.mp3']});
         popupSound.play();
         
         if (document.getElementById('credit')) {
-            showPopup("credit")
+            common.showPopup("credit");
         } else {
-            addPopup({
+            common.addPopup({
                 popupId: "credit",
-                content: "<원클릭 쓰리 강냉이>\n제작 크레딧\n\n 총기획\n 시나리오\n 레벨디자인\n 2D 그래픽\n 3D 그래픽\n 콘코인 제작\n 2D 게임 개발\n AR 게임 개발\n 벡엔드 개발\n 후원",
+                content: "<%- translation.CREDIT_TEXT.replace(/\n/g, "\\n") %>",
                 buttons: [
                     {
-                        title: "확인",
+                        title: "<%= translation.CONFIRM %>",
                         onclick: () => {
                             let yesSound = new Howl({src: ['/sound/yes.mp3']});
                             yesSound.play();
-                            hideAllPopup();
+                            common.hideAllPopup();
                         }
                     }
                 ]
-            })
+            });
         }
     }
-    
-    function playCoinSound() {
-        redirectWithSound('/sound/coin.mp3', '/reward');
-    }
-</script>
-<%- include("../_header") -%>
 
+</script>
     <div id="cloud"></div>
     <div id="home"></div>
     <img id="scarecrow" src="/images/misc/scarecrow.png"/>
     
     <% if (locals.stage_01 && locals.stage_02 && locals.stage_03) { %>
-        <a class="reward-container" onclick="playCoinSound()">
-            <img class="corn-coin" alt="원클릭 쓰리 강냉이" src="/images/misc/corn_coin.gif" />
-            <div class="button reward">보상 받기</div>
+        <a class="reward-container" onclick="common.redirectWithSound('/sound/coin.mp3', '/reward');">
+            <img class="corn-coin" alt="<%= translation.TITLE %>" src="/images/misc/corn_coin.gif" />
+            <div class="button reward"><%= translation.GET_REWARD %></div>
         </a>
     <% } else { %>
         <div class="title-container">
-            <img class="title" alt="원클릭 쓰리 강냉이" src="/images/misc/title.png" />
+            <img class="title" alt="<%= translation.TITLE %>" src="/images/misc/title<%= lang=='en' ? '_en' : ''%>.png" />
         </div>
     <% } %>
-    
     <div class="bottom-container">
         <div class="menu-container">
             <form id="form" class="button" action="/user/logout" method="post">
-                <input type="submit" value="로그아웃" /> 
+                <input type="submit" value="<%= translation.LOGOUT %>" /> 
             </form>
-            <button onclick="showCredit()" class="button">크레딧</button>
+            <button onclick="showCredit()" class="button"><%= translation.CREDIT %></button>
         </div>
         <div class="levels-container">
-            <a class="button <%= locals.stage_01 ? "completed" : "" %>" onclick="redirectWithSound('sound/levelStart.mp3', '/tutorial/01')">Level 1</a>
+            <a class="button <%= locals.stage_01 ? "completed" : "" %>" onclick="common.redirectWithSound('sound/levelStart.mp3', '/tutorial/01')"><%= translation.LEVEL_01 %></a>
             <% if (locals.stage_01) { %>
-                <a class="button <%= locals.stage_02 ? "completed" : "" %>" onclick="redirectWithSound('sound/levelStart.mp3', '/tutorial/02')">Level 2</a>
+                <a class="button <%= locals.stage_02 ? "completed" : "" %>" onclick="common.redirectWithSound('sound/levelStart.mp3', '/tutorial/02')"><%= translation.LEVEL_02 %></a>
             <% } else { %>
-                 <div class="button disabled">Level 2</div>
+                 <div class="button disabled"><%= translation.LEVEL_02 %></div>
             <% } %>
             <% if (locals.stage_01 && locals.stage_02) { %>
-                <a class="button <%= locals.stage_03 ? "completed" : "" %>" onclick="redirectWithSound('sound/levelStart.mp3', '/tutorial/03')">Level 3</a>
+                <a class="button <%= locals.stage_03 ? "completed" : "" %>" onclick="common.redirectWithSound('sound/levelStart.mp3', '/tutorial/03')"><%= translation.LEVEL_03 %></a>
             <% } else { %>
-                 <div class="button disabled">Level 3</div>
+                 <div class="button disabled"><%= translation.LEVEL_03 %></div>
             <% } %>
         </div>
     </div>
+    <a class="language-button" href="/?clang=<%= lang=='ko' ? 'en' : 'ko'%>"><%= lang=='ko' ? 'SWITCH TO ENGLISH' : '한국어로 보기'%></a>
 <%- include("../_footer") -%>

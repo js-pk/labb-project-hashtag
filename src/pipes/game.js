@@ -64,31 +64,31 @@ exports.showTutorial = function(req, res, next) {
     if (stageNo === '01') {
       res.render(`game/tutorial`, {
         name: user.name,
-        nav_title: '튜토리얼 1',
+        nav_title_code: 'TUTORIAL_01',
         game_index: 0
       });
     } else if (stageNo === '02') {
       if (req.session.user.stage_01 === true) {
         res.render(`game/tutorial`, {
           name: user.name,
-          nav_title: '튜토리얼 2',
+          nav_title_code: 'TUTORIAL_02',
           game_index: 1
         });
       } else {
         res.render('denied', {
-          message: 'Level 1을 먼저 완료하세요!'
+          message_code: 'GAME_02_DENIED'
         });
       }
     } else if (stageNo === '03') {
       if (req.session.user.stage_01 === true && req.session.user.stage_02 === true) {
         res.render(`game/tutorial`, {
           name: user.name,
-          nav_title: '튜토리얼 3',
+          nav_title_code: 'TUTORIAL_03',
           game_index: 2
         });
       } else {
         res.render('denied', {
-          message: 'Level 1 Level 2를 먼저 완료하세요!',
+          message_code: 'GAME_03_DENIED',
         });
       }
     }
@@ -105,28 +105,28 @@ exports.showGame = function (req, res, next) {
     if (stageNo === '01') {
       res.render(`game/${stageNo}`, {
         name: user.name,
-        nav_title: '농사 레벨 1'
+        nav_title_code: 'FARM_LEVEL_01'
       });
     } else if (stageNo === '02') {
       if (req.session.user.stage_01 === true) {
         res.render(`game/${stageNo}`, {
           name: user.name,
-          nav_title: '농사 레벨 2'
+          nav_title_code: 'FARM_LEVEL_02'
         });
       } else {
         res.render('denied', {
-          message: 'Level 1을 먼저 완료하세요!',
+          message_code: 'GAME_02_DENIED',
         });
       }
     } else if (stageNo === '03') {
       if (req.session.user.stage_01 === true && req.session.user.stage_02 === true) {
         res.render(`game/${stageNo}`, {
           name: user.name,
-          nav_title: '농사 레벨 3'
+          nav_title_code: 'FARM_LEVEL_03'
         });
       } else {
         res.render('denied', {
-          message: 'Level 1 Level 2를 먼저 완료하세요!',
+          message_code: 'GAME_03_DENIED',
         });
       }
     }
@@ -146,7 +146,6 @@ exports.upload = async function (req, res) {
   uploadFileS3(`${key}.png`, resizedImageBuffer, () => uploadMetaDataDB(key, req.session.user.id));
 
   res.sendStatus(200);
-  // TODO: prevent double clicking upload button.
 };
 
 exports.complete = function (req, res, next) {
@@ -158,9 +157,9 @@ exports.complete = function (req, res, next) {
       // update session and redirect to next game
       req.session.user[stageString] = true;
       if (stageNo === '01') {
-        res.redirect('/game/02');
+        res.redirect('/tutorial/02');
       } else if (stageNo === '02') {
-        res.redirect('/game/03');
+        res.redirect('/tutorial/03');
       } else if (stageNo === '03') {
         res.redirect('/reward');
       }

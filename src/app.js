@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
 const fileUpload = require('express-fileupload');
+const i18n=require("i18n-express");
 
 const home = require('./pipes/home');
 const user = require('./pipes/user');
@@ -21,8 +22,6 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, './views'));
 app.use(express.static('public'));
-
-app.locals.variables = require('./variables.json');
 
 // Set middlewares
 app.use(
@@ -52,6 +51,13 @@ app.use(
     },
   }),
 );
+
+app.use(i18n({
+  translationsPath: path.join(__dirname, 'i18n'), 
+  siteLangs: ["ko", "en"],
+  textsVarName: 'translation',
+  defaultLang: "ko"
+}));
 
 app.get('/auth/:token', auth.authenticate);
 app.get('/auth', auth.generate);

@@ -30,7 +30,7 @@
         if (email && email.value.match(regex)) {
             return true;
         } else {
-            alert("이메일을 올바르게 입력해주세요.")
+            alert("<%= translation.EMAIL_ERROR %>")
         }
     }
     
@@ -52,14 +52,23 @@
     function handlePopupClick() {
         let yesSound = new Howl({src: ['/sound/yes.mp3']});
         yesSound.play();
-        hideAllPopup();
+        common.hideAllPopup();
+    }
+    
+    function switchLanguage() {
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+          get: (searchParams, prop) => searchParams.get(prop),
+        });
+        let token = params.token;
+        
+        location=`/login?clang=<%= lang=='ko' ? 'en' : 'ko'%>&token=${token}`;
     }
 </script>
 <main>
-    <img id="title" alt="원클릭 쓰리 강냉이" src="/images/misc/title.png" />
+    <img id="title" alt="<%= translation.TITLE %>" src="/images/misc/title<%= lang=='en' ? '_en' : ''%>.png" />
     <form id="form" method="post" onsubmit="submitForm('/user/login'); return false">
         <fieldset>
-            <label for="email">E-MAIL을 입력하세요</label>
+            <label for="email"><%= translation.ENTER_EMAIL %></label>
             <input 
                 id="email"
                 class="text-input"
@@ -74,22 +83,23 @@
                 type="button" 
                 class="button" 
                 onclick="submitForm('/user/login')" 
-                value="로그인" 
+                value="<%= translation.LOGIN %>" 
             />
-            <a class="guiding-text" onclick="redirectToSignup(event)">새로 시작하기</a>
+            <a class="guiding-text" onclick="redirectToSignup(event)"><%= translation.REGISTER_GUIDE %></a>
         </fieldset>
     </form>
 
     <% if (locals.status) { %>
     <div id="error-popup" class="popup">
         <p class="content">
-            <%= locals.status.message %>
+            <%= translation[locals.status.message_code] %>
         </p>
         <div class="button-container">
-            <button onclick="handlePopupClick()">확인</button>
+            <button onclick="handlePopupClick()"><%= translation.CONFIRM %></button>
         </div>
     </div>
     <% } %>
+    <a class="language-button" onclick="switchLanguage()"><%= lang=='ko' ? 'SWITCH TO ENGLISH' : '한국어로 보기'%></a>
 </main>
 
 <%- include("../_footer") -%>

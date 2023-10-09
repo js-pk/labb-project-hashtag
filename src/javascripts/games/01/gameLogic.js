@@ -579,11 +579,11 @@ function end() {
 
   common.addPopup({
                 popupId: 'failGamePopup',
-                title: '에너지를 소진했습니다. 적절히 쉬는 것도 중요해요!',
+                title: translation.GAME_01_WARNING_02,
                 content: null,
                 imgURL: '/images/popup/4-3_fail.png',
                 buttons: [{
-                    title: "다시하기",
+                    title: translation.GAME_01_RETRY,
                     onclick: (event) => {
                       
                       common.hideAllPopup();
@@ -599,11 +599,11 @@ function SuccessScene() {
 
    common.addPopup({
                 popupId: 'successGamePopup',
-                title: '성공! 마침내 쓸만한 땅을 만들어냈군요!',
+                title: translation.GAME_01_POPUP_SUCCESS,
                 content: null,
                 imgURL: '/images/popup/4-3_success.png',
                 buttons: [{
-                    title: "다음 단계로 이동",
+                    title: translation.GAME_01_POPUP_MOVE,
                     onclick: (event) =>{
                      common.completeStage('01');
                       common.hideAllPopup();

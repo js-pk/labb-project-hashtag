@@ -566,125 +566,315 @@ function generateAnimals() {
 
   const frames = Object.keys(animationTextures).map((name) => animationTextures[name]);
   const sprite = new PIXI.AnimatedSprite(frames);
+  sprite.isAnimal=true; //tag as animal
   sprite.animationSpeed = 0.3;
   sprite.play();
   sprite.isCollided = false;
   
-  sprite.y = Math.random() * (app.view.height/2 - sprite.height) + guideBox.y/2;
-  sprite.speed = Math.random() * 3 + 2;
-  
-  if (walkingRight) {
-    sprite.x = 0 - sprite.width/2;
-    // sprite.vx = 1 // Move right
+    // Define initial position
+  sprite.x = walkingRight ? 0 : app.view.width;
+  sprite.y = Math.random() * app.view.height;
 
-  } else {
-    sprite.x = app.view.width/2 - sprite.width/2;
-    sprite.vx = -1; // Move left
-  }
+  // Define velocity components
+  sprite.vx = walkingRight ? 1 : -1;  // Depending on whether it's walking right or left
+  sprite.vy = Math.random() * 2 - 1;  // Random y velocity for some vertical movement
   
+  // Define speed
+  sprite.speed = Math.random() * 3 + 2; // Random speed between 2 to 5
 
+  // Add to stage
   app.stage.addChild(sprite);
-
+  
+  // Optional: Interactive Events
   sprite.interactive = true;
   sprite.on('pointerdown', pushSpriteAway);
 
   return sprite;
 }
 
+function cornFail(cornSprite,textureName) {
+  const replace=new Sprite(cornfail[textureName]);
+  replace.width = cornSprite.width;
+  replace.height = cornSprite.height;
+  replace.x = cornSprite.x;
+  replace.y = cornSprite.y;
 
-function switchToNextSpriteSheet() {
-  if (currentSpriteSheetIndex < cornSpriteSheets.length - 1) {
-    currentSpriteSheetIndex++;
+  batContainer.addChild(replace);
+  cornSprite.interactive=false;
+  cornSprite.isFailed=true;
+   score -= 4;
+  console.log("cornFail! score:", score);
+}
+function pushSpriteAway(event) {
+  
+  const sprite = event.currentTarget;
+  sprite.interactive = true; // Re-enable interactivity
+  sprite.isCollided = false; // Reset collision flag
 
-    // update frames for all cornAni1 instances on the stage.
-    batContainer.children.forEach((child) => {
-      if (child instanceof PIXI.AnimatedSprite) {
-        const frames = getCornFrames(cornSpriteSheets[currentSpriteSheetIndex]);
-        child.textures = frames;
-        child.gotoAndPlay(0); // restarts the animation from the first frame
-      }
-    });
-  }
+  const interactionData = event.data;
+  const globalPosition = interactionData.global;
+
+  const dx = globalPosition.x - sprite.x;
+  const dy = globalPosition.y - sprite.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  const pushForce = 10; 
+  sprite.vx = -(dx / distance) * pushForce;
+  sprite.vy = -(dy / distance) * pushForce;
+  
+  
+  sounds.bugPush.play();
 }
 
 
-function getCornFrames(spriteSheetTexture) {
-  const totalFrames = 2;
-  const singleFrameWidth = spriteSheetTexture.baseTexture.width / totalFrames;
-  const frames = [];
 
-  for (let i = 0; i < totalFrames; i++) {
-    const frame = new PIXI.Rectangle(singleFrameWidth * i, 0, singleFrameWidth, spriteSheetTexture.baseTexture.height);
-    const textureFrame = new PIXI.Texture(spriteSheetTexture.baseTexture, frame);
-    frames.push(textureFrame);
-  }
-
-  return frames;
+function generateJeChoJePopup(){
+  common.addPopup({
+                popupId: 'jechoPopup',
+                title: translation.GAME_02_POPUP_POISON,
+                content: null,
+                imgURL: '/images/popup/5-2-1_success.png',
+                buttons: [
+                  {
+                    title: translation.GAME_02_YES,
+                    onclick: (event) => {
+                      shouldSpawnWeeds=false;
+                     generateWormPopup();
+                    // app.ticker.start();
+                    isGamePaused=false;
+                 //   isPopup1Generated=true;
+                     counting=true;
+                    }
+                },
+                {
+                  title: translation.GAME_02_NO,
+                  onclick: (event) => {
+                    common.hideAllPopup();
+                    isGamePaused=false;
+                   // isPopup1Generated=true;
+                    ecoPoint++;
+               //     app.ticker.start();
+                    counting=true;
+                  }
+                }]    
+            }, () => {
+  //  app.ticker.stop();   
+		 isGamePaused=true;
+		 sounds.popup.play();
+      counting=false;
+      isPopup1Generated=true;
+});
 }
 
-function createGameOverScene() {
-  gameOverScene = new Container();
-  app.stage.addChild(gameOverScene);
-  gameOverScene.visible = false;
-  GameoverText = new PIXI.Text(
-    'Game Over!',
-    { fontFamily: 'Neo둥근모', fontSize: 50, fill: 'black' },
-  );
-  GameoverText.x = app.view.width / 2 - GameoverText.width / 2;
-  GameoverText.y = app.view.height / 2;
-  gameOverScene.addChild(GameoverText);
+function generateWormPopup(){
+  common.addPopup({
+                popupId: 'WormPopup',
+                title: translation.GAME_02_POPUP_WORM,
+                content: null,
+                imgURL: '/images/popup/earthworm_popup.png',
+                buttons: [
+                  {
+                    title: translation.CONFIRM,
+                    onclick: (event) => {
+                      
+                      common.hideAllPopup();
+                      //resume the game
+                     isGamePaused=false;
+                     isPopup1Generated=true;
+                    counting=true;
+                  //   app.ticker.start();
+                    }
+                }]
+  },() => {
+    isGamePaused=true;
+    sounds.popup.play();
+//   app.ticker.stop();
+    counting=false;
+    
+  });
 }
 
 
-function exitGame() {
-  console.log('exitgame');
-  common.completeStage('02');
+function generateNongYakPopup(){
+   common.addPopup({
+                popupId: 'nongyakPopup',
+                title: translation.GAME_02_POPUP_BUGKILLER,
+                content: null,
+                imgURL: '/images/popup/5-2-2_success.png',
+                buttons: [
+                  {
+                    title: translation.GAME_02_YES,
+                    onclick: (event) => {
+                      shouldGenerateBugs=false;
+                      shouldSpawnBees=false;
+                     generateBeesGoodByePopUp();
+                    //  app.ticker.start();
+                      counting=true;
+                      isGamePaused=false;
+                    }
+                },
+                {
+                  title: translation.GAME_02_NO,
+                  onclick: (event) => {
+                    common.hideAllPopup();
+                    isGamePaused=false;
+                    isPopup2Generated=true;
+                    ecoPoint++; // app.ticker.start();
+                    counting=true;
+                  }
+                }]    
+            }, () => {
+		 isGamePaused=true;
+		sounds.popup.play();
+    counting=false;
+		// app.ticker.stop();
+		isPopup2Generated=true;
+});
 }
 
-function end() {
-  app.ticker.remove(gameLoop);
-  gameScene.visible = false;
-  gameOverScene.visible = true;
-  GameoverText.visible = true;
-  console.log('Game OVER!');
-  app.ticker.stop();
-  setTimeout(() => {
-    restartGame();
-  }, 1000); // 1 second delay
+function generateBeesGoodByePopUp(){
+   common.addPopup({
+                popupId: 'BeesPopup',
+                title: translation.GAME_02_POPUP_BEE,
+                content: null,
+                imgURL: '/images/popup/beesgoodbye_popup.png',
+                buttons: [
+                  {
+                    title: translation.CONFIRM,
+                    onclick: (event) => {
+                      
+                      common.hideAllPopup();
+                     isGamePaused=false;
+                     isPopup2Generated=true;
+                    counting=true;
+                    }
+                }]
+  },() => {
+    isGamePaused=true;
+   		 sounds.popup.play();
+counting=false;
+  });
 }
 
-function restartGame() {
-  console.log('restartGame');
-  // Clear the main game scene and the bat container
-  app.stage.removeChildren();
-  // Add gameScene and batContainer back to the stage if they aren't already
-  if (!app.stage.children.includes(gameScene)) {
-    app.stage.addChild(gameScene);
-  }
-  if (!gameScene.children.includes(batContainer)) {
-    gameScene.addChild(batContainer);
-  }
-  // Re-create any initial game objects or UI components
-  createCountdown();
-  createBat();
 
-
-  createGameOverScene();
-
-  // Reset the game timer
-  countdownTime = 100;
-  isPopupGenerated=false;
-  // Set the visibility of game scenes
-  gameScene.visible = true;
-  gameOverScene.visible = false;
-
-  // Reset the game state to the play function
-  state = play;
-
-  // Ensure gameLoop is removed from the ticker to prevent duplicate additions
-  app.ticker.remove(gameLoop);
-
-  // Add the game loop back and start the ticker
-  app.ticker.add(gameLoop);
-  app.ticker.start();
+function checkFinalScore(){
+   console.log('Score: ', score);
+   console.log('Eco Point: ', ecoPoint);
+   if(score>20 && ecoPoint>=2){
+     successTwo();
+   }
+   if(score>20 && ecoPoint <2){
+     successOne();
+   }
+   if(score<=20){
+     failPopup();
+   }
 }
+
+function failPopup(){
+  common.addPopup({
+                popupId: 'failPopup',
+                title: translation.GAME_02_FAIL_03,
+                content: null,
+                imgURL: '/images/popup/5-2-3_fail.png',
+                buttons: [
+                  {
+                    title: translation.GAME_02_RETRY,
+                    onclick: (event) => {
+                      
+                     common.hideAllPopup();
+                     restartGame();
+                    }
+                }]
+  },() => {
+    isGamePaused=true;
+    sounds.popup.play();
+
+  });
+}
+
+function weedFailPopup(){
+  common.addPopup({
+    popupId:'weedFailPopup',
+    title:'옥수수 농사 실패! 잡초에게 영양분을 뺏겼어요',
+    content: null,
+    imgURL: '/images/popup/5-2-1_fail.png',
+    buttons: [
+      {
+        title:'다시하기',
+        onclick:(event) => {
+          common.hideAllPopup();
+          restartGame();
+        }
+      }]
+  }, () => {
+    isGamePaused=true;
+    sounds.popup.play();
+  });
+}
+function bugFailPopup(){
+  common.addPopup({
+    popupId:'bugFailPopup',
+    title:'옥수수 농사 실패! 해충을 제 때 방제해주세요',
+    content: null,
+    imgURL: '/images/popup/5-2-2_fail.png',
+    buttons: [
+      {
+        title:'다시하기',
+        onclick:(event) => {
+          common.hideAllPopup();
+          restartGame();
+        }
+      }]
+  }, () => {
+    isGamePaused=true;
+    sounds.popup.play();
+  });
+}
+function successOne(){
+  common.addPopup({
+                popupId: 'SuccessOnePopup',
+                title: translation.GAME_02_SUCCESS,
+                content: null,
+                imgURL: '/images/popup/5-2-3_success01.png',
+                buttons: [
+                  {
+                    title: translation.GAME_02_HARVEST,
+                    onclick: (event) => {
+                      
+                     common.hideAllPopup();
+                     common.completeStage('02');
+                    }
+                }]
+  },() => {
+    isGamePaused=true;
+    sounds.success.play();
+  });
+}
+
+function successTwo(){
+  common.addPopup({
+                popupId: 'SuccessTwoPopup',
+                title: translation.GAME_02_SUCCESS_ORGANIC,
+                content: null,
+                imgURL: '/images/popup/5-2-3_success02.png',
+                buttons: [
+                  {
+                    title: translation.GAME_02_HARVEST,
+                    onclick: (event) => {
+                      
+                     common.hideAllPopup();
+                     common.completeStage('02');
+                    }
+                }]
+  },() => {
+    isGamePaused=true;
+    sounds.success.play();
+  });
+}
+
+
+
+
+
+

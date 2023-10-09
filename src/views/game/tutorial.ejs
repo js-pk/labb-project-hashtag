@@ -8,36 +8,37 @@
             mode: 'talk',
             character: '/images/tutorial/01/farmer_01.gif',
             texts: [
-                "어서오세요. 당신이 <%= locals.name %>씨로군요? 저는 농부 랩삐 입니다.",
-                "이번에 미술관에서 옥수수 농사를 지으려는데 일손이 부족합니다.",
+                "<%- translation.TUTORIAL_01_01_01_TALK_BEFORE %><%= locals.name %><%- translation.TUTORIAL_01_01_01_TALK_AFTER %>",
+                "<%- translation.TUTORIAL_01_01_02_TALK %>",
             ]
         },
         {
             mode: 'popup',
             popupId: 'startGame01',
-            popupTitle: '랩삐를 도와 옥수수 농사를 시작할까요?',
+            popupTitle: '<%= translation.TUTORIAL_01_POPUP_TITLE %>',
             popupImage: '/images/popup/4-1_start.png',
-            popupButtonTitle: '네'
+            popupButtonTitle: '<%= translation.TUTORIAL_01_POPUP_ACTION %>'
             
         },
         {
             mode: 'talk',
             character: '/images/tutorial/01/farmer_01.gif',
             texts: [
-                 "좋아요! 그럼, 이제부터 할 일을 알려드릴게요.",
-                "주어진 일들을 하나씩 해결하다보면, 당신도 농부가 될 수 있습니다.",
+                <%- translation.TUTORIAL_01_02_TALK.map(t => `"${t}"`).join(',') %>
             ]
         },
         {
             mode: 'check',
-            actions: ["밭고르기", "물뿌리기", "씨앗심기", "휴식하기"],
+            actions: [
+                <%- translation.TUTORIAL_01_03_CHECK.map(t => `"${t}"`).join(',') %>
+            ],
             
         },
         {
             mode: 'talk',
             chatacter: '/images/tutorial/01/farmer_01.gif',
             texts: [
-                "자, 의자에 앉아 옥수수 농사를 시작해볼까요?"
+                <%- translation.TUTORIAL_01_04_TALK.map(t => `"${t}"`).join(',') %>
             ]
         }
     ];
@@ -47,42 +48,34 @@
             mode: 'talk',
             character: '/images/tutorial/02/farmer_01.gif',
             texts: [
-                "디지털 세계에도 ‘노동’은 존재하죠.",
-                "게임에 몰입하다보면, 일하고 있다는 걸 깜박하게 됩니다.",
-                "잊지마세요. 당신은 랩삐의 일손을 돕는 ‘놀이노동자’ 입니다.",
+                <%- translation.TUTORIAL_02_01_TALK.map(t => `"${t}"`).join(',') %>
             ]
         },
         {
             mode: 'talk',
             character: '/images/tutorial/02/farmer_01.gif',
             texts: [
-                "이제 옥수수가 자라길 기다릴 차례에요.",
-                "기다리는 시간 동안, 지루하고 고된 돌봄노동은 지속됩니다."
+                <%- translation.TUTORIAL_02_02_TALK.map(t => `"${t}"`).join(',') %>
             ]
         },
         {
             mode: 'talk',
             character: '/images/tutorial/02/farmer_02.gif',
             texts: [
-                "하지만, 걱정마세요. 게임의 시간은 현실보다 빠르게 흘러갑니다.",
-                "옥수수가 자라는 동안 할 일을 알려드릴게요."
+                <%- translation.TUTORIAL_02_03_TALK.map(t => `"${t}"`).join(',') %>
             ]
         },
         {
             mode: 'check',
             actions: [
-                '잡초뽑기',
-                '해충방지',
-                '야생동물 접근제한',
-                '기후 위기 시,',
-                '기도하기'
+                 <%- translation.TUTORIAL_02_04_CHECK.map(t => `"${t}"`).join(',') %>
             ]
         },
         {
             mode: 'talk',
             character: '/images/tutorial/02/scarecrow_03.gif',
             texts: [
-                "100초 동안, 허수애미가 되어 옥수수를 지켜주세요."
+                <%- translation.TUTORIAL_02_05_TALK.map(t => `"${t}"`).join(',') %>
             ]
         }
     ];
@@ -92,29 +85,22 @@
             mode: 'talk',
             character: '/images/tutorial/03/farmer_01.gif',
             texts:[
-                "먹음직스럽게 자란 우리의 옥수수를 보세요.",
-                "삭막한 도시 속에서 우리는 농사지을 땅도 갖기 힘들지만,",
-                "이곳에서는 손가락 만으로 채굴과 수확의 기쁨을 만끽할 수 있답니다."
+                <%- translation.TUTORIAL_03_01_TALK.map(t => `"${t}"`).join(',') %>
             ]
         },
         {
             mode: 'talk',
             character: '/images/tutorial/03/farmer_02.gif',
             texts: [
-                "지금부터, 옥수수를 소셜미디어에 자랑할 수 있는 시간을 드릴게요.",
-                "글과 사진을 올리는 일, 파일을 다운로드 받는 일을 통해 디지털 경제는 활성화됩니다",
-                "우리의 집중력, 시간, 정보, 데이터는 새로운 화폐로서",
-                "강냉이 한봉지와 맞바꾸어 먹을 만한 가치가 있습니다.",
-                "옥수수 셀카는 당신의 노동을 증명하는, 현대의 퍼포먼스!",
-                "자, 이 시대의 디지털 농부가 되었음을 알려보세요."
+                <%- translation.TUTORIAL_03_02_TALK.map(t => `"${t}"`).join(',') %>
             ]
         },
         {
             mode: 'popup',
             popupId: 'startGame03',
-            popupTitle: '사진 찍기 버튼을 눌러요. 그리고 콘 코인을 받으세요.',
+            popupTitle: '<%= translation.TUTORIAL_03_POPUP_TITLE %>',
             popupImage: '/images/popup/6-2_selfi.png',
-            popupButtonTitle: '셀카찍기'
+            popupButtonTitle: '<%= translation.TUTORIAL_03_POPUP_ACTION %>'
         }
     ];
     
@@ -160,7 +146,6 @@
             
             character.src = currentStage.character;
         } else if (currentStage.mode == 'check') {
-            console.log('here');
             currentActionIndex = 0;
         
             const checklist = document.createElement('div');  
@@ -210,7 +195,7 @@
             }
         } else if (currentStage.mode == 'popup') {
             popupSound.play();
-            addPopup({
+            common.addPopup({
                 popupId: currentStage.popupId,
                 title: currentStage.popupTitle,
                 imgURL: currentStage.popupImage,
@@ -220,13 +205,12 @@
                         onclick: () => {
                             yesSound.play();
                             setTutorial(currentStageIndex + 1);
-                            hideAllPopup();
+                            common.hideAllPopup();
                         }
                     }
                 ]
             })
         }
-        
     } 
     
     function endTutorial() {

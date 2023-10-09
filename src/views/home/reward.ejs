@@ -1,13 +1,59 @@
 <%- include("../_header") -%>
 <%- include("../_nav") -%>
+<script>
+    function exchangeReward() {
+      const form = document.createElement('form');
+      form.setAttribute('action', '/user/reward');
+      form.setAttribute('method', 'POST');
+      document.body.appendChild(form);
+      form.submit();
+    }
+    
+    function showExchangeRewardPopup() {
+      let victorySound = new Howl({src: ['sound/victory.mp3']});
+      victorySound.play();
+      
+      if (document.getElementById('reward')) {
+        common.showPopup('reward');
+      } else {
+        common.addPopup({
+          popupId: 'reward',
+          content: '<%- translation.REWARD_TEXT.replace(/\n/g, "\\n") %>',
+          buttons: [
+            {
+              title: '<%- translation.REWARD_ACTION.replace(/\n/g, "\\n") %>',
+              onclick: () => {
+                let yesSound = new Howl({src: ['/sound/yes.mp3']});
+                yesSound.play();
+                exchangeReward();
+              }
+            },
+            {
+              title: '<%- translation.REWARD_CANCEL.replace(/\n/g, "\\n") %>',
+              onclick: () => {
+                let noSound = new Howl({src: ['/sound/no.mp3']});
+                noSound.play();
+                common.hideAllPopup();
+              },
+            },
+          ],
+        });
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      if (document.getElementById('exchange-reward')) {
+        document.getElementById('exchange-reward').addEventListener('click', showExchangeRewardPopup);
+      }
+    });
+</script>
 <link rel="stylesheet" type="text/css" href="/styles/reward.css"></link>
-    <h3>축하합니다!!<br/>옥수수 마스터!!</h3>
+    <h3 style="white-space:pre;"><%= translation.REWARD_TITLE %></h3>
     <% if (locals.reward_exchanged) { %>
         <img class="coin expired" src="/images/misc/corn_coin.gif" />
-        <p>이 콘 코인은 이미 사용되었습니다. </p>
-        <div class="button-disabled">교환 완료</div>
+        <p class="description"><%= translation.REWARD_EXPIRED %></p>
     <% } else { %>
         <img class="coin" id="exchange-reward" src="/images/misc/corn_coin.gif" />
-        <p>이 콘 코인은 강냉이 한 봉지와 교환이 가능합니다.<br/><br/>랩삐 팩토리 앞으로 찾아가세요.</p>
+        <p class="description"><%= translation.REWARD_GUIDE %></p>
     <% } %>
 <%- include("../_footer") -%>

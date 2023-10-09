@@ -27,7 +27,7 @@ exports.index = function (req, res, next) {
       res.render('home/init');
     } else {
       res.render('home/denied', {
-        message: '원펀치 쓰리 강냉이는 국립현대미술관 서울관에서만 플레이 가능합니다.\n 전시관 내부의 QR코드를 이용해 접속해주세요.'
+        message_code: 'ACCESS_DENIED'
       })
     }
   }
@@ -39,11 +39,11 @@ exports.reward = function (req, res, next) {
     if (req.session.user.stage_01 && req.session.user.stage_02 && req.session.user.stage_03) {
       res.render('home/reward', {
         reward_exchanged: req.session.user.reward_exchanged,
-        nav_title: 'reward'
+        nav_title_code: 'REWARD'
       });
     } else {
       res.render('home/denied', {
-        message: '게임을 모두 완료해야 보상을 받을 수 있습니다.',
+        message_code: 'REWARD_DENIED',
       });
     }
   }
@@ -60,7 +60,7 @@ exports.register = function (req, res, next) {
     res.render('home/signup');
   } else {
     res.render('home/denied', {
-      message: '원펀치 쓰리 강냉이는 국립현대미술관 서울관에서만 플레이 가능합니다.\n 전시관 내부의 QR코드를 이용해 접속해주세요.'
+      message_code: 'ACCESS_DENIED'
     })
   }
 };
@@ -76,7 +76,7 @@ exports.login = function (req, res, next) {
     res.render('home/login');
   } else {
     res.render('home/denied', {
-      message: '원펀치 쓰리 강냉이는 국립현대미술관 서울관에서만 플레이 가능합니다.\n 전시관 내부의 QR코드를 이용해 접속해주세요.'
+      message_code: 'ACCESS_DENIED'
     })
   }
 };

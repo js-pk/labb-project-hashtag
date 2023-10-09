@@ -28,7 +28,7 @@
         if (name && name.value.trim() != "") {
             return true;
         } else {
-            alert("닉네임을 입력해주세요.");
+            alert("<%= translation.NICKNAME_ERROR %>");
         }
     }
 
@@ -38,7 +38,7 @@
         if (email && email.value.match(regex)) {
             return true;
         } else {
-            alert("이메일을 올바르게 입력해주세요.");
+            alert("<%= translation.EMAIL_ERROR %>");
         }
     }
 
@@ -47,7 +47,7 @@
         if (checkbox.checked) {
             return true;
         } else {
-             alert("개인 정보 활용에 동의해주세요.");
+             alert("<%= translation.AGREEMENT_ERROR %>");
         }
     }
     
@@ -69,25 +69,34 @@
     function handlePopupClick() {
         let yesSound = new Howl({src: ['/sound/yes.mp3']});
         yesSound.play();
-        hideAllPopup();
+        common.hideAllPopup();
+    }
+    
+    function switchLanguage() {
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+          get: (searchParams, prop) => searchParams.get(prop),
+        });
+        let token = params.token;
+        
+        location=`/register?clang=<%= lang=='ko' ? 'en' : 'ko'%>&token=${token}`;
     }
 </script>
 <main>
-    <img id="title" alt="원클릭 쓰리 강냉이" src="/images/misc/title.png" />
+    <img id="title" alt="<%= translation.TITLE %>" src="/images/misc/title<%= lang=='en' ? '_en' : ''%>.png" />
     <form id="form" method="post" onsubmit="submitForm('/user/register'); return false">
         <fieldset>
             
-            <label for="name">닉네임을 입력하세요</label>
+            <label for="name"><%= translation.ENTER_NICKNAME %></label>
             <input 
                 id="name"
                 class="text-input"
                 type="text" 
                 name="name" 
                 maxlength="64"
-                placeholder="닉네임"
+                placeholder="<%= translation.NICKNAME %>"
                 required
             />
-            <label for="email">E-MAIL을 입력하세요</label>
+            <label for="email"><%= translation.ENTER_EMAIL %></label>
             <input 
                 id="email"
                 class="text-input"
@@ -103,7 +112,7 @@
                 class="checkbox-container" 
                 for="checkbox"
             >
-                전시 기간 동안 개인 정보 활용에 동의합니다.
+                <%= translation.AGREE_PERSONAL_INFORMATION %>
                 <input 
                     id="checkbox"
                     type="checkbox"
@@ -120,23 +129,20 @@
                 value="시작"
             />
             
-            <a class="guiding-text" onclick="redirectToLogin(event)">이전에 게임을 진행하셨었나요?<br/> -> 로그인 하러가기 -></a>
-            
-            <% if (locals.status && ["USER_EXPIRED", "USER_EXISTS"].includes(locals.status.type)) { %>
-            <!-- <input type="button" onclick="submitForm('/user/login')" value="로그인" />            -->
-            <% } %>
+            <a class="guiding-text" onclick="redirectToLogin(event)"><%= translation.LOGIN_GUIDE %></a>
         </fieldset>
     </form>
 
     <% if (locals.status) { %>
     <div id="error-popup" class="popup">
         <p class="content">
-            <%= locals.status.message %>
+            <%= translation[locals.status.message_code] %>
         </p>
         <div class="button-container">
-            <button onclick="handlePopupClick()">확인</button>
+            <button onclick="handlePopupClick()"><%= translation.CONFIRM %></button>
         </div>
     </div>
     <% } %>
+    <a class="language-button" onclick="switchLanguage()"><%= lang=='ko' ? 'SWITCH TO ENGLISH' : '한국어로 보기'%></a>
 </main>
 <%- include("../_footer") -%>
