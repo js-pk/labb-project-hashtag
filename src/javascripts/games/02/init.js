@@ -55,8 +55,8 @@ export function resize() {
   const isLandscape = window.matchMedia('(orientation: landscape)').matches;
 
   // Swap values for width and height if in landscape
-  const actualWidth = isLandscape ? window.innerHeight : window.innerWidth;
-  const actualHeight = isLandscape ? window.innerWidth : window.innerHeight;
+  const actualWidth = isLandscape ? height : width;
+  const actualHeight = isLandscape ? width : height;
 
   h = actualHeight;
   w = h * portraitGameRatio;

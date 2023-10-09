@@ -7,6 +7,7 @@ export function loadResources() {
     .add('/images/sprites/items.json')
     .add('/images/sprites/rock-soils.json')
     .add('/images/sprites/faces.json')
+    .add('/images/sprites/earthworm.json')
     .load(setup);
 }
 

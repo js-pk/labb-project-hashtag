@@ -21,7 +21,6 @@ export const app = new PIXI.Application({
   transparent: true,
   resolution,
 });
-
 // will-read-frequently 속성 추가
 app.renderer.view.setAttribute('will-read-frequently', 'true');
 
@@ -47,16 +46,12 @@ function debounce(func, wait) {
 }
 
 export function resize() {
-  
-
-  let w; let
-    h;
+  let w; let h;
 
   const portraitGameRatio = 10 / 16;
   const isLandscape = window.matchMedia('(orientation: landscape)').matches;
-
-  const actualWidth = isLandscape ? window.innerHeight : window.innerWidth;
-  const actualHeight = isLandscape ? window.innerWidth : window.innerHeight;
+  const actualWidth = isLandscape ? height : width;
+  const actualHeight = isLandscape ? width : height;
 
   h = actualHeight;
   w = h * portraitGameRatio;

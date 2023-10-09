@@ -13,6 +13,7 @@ export function loadResources() {
     .add('/images/sprites/2/corn05.png')
     .add('/images/sprites/soils.json')
     .add('/images/sprites/2/bees-spritesheet.json')
+    .add('/images/sprites/2/badbug-spritesheet.json')
     .add('/images/sprites/2/moth-spritesheet.json')
     .add('/images/sprites/2/crow_from_left.json')
     .add('/images/sprites/2/crow_from_right.json')
@@ -22,6 +23,8 @@ export function loadResources() {
     .add('/images/sprites/2/boar_fromRight.json')
     .add('/images/sprites/2/weeds.json')
     .add('/images/sprites/2/corn-fail.json')
+    .add('/images/sprites/click-tab.json')
+ 
     .load(setup);
 }
 

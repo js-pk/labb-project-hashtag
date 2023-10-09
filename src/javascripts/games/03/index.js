@@ -106,6 +106,4 @@ document.addEventListener('DOMContentLoaded', () => {
 	    sceneEl.className = '';
 	  }
 	});
-	
-	
 });

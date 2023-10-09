@@ -1,17 +1,19 @@
+//game LV1
+/* global translation */
 import * as PIXI from 'pixi.js';
 
 import {
   app, Sprite, Graphics, resources, resolution,
 } from './init.js';
-import { stageSentences } from './texts.js';
+const stageSentences = translation.GAME_01_SENTENCES;
 import { common } from '../../common.js';
 
-let batContainer; let toolboxContainer; let items; let melon; let rake; let wateringCan; let seedPouch; let batSize; let cursorSprite; let guideBox; let guideText;
+let batContainer; let toolboxContainer; let items; let melon; let rake; let wateringCan; let seedPouch; let batSize; let cursorSprite; let guideBox; let guideText;let startButton;
 let wateringCanClicked = false;
 let seedPouchClicked = false;
 let rakeClicked = false;
-let state; let id; let rocks; let healthBar; let outerBar; let redBar; let innerBar; let gameScene; let gameOverScene; let health; let MaxHealthValue; let numberOfCol; let numberOfRows; let scale;
-let isGamePaused=false; let melonState='melon'; let niceFace; let faces; let notbadFace; let badFace; let currentStageAtStart; 
+let state; let id; let rocks; let healthBar; let outerBar; let redBar; let innerBar; let gameScene; let health; let MaxHealthValue; let numberOfCol; let numberOfRows; let scale;
+let isGamePaused=false; let melonState='melon'; let niceFace; let faces; let notbadFace; let badFace; let currentStageAtStart; let popupSound;let earthworm;
 let gameStage = 0;
 const bat1Array = [];
 
@@ -36,15 +38,25 @@ export function setup() {
   items = resources['/images/sprites/items.json'].textures;
   rocks = resources['/images/sprites/rock-soils.json'].textures;
  faces=resources['/images/sprites/faces.json'].textures;
+  popupSound=new Howl({
+    src: ['/sound/S_popup.mp3'],
+  });
+  
   
   gameScene = new PIXI.Container();
   app.stage.addChild(gameScene);
- 
-  createBat();
+  
+  createStartButton();
+  gameScene.alpha=0.3;
+  
+  
   CreateToolBox();
+  toolboxContainer.visible=false;
   CreateHealthBar();
+  createBat();
   CreateGuideConsole();
   createFaceStatus();
+   
   app.ticker.add((delta) => gameLoop(delta));
 
   state = play;
@@ -55,7 +67,8 @@ function createBat() {
   batPlain.width = batSize * numberOfCol;
   batPlain.height = batSize * numberOfRows;
   batPlain.x = ((app.view.width / resolution) - batPlain.width) / 2;
-  batPlain.y = ((app.view.height / resolution) - batPlain.height) / 2 + 25; // 처음 밭플레인, 올리려면 50 숫자 줄임.
+  batPlain.y = ((app.view.height / resolution) - batPlain.height) / 2 + 45; // 처음 밭플레인, 올리려면 숫자 줄임.
+ //batPlain.y= guideBox.y+50;
   gameScene.addChild(batPlain);
 
   batContainer = new PIXI.Container();
@@ -103,7 +116,7 @@ function CreateToolBox() {
   rake.y = toolHeight / 2;
   rake.interactive = true;
   rake.on('pointerdown', () => {
-    deactivateItem(rake);
+    changeItem(rake);
     rakeClicked = true;
     console.log('rakeClicked');
   });
@@ -118,7 +131,7 @@ function CreateToolBox() {
   wateringCan.y = toolHeight / 2;
   wateringCan.interactive = false;
   wateringCan.on('pointerdown', () => {
-    deactivateItem(wateringCan);
+    changeItem(wateringCan);
     wateringCanClicked = true;
     console.log('wateringCanClicked');
   });
@@ -133,7 +146,7 @@ function CreateToolBox() {
   seedPouch.y = toolHeight / 2;
   seedPouch.interactive = false;
   seedPouch.on('pointerdown', () => {
-    deactivateItem(seedPouch);
+    changeItem(seedPouch);
     seedPouchClicked = true;
     console.log('seedPouchClicked');
   });
@@ -158,61 +171,18 @@ function CreateToolBox() {
 }
 
 function melonClick() {
-  let popupSound=new Howl({
-    src: ['/sound/S_popup.mp3'],
-  });
+   health += 50;
+  changeItem(melon);
   
   if(melonState==='rock'){
-    health+=10;
+     health+=5;
     console.log('rock clicked, health incremented to: ', health);
+    restwithantPopup();
     //return;// If you don’t want to show a popup when the rock is clicked, return here
   }
-  
-  health += 100;
-  let popupTitle = '';
-  let IMG = '';
-  
-  switch(melonState){
-    case 'melon':
-      popupTitle='시원하고 달콤한 수박화채가 활력을 채워줍니다';
-      IMG:'/images/popup/4-2-1_energy.png';
-      break;
-    case 'noodle':
-      popupTitle='매콤한 국수를 새참으로 먹으며 힘을 보충합니다';
-      IMG:'/images/popup/4-2-2_energy.png';
-      break;
-    case 'coffee':
-      popupTitle='차가운 아메리카노가 피로를 풀어줍니다';
-      IMG:'/images/popup/4-2-3_energy.png';
-      break;
-    default:
-    console.error(`Unexpected melonState: ${melonState}`);
-    return;
-  }
-  
- common.addPopup({
-   popupId: 'energyPopup',
-   title: popupTitle,
-   content: null,
-   imgURL:IMG,
-   buttons:[{
-     title:"먹기",
-     onclick:(event) => {
-       deactivateItem(melon);
-       common.hideAllPopup();
-        //resume the game
-       isGamePaused=false;
-       console.log('먹기 button clicked');
-     }
-   }]
- }, () =>{
-       // Code to execute when the popup is opened.
-       isGamePaused=true;
-      popupSound.play();
- });
 }
 
-function deactivateItem(item) {
+function changeItem(item) {
  if(item != melon){
     if (item === rake) {
     item.texture = items['rake_false2x.png'];
@@ -225,6 +195,8 @@ function deactivateItem(item) {
   }
   return;
  }
+ 
+ let previousState= melonState;
  
  switch(melonState){
    case 'melon':
@@ -242,8 +214,100 @@ function deactivateItem(item) {
  }
   item.width=batSize;
   item.height=batSize;
+  
+  switch(previousState){
+    case 'melon':
+      melonToNoodlePopup();
+      break;
+    case'noodle':
+      noodleToCoffeePopup();
+      break;
+    case 'coffee':
+      coffeeToRockPopup();
+      break;
+  }
 }
 
+function melonToNoodlePopup(){
+  common.addPopup({
+    popupId: 'melonToNoodlePopup',
+    title: translation.GAME_01_POPUP_WATERMELON,
+    content: null,
+    imgURL:'/images/popup/4-2-1_energy.png',
+    buttons: [{
+      title: translation.GAME_01_EAT,
+      onclick: (event) => {
+        common.hideAllPopup();
+        isGamePaused=false;
+      }
+    }]
+  }, ()=> {
+    isGamePaused=true;
+    popupSound.play();
+   
+  });
+}
+
+
+function noodleToCoffeePopup(){
+  common.addPopup({
+    popupId: 'noodleToCoffeePopup',
+    title: translation.GAME_01_POPUP_NOODLE,
+    content: null,
+    imgURL:'/images/popup/4-2-2_energy.png',
+    buttons: [{
+      title: translation.GAME_01_EAT,
+      onclick: (event) => {
+        common.hideAllPopup();
+        isGamePaused=false;
+      }
+    }]
+  }, ()=> {
+    isGamePaused=true;
+      popupSound.play();
+   
+  });
+}
+
+function coffeeToRockPopup(){
+  common.addPopup({
+    popupId: 'coffeeToRockPopup',
+    title: translation.GAME_01_POPUP_AMERICANO,
+    content: null,
+    imgURL:'/images/popup/4-2-3_energy.png',
+    buttons: [{
+      title: translation.GAME_01_EAT,
+      onclick: (event) => {
+        common.hideAllPopup();
+        isGamePaused=false;
+      }
+    }]
+  }, ()=> {
+    isGamePaused=true;
+      popupSound.play();
+    
+  });
+}
+
+function restwithantPopup(){
+   common.addPopup({
+    popupId: 'restwithantPopup',
+    title: translation.GAME_01_POPUP_REST,
+    content: null,
+    imgURL:'/images/popup/restwithant_popup.png',
+    buttons: [{
+      title: translation.GAME_01_REST,
+      onclick: (event) => {
+        common.hideAllPopup();
+        isGamePaused=false;
+      }
+    }]
+  }, ()=> {
+    isGamePaused=true;
+      popupSound.play();
+    //  health+=20;
+  });
+}
 function CreateHealthBar() {
   MaxHealthValue = app.view.height * 0.5 / resolution;
   health = MaxHealthValue;
@@ -309,7 +373,7 @@ function play(delta) {
 
   if (health < 30) {
     currentMessage.type = 'warning';
-    displayWarning('힘들면 쉬어도 괜찮아요.', 3000); // 5 seconds warning duration
+    displayWarning(translation.GAME_01_WARNING_01, 3000); // 5 seconds warning duration
   }
   // determine which face to show
   if (healthPercentage > 66) {
@@ -325,6 +389,7 @@ function play(delta) {
     notbadFace.visible = false;
     badFace.visible = true;
   }
+  if(gameStage >=1 && Math.random()<0.001)spawnWorms();
 }
 
 
@@ -354,12 +419,12 @@ function createFaceStatus(){
 
 function CreateGuideConsole() {
   if (gameStage === 0) {
-    initializeGuideBox(['START']); // Pass ['START'] as a placeholder sentence
-    guideText.text = 'START';
+    initializeGuideBox(['']); // Pass ['START'] as a placeholder sentence
+    guideText.text = stageSentences[1][1];
     // Make 'START' text interactive
-    guideText.interactive = true;
-    guideText.buttonMode = true;
-    guideText.on('pointerdown', onStartTextClick); // Assign a click event handler to 'START' text
+    // guideText.interactive = true;
+    // guideText.buttonMode = true;
+    // guideText.on('pointerdown', onStartTextClick); // Assign a click event handler to 'START' text
     return;
   }
   
@@ -373,17 +438,48 @@ function CreateGuideConsole() {
   guideText.text = sentences[0];
   startSentenceDisplayInterval(sentences);
 }
+function createStartButton(){
+  // Create a button using PIXI Graphics
+startButton = new PIXI.Graphics();
+startButton.beginFill(0x0330fc); // #0330fc
+startButton.drawRoundedRect(0, 0, 150, 50,20); // Draw the rectangle
+startButton.endFill();
 
-function onStartTextClick() {
+// Add text to the button
+let buttonText = new PIXI.Text('START', {fontFamily : 'Neo둥근모', fontSize: 24, fill : 0xFFFFFF, align : 'center'});
+buttonText.x = startButton.width / 2;
+buttonText.y = startButton.height / 2;
+buttonText.anchor.set(0.5, 0.5); // Center the text on the button
+startButton.addChild(buttonText);
+
+// Position the button in the middle of the screen
+startButton.x = (app.view.width /resolution- startButton.width) / 2;
+startButton.y = (app.view.height/resolution - startButton.height) / 2;
+
+// Make it interactive
+startButton.interactive = true;
+startButton.buttonMode = true;
+
+// Add click and tap event handlers
+startButton.on('pointerdown', onStartButtonClick);
+
+// Add the button to the stage
+app.stage.addChild(startButton);
+}
+function onStartButtonClick() {
   let startSound = new Howl({
     src: ['/sound/S_levelStart.mp3'],
   });
   startSound.play(); // Play sound after a user gesture (click)
 
-  guideText.interactive = false;
-  guideText.buttonMode = false;
-  guideText.off('pointerdown', onStartTextClick); // Remove the click event after it's clicked
-  
+  // guideText.interactive = false;
+  // guideText.buttonMode = false;
+  // guideText.off('pointerdown', onStartTextClick); // Remove the click event after it's clicked
+  gameScene.interactive=true;
+  gameScene.visible=true;
+  gameScene.alpha=1;
+  toolboxContainer.visible=true;
+  startButton.visible=false;
   setTimeout(() => {
     gameStage = 1; // Set gameStage to 1 after displaying 'START'
     if (stageSentences[1] && stageSentences[1].length > 0) {
@@ -401,7 +497,7 @@ function initializeGuideBox(sentences){
   guideBox.drawRoundedRect(0, 0, batContainer.width * 1.5, (app.view.height / resolution) / 8, 16);
   guideBox.endFill();
   guideBox.x = ((app.view.width / resolution) - guideBox.width) / 2;
-  guideBox.y = (app.view.height / resolution) / 10;
+  guideBox.y = (app.view.height / resolution) / 11;
   gameScene.addChild(guideBox);
 
   const baseSize = 40; // This is your base font size for a known screen size, e.g., 800px width
@@ -420,11 +516,9 @@ function initializeGuideBox(sentences){
 
 function startSentenceDisplayInterval(sentences) {
   let index = 0;
+  
   const interval = setInterval(() => {
-    if (gameStage != currentStageAtStart) {
-      clearInterval(interval);
-      return;
-    }
+    if (gameStage !== 1) clearInterval(interval);
     guideText.text = sentences[index];
     index++;
     if (index >= sentences.length) {
@@ -463,7 +557,6 @@ function continueGuideMessages() {
     }
   }, 2500);
 }
-
 
 function checkTransition() {
   const clickedCount = Array.from(batContainer.children).filter((sprite) => sprite.isFilled).length;
@@ -518,6 +611,15 @@ function onClick() {
   }
 
   let batSprite;
+  let rakeSound=new Howl ({
+    src:['/sound/S_tool.mp3'],
+  });
+  let waterSound=new Howl ({
+    src:['/sound/S_water.mp3'],
+  });
+  let seedSound=new Howl ({
+    src:['/sound/S_seed.mp3'],
+  });
 
   if (gameStage === 1 && rakeClicked) {
     if (Math.random() <= 0.4) {
@@ -528,7 +630,10 @@ function onClick() {
       batSprite = new Sprite(id['soils02@3x.png']);
     }
     batSprite.interactive = true;
-    batSprite.on('pointerdown', onClick);
+    batSprite.on('pointerdown', function(){
+      if(gameStage===1) rakeSound.play();
+      onClick.call(batSprite);
+    });
     bat1Array.push(batSprite);
     wateringCan.interactive = false;
   } else if (gameStage === 2) {
@@ -537,8 +642,11 @@ function onClick() {
     if (wateringCanClicked) {
       batSprite = new Sprite(id['soils03@3x.png']);
       batSprite.interactive = true;
-      batSprite.on('pointerdown', onClick);
-
+      batSprite.on('pointerdown', function(){
+        waterSound.play();
+        onClick.call(batSprite);
+      });
+      
       const index = bat1Array.indexOf(this);
       if (index > -1) {
         bat1Array.splice(index, 1, batSprite);
@@ -549,7 +657,10 @@ function onClick() {
   } else if (gameStage === 3 && seedPouchClicked) {
     batSprite = new Sprite(id['soils04-1@3x.png']);
     batSprite.interactive = true;
-    batSprite.on('pointerdown', onClick);
+    batSprite.on('pointerdown',function(){
+      seedSound.play();
+      onClick.call(batSprite);
+    });
 
     const index = bat1Array.indexOf(this);
     if (index > -1) {
@@ -653,3 +764,27 @@ function restartGame() {
 }
 
 
+function getWormFrames(){
+  const earthworm=resources['/images/sprites/earthworm.json'].textures;
+ const frames = Object.keys(earthworm).map(frameKey => earthworm[frameKey]);
+  return frames;
+}
+function spawnWorms(){
+  const randomColumn = Math.floor(Math.random() * 4);
+  const randomRow = Math.floor(Math.random() * 6);
+  
+  const wormFrames=getWormFrames();
+  const worm=new PIXI.AnimatedSprite(wormFrames);
+  
+  worm.x=batSize *randomColumn;
+  worm.y=batSize *randomRow;
+  
+  worm.timer=0;
+  worm.column=randomColumn;
+  worm.row=randomRow;
+  worm.animationSpeed=0.1;
+  worm.play();
+  worm.visible=true;
+  worm.lifetime=10;
+  batContainer.addChild(worm);
+}

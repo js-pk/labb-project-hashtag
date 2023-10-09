@@ -2,15 +2,17 @@ import * as PIXI from 'pixi.js';
 import {
   app, Container, Sprite, TextureCache, Graphics, resources, resolution,
 } from './init.js';
-import { stageSentences } from './texts.js';
+const stageSentences = translation.GAME_02_SENTENCES;
 
 import { common } from '../../common.js';
 
-let countdownText; let id; let soils; let bgSprites; let batContainer; let gameScene; let gameOverScene; let GameoverText; let state; let bg; let cornfail;
-let countdownTime = 100;
-let lastTime = Date.now();
+let countdownText; let soils; let batContainer; let gameScene; let state; let bg; let cornfail; let badbugFrames; let hasResetCollisions=false; let click;
+let countdownTime = 100; let startButton; let counting=false; let clickAnimation;
+let lastTime=Date.now();
 let cornSprite1; let cornSprite2; let cornSprite3; let cornSprite4; let cornSprite5; let cornAni1; let cornSpriteSheets; let beeFrames; let mothFrames; let walkingRightTextures1; let walkingRightTextures2; let walkingRightTextures3; let walkingLeftTextures1; let walkingLeftTextures2; let walkingLeftTextures3;
-let scale; let batSize; let weeds; let weedKeys; let guideBox; let guideText; let gameStage=1; let isPopupGenerated=false;
+let scale; let batSize; let weeds; let weedKeys; let guideBox; let guideText; let gameStage=1; let isPopup1Generated=false; let isPopup2Generated=false; 
+let shouldSpawnWeeds=true; let shouldGenerateBugs=true; let shouldSpawnBees=true;
+let popupSound; 
 // 밭 한칸당 4점 x 24 = 96점
 let score = 96;
 let ecoPoint = 0;
@@ -29,14 +31,19 @@ let currentSpriteSheetIndex = 0;
 let accumulatedTime = 0;
 let numberOfCol=4; let numberOfRows=6; let cornSprites=[];
 
-const currentMessage = {
-  type: 'guide',
-  index: 0,
-  interval: null,
+const sounds={
+   bugPush: new Howl({
+      src:['/sound/S_bugkill.mp3']}),
+  success:new Howl({
+    src:['/sound/S_success.mp3']}),
+  popup: new Howl({
+    src:['/sound/S_popup.mp3']
+  })
 };
 
+
 export function setup() {
-  // bgSprites = resources['/images/sprites/2/bg-soil-glitch.json'].textures;
+
   cornSprite1 = resources['/images/sprites/2/corn01.png'].texture;
   cornSprite2 = resources['/images/sprites/2/corn02.png'].texture;
   cornSprite3 = resources['/images/sprites/2/corn03.png'].texture;
@@ -46,6 +53,7 @@ export function setup() {
 
   beeFrames = resources['/images/sprites/2/bees-spritesheet.json'].textures;
   mothFrames = resources['/images/sprites/2/moth-spritesheet.json'].textures;
+  badbugFrames=resources['/images/sprites/2/badbug-spritesheet.json'].textures;
 
   walkingRightTextures1 = resources['/images/sprites/2/crow_from_left.json'].textures;
   walkingRightTextures2 = resources['/images/sprites/2/waterDeer_from_left.json'].textures;
@@ -56,74 +64,104 @@ export function setup() {
   soils = resources['/images/sprites/soils.json'].textures;
   weeds = resources['/images/sprites/2/weeds.json'].textures;
   cornfail = resources['/images/sprites/2/corn-fail.json'].textures;
+//  click= resources['/images/sprites/click-tab.json'].textures;
   weedKeys = Object.keys(weeds);
 
   gameScene = new Container();
   app.stage.addChild(gameScene);
 
-
+  createStartButton();
+  gameScene.alpha=0.3;
   createBat();
   CreateGuideConsole();
   createCountdown();
-  createGameOverScene();
+  isGamePaused=true;
   
   state = play;
 
   app.ticker.add(gameLoop);
 }
 
-function CreateGuideConsole(){
-    if (!stageSentences[gameStage]) {
-    console.error(`no sentences found for stage ${gameStage}`);
-    return;
-  }
-  const sentences = stageSentences[gameStage];
-  if (guideBox) {
-    gameScene.removeChild(guideBox);
-    guideBox = null;
-  }
-  guideBox=new PIXI.Graphics();
-  guideBox.beginFill(0xFFFFFF);
-  guideBox.drawRoundedRect(0, 0, batContainer.width * 1.5, (app.view.height / resolution) / 8, 16);
-  guideBox.endFill();
-  guideBox.x = ((app.view.width / resolution) - guideBox.width) / 2;
-  guideBox.y = (app.view.height / resolution) / 10;
-  guideBox.zIndex = 99;
-  gameScene.addChild(guideBox);
-  gameScene.children.sort((a, b) => a.zIndex - b.zIndex); // Sort after adding a new child
 
-  
-  const baseSize = 40; // This is your base font size for a known screen size, e.g., 800px width
-  const baseScreenWidth = 800; // The screen width you designed for
-  const currentScreenWidth = window.innerWidth; // Get current screen (viewport) width
-  const dynamicFontSize = (currentScreenWidth / baseScreenWidth) * baseSize;
-  guideText = new PIXI.Text(sentences[0], { fontFamily: "Neo둥근모", fontSize: dynamicFontSize*2, fill: '#000000', wordWrap: true, wordWrapWidth: batContainer.width * 1.1 });
-  guideText.anchor.set(0.5);
-  guideText.x = guideBox.width / 2;
-  guideText.y = guideBox.height / 2;
-  guideBox.addChild(guideText);
-  const currentStageAtStart = gameStage;
-  // Display each sentence sequentially every second
-  let index = 1; // starting from the second sentence since the first one is already displayed
-  const interval = setInterval(() => {
-    if (gameStage != currentStageAtStart) { // If the game stage has changed, stop the loop and exit
-      clearInterval(interval);
-      return;
-    }
-    guideText.text = sentences[index];
-    index++;
-
-    if (index >= sentences.length) {
-      if (gameStage === 0) {
-        clearInterval(interval);
-        gameStage = 1;
-        CreateGuideConsole();
-      } else if (gameStage === 1 || gameStage === 2 || gameStage === 3) {
-        index = 0;
-      }
-    }
-  }, 2000);
+function gameLoop(delta) {
+  // Runs the current game `state` in a loop and renders the sprites
+  play(delta);
 }
+
+function play(delta) {
+    if(isGamePaused) return; // Stops the execution of play function when the game is paused
+ 
+  if(counting && countdownTime>0){
+    countdownTime -= 0.02*delta;
+  }
+   if (countdownTime <= 0) {
+    countdownTime = 0;
+    checkFinalScore();
+  }
+  countdownText.text = Math.floor(countdownTime).toString();
+
+  updateGameStage();
+  updateAnimations(delta);
+  handleCollisions();
+   spawnEntities();
+   handlePopupsAndTimers(delta);
+ 
+  if(gameStage===3 &&!hasResetCollisions){
+    resetCollisions();
+    hasResetCollisions=true;
+  }
+}
+
+function restartGame() {
+  console.log('restartGame');
+  isGamePaused= false;
+  
+  app.stage.removeChildren();
+  
+  app.ticker.remove(gameLoop);
+  app.ticker.add(gameLoop);
+  // Reset variables and states
+  countdownTime = 100;
+ // lastTime = Date.now();
+  gameStage = 1;
+  
+  // Add gameScene and batContainer back to the stage if they aren't already
+  app.stage.addChild(gameScene);
+  
+  if (batContainer) {
+    gameScene.addChild(batContainer);
+
+    batContainer.children.forEach((child) => {
+      if (child instanceof PIXI.AnimatedSprite) {
+        child.gotoAndPlay(0); // resets the animation to the first frame
+      }
+    });
+  }
+
+  // Re-create any initial game objects or UI components
+  CreateGuideConsole();
+  createCountdown();
+  currentSpriteSheetIndex = 0;
+  createBat();
+ 
+  // Reset other game flags
+  isPopup1Generated = false; 
+  isPopup2Generated = false;
+  shouldGenerateBugs = false;
+  shouldSpawnBees = true;
+  shouldSpawnWeeds = true;
+  hasResetCollisions = false;
+
+  // Reset the game state to the play function
+  state = play;
+
+  // Add the game loop back and start the ticker
+//  app.ticker.add(gameLoop);
+  if (!app.ticker.started) app.ticker.start();
+  console.log(`countdownTime: ${countdownTime}, lastTime: ${lastTime}`);
+
+}
+
 
 function createBat() {
   const cornFrames = getCornFrames(cornSpriteSheets[currentSpriteSheetIndex]);
@@ -155,30 +193,149 @@ function createBat() {
       cornAni1.width = batSize;
       cornAni1.height = batSize;
       cornAni1.x = batSpot.x;
-      cornAni1.y = batSpot.y;
+      cornAni1.y = batSpot.y-30;
       cornAni1.animationSpeed = 0.1;
       cornAni1.play();
 
-      cornAni1.isLeftmost = (i === 0);
-
-      cornAni1.isRightmost = (i === numberOfCol - 1);
-
-      cornAni1.isUppermost = (j === 0);
-
-      cornAni1.isBottommost = (j === numberOfRows - 1);
       batContainer.addChild(cornAni1);
       
       cornSprites[i][j] = cornAni1; // populate the array with the corn sprite references
-
     }
   }
 
   batContainer.x = ((app.view.width / resolution) - batContainer.width) / 2;
-  batContainer.y = ((app.view.height / resolution) - batContainer.height) / 2+45;
+  batContainer.y = ((app.view.height / resolution) - batContainer.height) / 2+70;
   gameScene.addChild(batContainer);
- 
+}
+function createStartButton(){
+  // Create a button using PIXI Graphics
+startButton = new PIXI.Graphics();
+startButton.beginFill(0x0330fc); // #0330fc
+startButton.drawRoundedRect(0, 0, 150*2, 50*2,20*2); // Draw the rectangle
+startButton.endFill();
+
+// Add text to the button
+let buttonText = new PIXI.Text('START', {fontFamily : 'Neo둥근모', fontSize: 24*2, fill : 0xFFFFFF, align : 'center'});
+buttonText.x = startButton.width / 2;
+buttonText.y = startButton.height / 2;
+buttonText.anchor.set(0.5, 0.5); // Center the text on the button
+startButton.addChild(buttonText);
+
+// Position the button in the middle of the screen
+startButton.x = (app.view.width /resolution- startButton.width) / 2;
+startButton.y = (app.view.height/resolution - startButton.height) / 2;
+
+// Make it interactive
+startButton.interactive = true;
+startButton.buttonMode = true;
+
+// Add click and tap event handlers
+startButton.on('pointerdown', onStartButtonClick);
+
+// Add the button to the stage
+app.stage.addChild(startButton);
+
+const clickFrames=getClickFrames();
+clickAnimation=new PIXI.AnimatedSprite(clickFrames);
+clickAnimation.x= startButton.x+startButton.width/2;
+clickAnimation.y=startButton.y;
+clickAnimation.animationSpeed=0.1;
+clickAnimation.loop=true;
+app.stage.addChild(clickAnimation);
+clickAnimation.play();
 
 }
+function getClickFrames(){
+  const clickTextureAtlas = resources['/images/sprites/click-tab.json'].textures;
+  const frames = Object.keys(clickTextureAtlas).map(frameKey => clickTextureAtlas[frameKey]);
+  return frames;
+}
+
+
+function onStartButtonClick() {
+  let startSound = new Howl({
+    src: ['/sound/S_levelStart.mp3'],
+  });
+  startSound.play(); // Play sound after a user gesture (click)
+  clickAnimation.stop();
+  clickAnimation.visible=false;
+
+  gameScene.interactive=true;
+  gameScene.visible=true;
+  gameScene.alpha=1;
+  counting=true;
+  isGamePaused=false;
+  startButton.visible=false;
+  setTimeout(() => {
+    gameStage = 1; // Set gameStage to 1 after displaying 'START'
+    if (stageSentences[1] && stageSentences[1].length > 0) {
+      guideText.text = stageSentences[1][0];
+      startSentenceDisplayInterval(stageSentences[1]); // Start displaying the sentences
+    } else {
+      console.error('No sentences found for stage 1');
+    }
+  }, 2000);
+}
+function CreateGuideConsole(){
+  
+  
+    if (!stageSentences[gameStage]) {
+    console.error(`no sentences found for stage ${gameStage}`);
+    return;
+  }
+  const sentences = stageSentences[gameStage];
+  startSentenceDisplayInterval(sentences);
+  if (guideBox) {
+    gameScene.removeChild(guideBox);
+    guideBox = null;
+  }
+  guideBox=new PIXI.Graphics();
+  guideBox.beginFill(0xFFFFFF);
+  guideBox.drawRoundedRect(0, 0, batContainer.width * 1.5, (app.view.height / resolution) / 8, 16);
+  guideBox.endFill();
+  guideBox.x = ((app.view.width / resolution) - guideBox.width) / 2;
+  guideBox.y = (app.view.height / resolution) / 11;
+  guideBox.zIndex = 99;
+  gameScene.addChild(guideBox);
+  gameScene.children.sort((a, b) => a.zIndex - b.zIndex); // Sort after adding a new child
+
+  
+  const baseSize = 40; // This is your base font size for a known screen size, e.g., 800px width
+  const baseScreenWidth = 800; // The screen width you designed for
+  const currentScreenWidth = window.innerWidth; // Get current screen (viewport) width
+  const dynamicFontSize = (currentScreenWidth / baseScreenWidth) * baseSize;
+  guideText = new PIXI.Text(sentences[0], { fontFamily: "Neo둥근모", fontSize: dynamicFontSize*2, fill: '#000000', wordWrap: true, wordWrapWidth: batContainer.width * 1.1 });
+  guideText.anchor.set(0.5);
+  guideText.x = guideBox.width / 2;
+  guideText.y = guideBox.height / 2;
+  guideBox.addChild(guideText);
+
+}
+
+function startSentenceDisplayInterval(sentences){
+  const currentStageAtStart = gameStage;
+  // Display each sentence sequentially every second
+  let index = 1; // starting from the second sentence since the first one is already displayed
+  const interval = setInterval(() => {
+    if (gameStage != currentStageAtStart) { // If the game stage has changed, stop the loop and exit
+      clearInterval(interval);
+      return;
+    }
+    guideText.text = sentences[index];
+    index++;
+
+    if (index >= sentences.length) {
+      if (gameStage === 0) {
+        clearInterval(interval);
+        gameStage = 1;
+        CreateGuideConsole();
+      } else if (gameStage === 1 || gameStage === 2 || gameStage === 3) {
+        index = 0;
+      }
+    }
+  }, 2000);
+}
+
 function createCountdown() {
   if (countdownText) {
     gameScene.removeChild(countdownText);
@@ -186,7 +343,7 @@ function createCountdown() {
   }
    const circle = new PIXI.Graphics();
     circle.beginFill(0x58bfff); 
-    circle.drawCircle(0, 0, 45); // Change 40 to the radius you desire
+    circle.drawCircle(0, 0, 45); 
     circle.endFill();
     
      // Position the circle
@@ -216,10 +373,14 @@ function getRandomWeed() {
   weed.interactive = true;
   weed.buttonMode = true; // Changes the cursor to a hand when hovering over the sprite
 
-  weed.on('pointerdown', () => {
-    batContainer.removeChild(weed); // Remove the weed from the container when clicked
-  });
+ let weedSound=new Howl({
+   src:['/sound/S_weed.mp3'],
+ });
 
+  weed.on('pointerdown',function(){
+     batContainer.removeChild(weed); 
+     weedSound.play();
+  })
   return weed;
 }
 
@@ -237,7 +398,8 @@ function spawnWeed() {
   weed.timer = 0;
   weed.column = randomColumn;
   weed.row = randomRow;
-
+  weed.lifetime=2000;
+  weed.entityType='weed';
   // Attach a listener to the weed to handle removals (when it's clicked).
   weed.on('pointerdown', () => {
     batContainer.removeChild(weed); // Remove the weed from the container when clicked
@@ -245,6 +407,64 @@ function spawnWeed() {
   
   batContainer.addChild(weed);
 }
+function getBeeFrames() {
+  const beeTextureAtlas = resources['/images/sprites/2/bees-spritesheet.json'].textures;
+  const frames = Object.keys(beeTextureAtlas).map(frameKey => beeTextureAtlas[frameKey]);
+  return frames;
+}
+function spawnBees() {
+  const randomColumn = Math.floor(Math.random() * 4);
+  const randomRow = Math.floor(Math.random() * 6);
+  
+  const beeFrames = getBeeFrames(); // Getting frames from JSON spritesheet
+  const bee = new PIXI.AnimatedSprite(beeFrames);
+  
+  // bee.width = batSize;
+  // bee.height = batSize;
+  bee.x = batSize * randomColumn;
+  bee.y = batSize * randomRow;
+  
+  // Initialize properties for this bee
+  bee.timer = 0;
+  bee.column = randomColumn;
+  bee.row = randomRow;
+  bee.animationSpeed = 0.1; // You can adjust the animation speed as needed
+  bee.play();
+  bee.visible=true;
+  bee.entityType='bee';
+  bee.lifetime=500;
+  batContainer.addChild(bee);
+}
+function switchToNextCornSpriteSheet() {
+  if (currentSpriteSheetIndex < cornSpriteSheets.length - 1) {
+    currentSpriteSheetIndex++;
+
+    // update frames for all cornAni1 instances on the stage.
+    batContainer.children.forEach((child) => {
+      if (child instanceof PIXI.AnimatedSprite && child.entityType !=='bee') {
+        const frames = getCornFrames(cornSpriteSheets[currentSpriteSheetIndex]);
+        child.textures = frames;
+        child.gotoAndPlay(0); // restarts the animation from the first frame
+      }
+    });
+  }
+}
+
+
+function getCornFrames(spriteSheetTexture) {
+  const totalFrames = 2;
+  const singleFrameWidth = spriteSheetTexture.baseTexture.width / totalFrames;
+  const frames = [];
+
+  for (let i = 0; i < totalFrames; i++) {
+    const frame = new PIXI.Rectangle(singleFrameWidth * i, 0, singleFrameWidth, spriteSheetTexture.baseTexture.height);
+    const textureFrame = new PIXI.Texture(spriteSheetTexture.baseTexture, frame);
+    frames.push(textureFrame);
+  }
+
+  return frames;
+}
+
 
 function findCorrespondingCorn(column, row) {
   if(column < 0 || column >= numberOfCol || row < 0 || row >= numberOfRows) {
@@ -254,73 +474,32 @@ function findCorrespondingCorn(column, row) {
   return cornSprites[column][row];
 }
 
-
-function gameLoop(delta) {
-  // Runs the current game `state` in a loop and renders the sprites
-  play(delta);
-
-  if (countdownTime <= 0) {
-    end();
+function updateAnimations(deltaTime){
+ 
+ // const convertedDelta= delta/1000;
+    //for animation
+  accumulatedTime += deltaTime;
+  const switchThreshold=900; //adjust this value to control speed
+  if (accumulatedTime >= switchThreshold) {
+    switchToNextCornSpriteSheet();
+    accumulatedTime -=switchThreshold; // reset the accumulated time or subtract 20 from it
   }
-  
 }
 
-function play(delta) {
-    if(isGamePaused) return; // Stops the execution of play function when the game is paused
+function handlePopupsAndTimers(delta){
 
-  // All the game logic goes here
-  const currentTime = Date.now();
-  const deltaTime = (currentTime - lastTime) / 1000;
-  // countdown logic
-  countdownTime -= deltaTime;
-
-  if (countdownTime <= 0) {
-    countdownTime = 0;
-  }
-  countdownText.text = Math.floor(countdownTime).toString();
-
-  lastTime = currentTime;
-
- // Update gameStage based on countdownTime
-    if (countdownTime <= 100 && countdownTime >= 70) gameStage = 1;
-    else if (countdownTime <= 70 && countdownTime >= 30) gameStage = 2;
-    else if (countdownTime <= 30 && countdownTime >= 0) gameStage = 3;
-    
-      // Handle stage change
-    if (previousGameStage !== gameStage) {
-        handleStageChange(previousGameStage, gameStage);
-        previousGameStage = gameStage; // Update previousGameStage after handling the change
-    }
-     // Continue with other game logics like handling collisions, spawning entities, etc.
-    handleCollisions();
-    accumulatedTime += deltaTime;
-    
-    if (gameStage===2&& countdownTime <70 && !isPopupGenerated){
-      generateNongYakPopup();
-      isPopupGenerated=true;
-    }
-    if (gameStage === 1 && Math.random() < 0.01) spawnWeed();
-    if (gameStage === 2 && Math.random() < 0.03) generateBugs();
-    if (gameStage === 3 && Math.random() < 0.03) generateAnimals();
-
-  handleCollisions();
-
-  accumulatedTime += deltaTime;
-  if (accumulatedTime >= 40) {
-    switchToNextSpriteSheet();
-    accumulatedTime -= 40; // reset the accumulated time or subtract 20 from it
-  }
-  
-  // Handle Weed timers
+   
+      // Handle Weed timers
   batContainer.children.forEach(child => {
-    if (child.timer !== undefined) {
-      child.timer += deltaTime;
-      if (child.timer > 1) {
+    if (child.entityType==='weed'&& child.timer !== undefined) {
+      child.timer += delta;
+      if (child.timer > 100) {
         let correspondingCorn = findCorrespondingCorn(child.column, child.row);
         if (correspondingCorn) {
          // Create new failed corn sprite
         const failedCorn = new Sprite(cornfail['Corn_fail01@2x.png']);
-        
+        score -=2;
+        console.log('score: ', score);
         failedCorn.x = correspondingCorn.x;
         failedCorn.y = correspondingCorn.y;
         failedCorn.width = correspondingCorn.width;
@@ -335,63 +514,76 @@ function play(delta) {
         batContainer.removeChild(child);  // Remove the weed
         }
       }
+    }else if (child.entityType==='bee' && child.lifetime!== undefined){
+      child.lifetime -= delta;
+      if(child.lifetime <=0){
+        child.visible=false;
+      }
+    } 
+  });
+}
+function updateGameStage(){
+  let newgameStage;
+  // Update gameStage based on countdownTime
+    if (countdownTime > 70) newgameStage = 1;
+    else if (countdownTime > 30) newgameStage = 2;
+    else if (countdownTime >0) newgameStage = 3;
+    
+      // Handle stage change
+    if (previousGameStage !== newgameStage) {
+       console.log('gameStage changed');
+        gameStage= newgameStage;
+        checkScore();
+        handleStageChange(previousGameStage, gameStage);
+        previousGameStage = gameStage; // Update previousGameStage after handling the change
     }
-  });
+}
+function checkScore(){
+
+  switch(gameStage){
+    case 1:
+      
+      break;
+    case 2:
+      handleScoreCheckForStage1();
+      break;
+    case 3:
+      handleScoreCheckForStage2();
+    default:
+      console.error('unhandled game stage: ${gameStage}');
+  }
+}
+function handleScoreCheckForStage1(){
+ 
+  if(score >85 && !isPopup1Generated){
+    generateJeChoJePopup();
+  }
+    if(score<=85 && !isPopup1Generated){
+    weedFailPopup();
+  }
 }
 
-function generateNongYakPopup(){
-  common.addPopup({
-                popupId: 'nongyakPopup',
-                title: '제초제를 살포할까요? 밭에 잡초가 나지 않습니다.',
-                content: null,
-                imgURL: '/images/popup/5-2-1_success.png',
-                buttons: [
-                  {
-                    title: "예",
-                    onclick: (event) => {
-                      
-                     generateWormPopup();
-                    }
-                },
-                {
-                  title: "아니오",
-                  onclick: (event) => {
-                    common.hideAllPopup();
-                    isGamePaused=false;
-                  }
-                }]    
-            }, () => {
-		 isGamePaused=true;
-});
+function handleScoreCheckForStage2(){
+  
+  if(score>60 && !isPopup2Generated){
+    generateNongYakPopup();
+  }
+  if(score<60 && !isPopup2Generated){
+    bugFailPopup();
+  }
 }
 
-function generateWormPopup(){
-  common.addPopup({
-                popupId: 'WormPopup',
-                title: '지렁이는 터전을 잃었습니다.',
-                content: null,
-                imgURL: '/images/popup/earthworm_popup.png',
-                buttons: [
-                  {
-                    title: "확인",
-                    onclick: (event) => {
-                      
-                      common.hideAllPopup();
-                      //resume the game
-                     isGamePaused=false;
-                    }
-                }]
-  },() => {
-    isGamePaused=true;
-  });
+
+function spawnEntities(){
+     if (gameStage === 1 && Math.random() < 0.01 && shouldSpawnWeeds) spawnWeed();
+    if (gameStage === 2 && Math.random() < 0.02 && shouldGenerateBugs) generateBugs();
+    if (gameStage === 3 && Math.random() < 0.025) generateAnimals();
+    if(gameStage ===2 && Math.random()< 0.01&&shouldSpawnBees) spawnBees();
 }
 
 function handleStageChange(fromStage, toStage) {
-    // Here, perform any setup or teardown needed when the game stage changes.
-    // For example, you might want to reset timers, or clear entities, or update the guide console, etc.
     CreateGuideConsole(); // For example, updating the Guide Console when the stage changes.
 }
-
 
 function checkCollision(sprite, targetSprite) {
   if (!(sprite instanceof PIXI.Sprite) || !(targetSprite instanceof PIXI.Sprite)) {
@@ -408,7 +600,9 @@ function checkCollision(sprite, targetSprite) {
 }
 
 function handleCollisions() {
-   app.stage.children.forEach((child) => {
+  app.stage.children.forEach((child) => {
+        
+
     if (child instanceof PIXI.Sprite && child.vx && child.vy) {
       let hasCollided = false;
       
@@ -419,29 +613,23 @@ function handleCollisions() {
           
         
               if (!currentCorn.isFailed && !currentCorn.isFilled && checkCollision(child, currentCorn)) {
-
-
-              currentCorn.isFilled = true;
-              hasCollided = true;
+                console.log('collision happend between', child, 'and', currentCorn);
+                currentCorn.isFilled = true;
+                hasCollided = true;
               
               // Stop sprite from moving
               child.vx = 0; 
               child.vy = 0; 
               child.isCollided = true;
               
-              cornFail(currentCorn, 'Corn_fail02@2x.png');
-              
-              // Remove the corn sprite from the container
-              batContainer.removeChild(currentCorn); 
-              
-              // If still in contact after 2 seconds, apply cornFail again
-              setTimeout(() => {
-                if (checkCollision(child, currentCorn)) {
-                  currentCorn.isFilled = true;
-                  cornFail(currentCorn); 
-                  batContainer.removeChild(currentCorn);
-                }
-              }, 2000); 
+              if(child.vx===0 && child.vy ===0){
+                setTimeout (() => {
+                  if(checkCollision(child,currentCorn)){
+                    cornFail(currentCorn, 'Corn_fail02@2x.png');
+                    batContainer.removeChild(currentCorn);
+                  }
+                }, 2000);
+              }
               
               break;
           }
@@ -457,43 +645,27 @@ function handleCollisions() {
     }
   });
 }
-
-function cornFail(cornSprite,textureName) {
-  const replace=new Sprite(cornfail[textureName]);
-  replace.width = cornSprite.width;
-  replace.height = cornSprite.height;
-  replace.x = cornSprite.x;
-  replace.y = cornSprite.y;
-
-  batContainer.addChild(replace);
-  cornSprite.interactive=false;
-  cornSprite.isFailed=true;
-   score -= 4;
- // console.log("score:", score);
+function resetCollisions() {
+  app.stage.children.forEach((sprite) => {
+    if (sprite instanceof PIXI.Sprite) {
+      // Reset collision-related properties
+      sprite.isCollided = false;
+      sprite.isFailed = false;
+      sprite.isFilled = false;
+    }
+  });
+  
+  cornSprites.flat().forEach((corn) => {
+    corn.isFailed = false;
+    corn.isFilled = false;
+  });
 }
-
-function pushSpriteAway(event) {
-  const sprite = event.currentTarget;
-  sprite.interactive = true; // Re-enable interactivity
-  sprite.isCollided = false; // Reset collision flag
-
-  const interactionData = event.data;
-  const globalPosition = interactionData.global;
-
-  const dx = globalPosition.x - sprite.x;
-  const dy = globalPosition.y - sprite.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
-
-  const pushForce = 10; 
-  sprite.vx = -(dx / distance) * pushForce;
-  sprite.vy = -(dy / distance) * pushForce;
-}
-
-
 
 function generateBugs() {
+  
   // randomly select which animation to use
-  const randomBugAni = Math.random() < 0.5 ? beeFrames : mothFrames;
+  const randomBugAni = Math.random() < 0.5 ? badbugFrames : mothFrames;
+  
   // Get all frame names from the selected animation
   const frameNames = Object.keys(randomBugAni);
   // convert frame names to textures
@@ -542,9 +714,9 @@ function generateBugs() {
   sprite.interactive = true;
   sprite.on('pointerdown', pushSpriteAway);
 
+
   return sprite;
 }
-
 function generateAnimals() {
   const walkingRight = Math.random() < 0.5;
   const randomAnimalIndex = Math.floor(Math.random() * 3);
