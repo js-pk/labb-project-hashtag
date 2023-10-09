@@ -1,0 +1,168 @@
+{
+    "TITLE": "One Click, Three Gangnaengi",
+    "ACCESS_DENIED": "The game <One Click, Three Gangnaengi> is playable at MMCA, Seoul. Please access using the QR code inside the exhibition hall.\n\nOperating Period\n2023.11.02 - 2024.04.07",
+    
+    "ENTER_NICKNAME": "Enter your nickname",
+    "ENTER_EMAIL": "Enter your email",
+    "AGREE_PERSONAL_INFORMATION": "I agree to the use of personal information during the exhibition period.",
+    "LOGIN_GUIDE": "Have you played this game before?\n -> Sign in ->",
+    "REGISTER_GUIDE": "Sign up",
+    
+    "NICKNAME_ERROR": "Please enter the nickname.",
+    "EMAIL_ERROR": "Please enter the correct email.",
+    "AGREEMENT_ERROR": "Please agree to the terms.",
+    
+    "EMAIL_NOT_EXISTS": "Email does not exist.",
+    "EMAIL_ALREADY_EXISTS": "This email is already in use. If you have played the game before, please sign in.",
+    "REGISTER_ERROR": "An error occurred during the registration process",
+    "REWARD_ERROR": "An error occurred during the reward exchange process",
+    
+    "LOGIN": "SIGN IN",
+    "LOGOUT": "SIGN OUT",
+    "NICKNAME": "Nickname",
+    "CONFIRM": "CONFIRM",
+    
+    "CREDIT": "CREDIT",
+    "CREDIT_TEXT": "<원클릭 쓰리 강냉이>\n제작 크레딧\n\n 총기획\n 시나리오\n 레벨디자인\n 2D 그래픽\n 3D 그래픽\n 콘코인 제작\n 2D 게임 개발\n AR 게임 개발\n 벡엔드 개발\n 후원",
+    
+    "REWARD": "REWARD",
+    "GET_REWARD": "GET REWARD",
+    "REWARD_TITLE": "Congraturation!!\nCorn Master!!",
+    "REWARD_GUIDE": "This Concoin can be exchanged for one bag of Gangnaengi.\n\nPlease come to the labB Factory.",
+    "REWARD_EXPIRED": "This Concoin had already been used.",
+    "REWARD_TEXT": "You have only one exchange opportunity.\nOnly the distributor can press the exchange button, and if pressed in advance, the exchange will be impossible.\nWould you like to exchange Concoin and Gangnaengi now?",
+    "REWARD_ACTION": "EXCHANGE",
+    "REWARD_CANCEL": "CANCEL",
+    "REWARD_DENIED": "You must complete all the games to receive the reward.",
+    
+    "LEVEL_01": "LEVEL 1",
+    "LEVEL_02": "LEVEL 2",
+    "LEVEL_03": "LEVEL 3",
+    
+    "TUTORIAL_01": "TUTORIAL 1",
+    "TUTORIAL_02": "TUTORIAL 2",
+    "TUTORIAL_03": "TUTORIAL 3",
+    
+    "FARM_LEVEL_01": "FARM LEVEL 1",
+    "FARM_LEVEL_02": "FARM LEVEL 2",
+    "FARM_LEVEL_03": "FARM LEVEL 3",
+    
+    "GAME_02_DENIED": "Complete Level 1 first!",
+    "GAME_03_DENIED": "Complete Levels 1 and 2 first!",
+    
+    "TUTORIAL_01_01_01_TALK_BEFORE": "Welcome! You're ",
+    "TUTORIAL_01_01_01_TALK_AFTER": ", right? I'm Farmer labB.",
+    "TUTORIAL_01_01_02_TALK": "We're trying to grow corn at the museum, but we're short of hands.",
+
+    "TUTORIAL_01_POPUP_TITLE": "Would you like to help labB start the corn farm?",
+    "TUTORIAL_01_POPUP_ACTION": "YES",
+    "TUTORIAL_01_02_TALK": [
+        "Great! Let me tell you what needs to be done.",
+        "By completing each task, you can become a farmer."
+    ],
+    "TUTORIAL_01_03_CHECK": [
+        "Plow the field",
+        "Water the ground",
+        "Plant seeds",
+        "Take a rest"
+    ],
+    "TUTORIAL_01_04_TALK": [
+        "Now, let's take a seat and start farming."
+    ],
+    
+    "GAME_01_01": [
+        "Clear the land and remove rocks.",
+        "You need to choose a hoe first."
+    ],
+    "GAME_01_02": [
+        "Moisten the soil with a sprinkler."
+    ],
+    "GAME_01_03": [
+        "Plant corn seeds in the soil."
+    ],
+    "GAME_01_WARNING_01": "It's okay to take breaks.",
+    "GAME_01_WARNING_03": "You've run out of energy! Rest is essential.",
+    "GAME_01_ALMOST_COMPLETE": "You're almost there. Hang in there!",
+    
+    "GAME_01_POPUP_WATERMELON": "A cool, sweet watermelon restores your energy.",
+    "GAME_01_POPUP_NOODLE": "Spicy noodles rejuvenate you.",
+    "GAME_01_POPUP_AMERICANO": "A cold Americano relieves your fatigue.",
+    
+    "GAME_01_POPUP_REST": "Take a moment to gaze at the surrounding scenery and rest.",
+    "GAME_01_REST": "LOOK AROUND",
+    
+    "GAME_01_RETRY": "RETRY",
+    "GAME_01_EAT": "EAT",
+    
+    "GAME_01_POPUP_SUCCESS": "Success! You've cultivated a viable field!",
+    "GAME_01_POPUP_MOVE": "GO TO NEXT STAGE",
+    
+    
+    "TUTORIAL_02_01_TALK": [
+        "Even in the digital world, 'labor' exists.",
+        "While engrossed in the game, you might forget you're working.",
+        "Remember, you're a 'player-worker' helping labB."
+    ],
+    "TUTORIAL_02_02_TALK": [
+        "Now, it's time to wait for the corn to grow.",
+        "During this waiting period, the tedious and exhausting care working continues."
+    ],
+    "TUTORIAL_02_03_TALK": [
+        "But don't worry. Game time passes faster than real life.",
+        "Here are your tasks while the corn grows."
+    ],
+    "TUTORIAL_02_04_CHECK": [
+        "Pull weeds",
+        "Pest control",
+        "Prevent wildlife access",
+        "In times of climate crisis,",
+        "Just pray"
+    ],
+    "TUTORIAL_02_05_TALK": [
+        "For 100 seconds, be a scarecrow and protect the corn."
+    ],
+    
+    "GAME_02_01": [
+        "Please pull the weeds."
+    ],
+    "GAME_02_02": [
+        "Please remove the pests."
+    ],
+    "GAME_02_03": [
+        "Please prevent wildlife intrusions."
+    ],
+    "GAME_02_FAIL_01": "Corn farming failed! Weeds took away the nutrients.",
+    "GAME_02_FAIL_02": "Corn farming failed! Please get rid of the bugs in time.",
+    "GAME_02_FAIL_03": "Corn farming failed! Animals damaged the cornfield.",
+    
+    "GAME_02_POPUP_POISON": "Should we spray herbicide? It prevents weed growth.",
+    "GAME_02_POPUP_WORM": "The earthworm has lost its habitat.",
+    
+    "GAME_02_POPUP_BUGKILLER": "Should we spray pesticide? It prevents pest diseases.",
+    "GAME_02_POPUP_BEE": "The number of honeybees has decreased.",
+    
+    "GAME_02_SUCCESS": "You've successfully grown premium corn!",
+    "GAME_02_SUCCESS_ORGANIC": "You've successfully grown organic corn!",
+    "GAME_02_HARVEST": "HARVEST",
+    "GAME_02_YES": "YES",
+    "GAME_02_NO": "NO",
+    "GAME_02_RETRY": "RETRY",
+    
+    "TUTORIAL_03_01_TALK": [
+        "Look at our deliciously grown corn.",
+        "In the barren urban landscape, it's tough to find farmland.",
+        "But here, with just a click, you can relish the joy of mining and harvesting."
+    ],
+    "TUTORIAL_03_02_TALK": [
+        "Now, it's time to showcase your corn on social media.",
+        "By posting writings and pictures, downloading files, the digital economy gets a boost.",
+        "Our focus, time, information, and data, as a new form of currency,",
+        "have the value worth exchanging for a bag of Gangneangi",
+        "The corn selfie is a modern performance proving your labor!",
+        "Now, announce your identity as a digital farmer of this era."
+    ],
+    "TUTORIAL_03_POPUP_TITLE": "Press the camera button and earn Corn Coins.",
+    "TUTORIAL_03_POPUP_ACTION": "TAKE A PHOTO",
+    
+    "GAME_03_COIN_TRANSFERING": "Converting corn face data to Corn Coins."
+}
