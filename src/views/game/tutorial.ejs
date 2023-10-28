@@ -122,8 +122,13 @@
         const character = document.createElement('img');
         character.id = 'character';
         
+        const clickIcon = document.createElement('img');
+        clickIcon.src = '/images/misc/click.gif';
+        clickIcon.id = 'click-icon';
+        
         tutorial.appendChild(textbox);
         tutorial.appendChild(character);
+        tutorial.appendChild(clickIcon);
         document.body.appendChild(tutorial);
     }
     
@@ -137,13 +142,13 @@
 
         if (currentStage.mode == 'talk') {
             currentTextIndex = 0;
+            
             const tutorial = document.getElementById('tutorial');
             const textbox = document.getElementById('textbox');
             const character = document.getElementById('character');
-            
+
             tutorial.className = `background-0${currentTutorialIndex+1}-0${stageIndex+1}`;
             textbox.textContent = currentStage.texts[currentTextIndex];
-            
             character.src = currentStage.character;
         } else if (currentStage.mode == 'check') {
             currentActionIndex = 0;
@@ -161,20 +166,22 @@
         
     }
     
-    function onClickTutorial() {
+    function onClickTutorial(e) {
+        if (e.target.parentElement.className == 'popup' || (e.target.parentElement.parentElement && e.target.parentElement.parentElement.className == 'popup')) {
+            return;
+        }
+        
         let yesSound = new Howl({src: ['/sound/yes.mp3']});
         let popupSound = new Howl({src: ['/sound/S_popup.mp3']});
-    
-        const currentStage = stages[currentStageIndex];
         
+        setClickIcon();
+        const currentStage = stages[currentStageIndex];
         if (!currentStage) {
             endTutorial();
         }
-        
         if (currentStage.mode == 'talk') {
             yesSound.play();
             const textbox = document.getElementById('textbox');
-            
             if (currentTextIndex < currentStage.texts.length - 1) {
                 currentTextIndex += 1;
                 textbox.textContent = currentStage.texts[currentTextIndex];
@@ -212,6 +219,16 @@
             })
         }
     } 
+    
+    function setClickIcon() {
+        if (currentStageIndex > 0) {
+            document.getElementById('click-icon').style.visibility = 'hidden';
+        } else if (stages[currentStageIndex].mode == 'talk') {
+            document.getElementById('click-icon').style.visibility = 'visible';
+        } else {
+            document.getElementById('click-icon').style.visibility = 'hidden';
+        }
+    }
     
     function endTutorial() {
         window.location.href = `/game/0${currentTutorialIndex+1}`;

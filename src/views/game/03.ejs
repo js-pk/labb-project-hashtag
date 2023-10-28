@@ -1,11 +1,40 @@
-<%- include("../_header") -%>
+
+<!doctype html>
+<html lang="<%= lang %>">
+
+  <head>
+      <meta charset="utf-8">
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <title><%= translation.TITLE %></title>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+      <script src="/scripts/common.js"></script>
+      <!--<script src="/scripts/actions.js"></script>-->
+      <link rel="stylesheet" href="https://unpkg.com/@kfonts/neodgm/index.css" />
+      <link rel="stylesheet" type="text/css" href="/styles/global.css"></link>
+      <meta name=”color-scheme” content=”light”>
+      
+      <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-face-aframe.prod.js"></script>
+      <script src="/scripts/ar.js"></script>
+      <link rel="stylesheet" type="text/css" href="/styles/ar.css"></link>
+  </head>
+  
+  <body>
+    <div id="container">
+    
+
 <%- include("../_nav") -%>
-<link rel="stylesheet" type="text/css" href="/styles/ar.css"></link>
-<script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-face-aframe.prod.js"></script>
-<script src="/scripts/ar.js"></script>
+
+
+
+
 
 <div class="ar-container">
+    <div id="loading" class="loading">
+      <h2><%= translation.GAME_03_LOADING %></h2>
+      <img src="/images/misc/loading.gif"/>
+    </div>
     <a-scene 
       mindar-face 
       embedded 
@@ -14,6 +43,7 @@
       vr-mode-ui="enabled: false" 
       device-orientation-permission-ui="enabled: false"
       loading-screen="enabled: false"
+      mindar-image="uiLoading: #loading" 
     >
       <a-assets>
         <a-asset-item id="headModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.2/examples/face-tracking/assets/sparkar/headOccluder.glb"></a-asset-item>
