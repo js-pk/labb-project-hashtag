@@ -1,6 +1,6 @@
 {
-    "TITLE": "One Click, Three Gangnaengi",
-    "ACCESS_DENIED": "The game <One Click, Three Gangnaengi> is playable at MMCA, Seoul. Please access using the QR code inside the exhibition hall.\n\nOperating Period\n2023.11.02 - 2024.04.07",
+    "TITLE": "One Click, Three Gangnaengyi",
+    "ACCESS_DENIED": "The game <One Click, Three Gangnaengyi> is playable at MMCA, Seoul. Please access using the QR code inside the exhibition hall.\n\nOperating Period\n2023.11.03 - 2024.04.07",
     
     "ENTER_NICKNAME": "Enter your nickname",
     "ENTER_EMAIL": "Enter your email",
@@ -23,14 +23,14 @@
     "CONFIRM": "CONFIRM",
     
     "CREDIT": "CREDIT",
-    "CREDIT_TEXT": "<원클릭 쓰리 강냉이>\n제작 크레딧\n\n 총기획\n 시나리오\n 레벨디자인\n 2D 그래픽\n 3D 그래픽\n 콘코인 제작\n 2D 게임 개발\n AR 게임 개발\n 벡엔드 개발\n 후원",
+    "CREDIT_TEXT": "<One Click Three Gangnaengyi>\nCredits\n\n Executive Producer: lab B\n Game Designer: An Gayoung\n Development Lead: Park Jungsue\n 2D Game Developer : Jenin Kii\n Backend & Frontend: Park Jungsue\n 3D Artist: Kang Minjeong, Jenin Kii\n 2D Artist: An Gayoung, Choi Hyelyeon",
     
     "REWARD": "REWARD",
     "GET_REWARD": "GET REWARD",
     "REWARD_TITLE": "Congraturation!!\nCorn Master!!",
-    "REWARD_GUIDE": "This Concoin can be exchanged for one bag of Gangnaengi.\n\nPlease come to the labB Factory.",
+    "REWARD_GUIDE": "This Concoin can be exchanged for one bag of Gangnaengyi.\n\nPlease come to the labB Factory.",
     "REWARD_EXPIRED": "This Concoin had already been used.",
-    "REWARD_TEXT": "You have only one exchange opportunity.\nOnly the distributor can press the exchange button, and if pressed in advance, the exchange will be impossible.\nWould you like to exchange Concoin and Gangnaengi now?",
+    "REWARD_TEXT": "You have only one exchange opportunity.\nOnly the distributor can press the exchange button, and if pressed in advance, the exchange will be impossible.\nWould you like to exchange Concoin and Gangnaengyi now?",
     "REWARD_ACTION": "EXCHANGE",
     "REWARD_CANCEL": "CANCEL",
     "REWARD_DENIED": "You must complete all the games to receive the reward.",
@@ -61,7 +61,7 @@
         "By completing each task, you can become a farmer."
     ],
     "TUTORIAL_01_03_CHECK": [
-        "Plow the field",
+        "Till the field",
         "Water the ground",
         "Plant seeds",
         "Take a rest"
@@ -71,17 +71,16 @@
     ],
     
     "GAME_01_01": [
-        "Clear the land and remove rocks.",
-        "You need to choose a hoe first."
+        "Till the field and remove the stones."
     ],
     "GAME_01_02": [
-        "Moisten the soil with a sprinkler."
+        "Pouring water using the watering can."
     ],
     "GAME_01_03": [
         "Plant corn seeds in the soil."
     ],
     "GAME_01_WARNING_01": "It's okay to take breaks.",
-    "GAME_01_WARNING_03": "You've run out of energy! Rest is essential.",
+    "GAME_01_WARNING_02": "You've run out of energy! Rest is essential.",
     "GAME_01_ALMOST_COMPLETE": "You're almost there. Hang in there!",
     
     "GAME_01_POPUP_WATERMELON": "A cool, sweet watermelon restores your energy.",
@@ -101,7 +100,7 @@
     "TUTORIAL_02_01_TALK": [
         "Even in the digital world, 'labor' exists.",
         "While engrossed in the game, you might forget you're working.",
-        "Remember, you're a 'player-worker' helping labB."
+        "Remember, you're a 'playbor' helping labB."
     ],
     "TUTORIAL_02_02_TALK": [
         "Now, it's time to wait for the corn to grow.",
@@ -139,7 +138,7 @@
     "GAME_02_POPUP_WORM": "The earthworm has lost its habitat.",
     
     "GAME_02_POPUP_BUGKILLER": "Should we spray pesticide? It prevents pest diseases.",
-    "GAME_02_POPUP_BEE": "The number of honeybees has decreased.",
+    "GAME_02_POPUP_BEE": "The number of honeybees has decreased. ",
     
     "GAME_02_SUCCESS": "You've successfully grown premium corn!",
     "GAME_02_SUCCESS_ORGANIC": "You've successfully grown organic corn!",
@@ -157,12 +156,13 @@
         "Now, it's time to showcase your corn on social media.",
         "By posting writings and pictures, downloading files, the digital economy gets a boost.",
         "Our focus, time, information, and data, as a new form of currency,",
-        "have the value worth exchanging for a bag of Gangneangi",
+        "have the value worth exchanging for a bag of Gangnaengyi",
         "The corn selfie is a modern performance proving your labor!",
         "Now, announce your identity as a digital farmer of this era."
     ],
     "TUTORIAL_03_POPUP_TITLE": "Press the camera button and earn Corn Coins.",
     "TUTORIAL_03_POPUP_ACTION": "TAKE A PHOTO",
     
+    "GAME_03_LOADING": "Please wait until corn glasses and a beard appear...",
     "GAME_03_COIN_TRANSFERING": "Converting corn face data to Corn Coins."
 }
