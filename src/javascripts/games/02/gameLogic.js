@@ -1,3 +1,5 @@
+//game LV2
+
 import * as PIXI from 'pixi.js';
 import {
   app, Container, Sprite, TextureCache, Graphics, resources, resolution,
@@ -9,8 +11,8 @@ import { common } from '../../common.js';
 let countdownText; let soils; let batContainer; let gameScene; let state; let bg; let cornfail; let badbugFrames; let hasResetCollisions=false; let click;
 let countdownTime = 100; let startButton; let counting=false; let clickAnimation;
 let lastTime=Date.now();
-let cornSprite1; let cornSprite2; let cornSprite3; let cornSprite4; let cornSprite5; let cornAni1; let cornSpriteSheets; let beeFrames; let mothFrames; let walkingRightTextures1; let walkingRightTextures2; let walkingRightTextures3; let walkingLeftTextures1; let walkingLeftTextures2; let walkingLeftTextures3;
-let scale; let batSize; let weeds; let weedKeys; let guideBox; let guideText; let gameStage=1; let isPopup1Generated=false; let isPopup2Generated=false; 
+let cornSprite1; let cornSprite2; let cornSprite3; let cornSprite4; let cornSprite5; let cornAni1; let cornSpriteSheets; let beeFrames; let mothFrames; let crowRightTexture; let waterDeerRightTexture; let boarRightTexture; let crowLeftTexture; let waterDeerLeftTexture; let boarLeftTexture;
+let scale; let batSize; let weeds; let weedKeys; let guideBox; let guideText; let gameStage=0; let isPopup1Generated=false; let isPopup2Generated=false; 
 let shouldSpawnWeeds=true; let shouldGenerateBugs=true; let shouldSpawnBees=true;
 let popupSound; 
 // 밭 한칸당 4점 x 24 = 96점
@@ -38,6 +40,12 @@ const sounds={
     src:['/sound/S_success.mp3']}),
   popup: new Howl({
     src:['/sound/S_popup.mp3']
+  }),
+  fail: new Howl({
+    src:['/sound/S_fail.mp3']
+  }),
+  AnimalPush: new Howl({
+    src:['/sound/S_animal.mp3']
   })
 };
 
@@ -55,12 +63,12 @@ export function setup() {
   mothFrames = resources['/images/sprites/2/moth-spritesheet.json'].textures;
   badbugFrames=resources['/images/sprites/2/badbug-spritesheet.json'].textures;
 
-  walkingRightTextures1 = resources['/images/sprites/2/crow_from_left.json'].textures;
-  walkingRightTextures2 = resources['/images/sprites/2/waterDeer_from_left.json'].textures;
-  walkingRightTextures3 = resources['/images/sprites/2/boar_fromLeft.json'].textures;
-  walkingLeftTextures1 = resources['/images/sprites/2/crow_from_right.json'].textures;
-  walkingLeftTextures2 = resources['/images/sprites/2/waterDeer_from_Right.json'].textures;
-  walkingLeftTextures3 = resources['/images/sprites/2/boar_fromRight.json'].textures;
+  crowRightTexture = resources['/images/sprites/2/crow_from_left.json'].textures;
+  waterDeerRightTexture = resources['/images/sprites/2/waterDeer_from_left.json'].textures;
+  boarRightTexture = resources['/images/sprites/2/boar_fromLeft.json'].textures;
+  crowLeftTexture = resources['/images/sprites/2/crow_from_right.json'].textures;
+  waterDeerLeftTexture = resources['/images/sprites/2/waterDeer_from_Right.json'].textures;
+  boarLeftTexture = resources['/images/sprites/2/boar_fromRight.json'].textures;
   soils = resources['/images/sprites/soils.json'].textures;
   weeds = resources['/images/sprites/2/weeds.json'].textures;
   cornfail = resources['/images/sprites/2/corn-fail.json'].textures;
@@ -85,18 +93,23 @@ export function setup() {
 
 function gameLoop(delta) {
   // Runs the current game `state` in a loop and renders the sprites
+ 
   play(delta);
 }
 
 function play(delta) {
-    if(isGamePaused) return; // Stops the execution of play function when the game is paused
+  if(isGamePaused) return; // Stops the execution of play function when the game is paused
  
   if(counting && countdownTime>0){
-    countdownTime -= 0.02*delta;
+    countdownTime -= 0.01*delta;
   }
    if (countdownTime <= 0) {
     countdownTime = 0;
     checkFinalScore();
+  }
+  //스코어가 일정 이하가 되면 바로 게임오버로 바꾸기
+  if(score<12){
+    restartGame();
   }
   countdownText.text = Math.floor(countdownTime).toString();
 
@@ -110,40 +123,60 @@ function play(delta) {
     resetCollisions();
     hasResetCollisions=true;
   }
+  //console.log(`countdownTime: ${countdownTime}, lastTime: ${lastTime}`);
 }
 
 function restartGame() {
   console.log('restartGame');
-  isGamePaused= false;
-  
+
+  // Pause and Reset Flags
+  isGamePaused = true;
+  counting = false;
+
+  // Cleanup: Remove children and ticker function
   app.stage.removeChildren();
-  
   app.ticker.remove(gameLoop);
-  app.ticker.add(gameLoop);
-  // Reset variables and states
+   app.ticker.add(gameLoop);
+  // Reset Variables
+  previousGameStage = null;
+  cornSprites = []; // Note: Ensure array references are managed to prevent memory leaks
+  lastTime = undefined;
   countdownTime = 100;
- // lastTime = Date.now();
-  gameStage = 1;
+  accumulatedTime = 0;
   
-  // Add gameScene and batContainer back to the stage if they aren't already
+  gameStage = 0;
+  score = 96;
+  ecoPoint = 0;
+
+  // Re-add gameScene and batContainer to the stage if they aren't already
   app.stage.addChild(gameScene);
   
   if (batContainer) {
     gameScene.addChild(batContainer);
 
+    // Reset sprite sheet index
+    currentSpriteSheetIndex = 0;
+
+    // Reset all animations to use the first sprite sheet and frame
     batContainer.children.forEach((child) => {
-      if (child instanceof PIXI.AnimatedSprite) {
-        child.gotoAndPlay(0); // resets the animation to the first frame
+      if (child instanceof PIXI.AnimatedSprite && child.entityType !== 'bee') {
+        const frames = getCornFrames(cornSpriteSheets[currentSpriteSheetIndex]);
+        child.textures = frames;
+        child.gotoAndPlay(0); // restarts the animation from the first frame
       }
     });
   }
 
   // Re-create any initial game objects or UI components
+  // Note: Ensure that your create function doesn’t add extra event listeners that may pile up
   CreateGuideConsole();
   createCountdown();
-  currentSpriteSheetIndex = 0;
   createBat();
- 
+  createStartButton();
+
+  // Reset UI
+  gameScene.alpha = 0.3;
+
   // Reset other game flags
   isPopup1Generated = false; 
   isPopup2Generated = false;
@@ -151,17 +184,14 @@ function restartGame() {
   shouldSpawnBees = true;
   shouldSpawnWeeds = true;
   hasResetCollisions = false;
-
+  
+  resetCollisions();
+  
   // Reset the game state to the play function
-  state = play;
+   state = play;
 
-  // Add the game loop back and start the ticker
-//  app.ticker.add(gameLoop);
   if (!app.ticker.started) app.ticker.start();
-  console.log(`countdownTime: ${countdownTime}, lastTime: ${lastTime}`);
-
 }
-
 
 function createBat() {
   const cornFrames = getCornFrames(cornSpriteSheets[currentSpriteSheetIndex]);
@@ -207,15 +237,16 @@ function createBat() {
   batContainer.y = ((app.view.height / resolution) - batContainer.height) / 2+70;
   gameScene.addChild(batContainer);
 }
+
 function createStartButton(){
   // Create a button using PIXI Graphics
 startButton = new PIXI.Graphics();
 startButton.beginFill(0x0330fc); // #0330fc
-startButton.drawRoundedRect(0, 0, 150*2, 50*2,20*2); // Draw the rectangle
+startButton.drawRoundedRect(0, 0, 150, 50,20); // Draw the rectangle
 startButton.endFill();
 
 // Add text to the button
-let buttonText = new PIXI.Text('START', {fontFamily : 'Neo둥근모', fontSize: 24*2, fill : 0xFFFFFF, align : 'center'});
+let buttonText = new PIXI.Text('START', {fontFamily : 'Neo둥근모', fontSize: 28, fill : 0xFFFFFF, align : 'center'});
 buttonText.x = startButton.width / 2;
 buttonText.y = startButton.height / 2;
 buttonText.anchor.set(0.5, 0.5); // Center the text on the button
@@ -239,18 +270,17 @@ const clickFrames=getClickFrames();
 clickAnimation=new PIXI.AnimatedSprite(clickFrames);
 clickAnimation.x= startButton.x+startButton.width/2;
 clickAnimation.y=startButton.y;
-clickAnimation.animationSpeed=0.1;
+clickAnimation.animationSpeed=0.2;
 clickAnimation.loop=true;
 app.stage.addChild(clickAnimation);
 clickAnimation.play();
-
 }
+
 function getClickFrames(){
   const clickTextureAtlas = resources['/images/sprites/click-tab.json'].textures;
   const frames = Object.keys(clickTextureAtlas).map(frameKey => clickTextureAtlas[frameKey]);
   return frames;
 }
-
 
 function onStartButtonClick() {
   let startSound = new Howl({
@@ -266,18 +296,22 @@ function onStartButtonClick() {
   counting=true;
   isGamePaused=false;
   startButton.visible=false;
+  shouldGenerateBugs=true;
+ 
   setTimeout(() => {
     gameStage = 1; // Set gameStage to 1 after displaying 'START'
+ 
+   
     if (stageSentences[1] && stageSentences[1].length > 0) {
       guideText.text = stageSentences[1][0];
       startSentenceDisplayInterval(stageSentences[1]); // Start displaying the sentences
     } else {
       console.error('No sentences found for stage 1');
     }
-  }, 2000);
+  }, 1500);
 }
+
 function CreateGuideConsole(){
-  
   
     if (!stageSentences[gameStage]) {
     console.error(`no sentences found for stage ${gameStage}`);
@@ -298,18 +332,17 @@ function CreateGuideConsole(){
   guideBox.zIndex = 99;
   gameScene.addChild(guideBox);
   gameScene.children.sort((a, b) => a.zIndex - b.zIndex); // Sort after adding a new child
-
   
+   
   const baseSize = 40; // This is your base font size for a known screen size, e.g., 800px width
   const baseScreenWidth = 800; // The screen width you designed for
   const currentScreenWidth = window.innerWidth; // Get current screen (viewport) width
   const dynamicFontSize = (currentScreenWidth / baseScreenWidth) * baseSize;
-  guideText = new PIXI.Text(sentences[0], { fontFamily: "Neo둥근모", fontSize: dynamicFontSize*2, fill: '#000000', wordWrap: true, wordWrapWidth: batContainer.width * 1.1 });
+  guideText = new PIXI.Text(sentences[0], { fontFamily: "Neo둥근모", fontSize: dynamicFontSize, fill: '#000000', wordWrap: true, wordWrapWidth: batContainer.width * 1.1 });
   guideText.anchor.set(0.5);
   guideText.x = guideBox.width / 2;
   guideText.y = guideBox.height / 2;
   guideBox.addChild(guideText);
-
 }
 
 function startSentenceDisplayInterval(sentences){
@@ -337,31 +370,43 @@ function startSentenceDisplayInterval(sentences){
 }
 
 function createCountdown() {
+  const guideboxX = ((app.view.width / resolution) - batContainer.width * 1.5) / 2;
+  const guideboxY = ((app.view.height / resolution) - batContainer.height) / 2;
+
+  
   if (countdownText) {
     gameScene.removeChild(countdownText);
     countdownText = null;
   }
    const circle = new PIXI.Graphics();
     circle.beginFill(0x58bfff); 
-    circle.drawCircle(0, 0, 45); 
+    circle.drawCircle(0, 0, app.view.width/resolution*0.05); 
     circle.endFill();
     
      // Position the circle
     circle.x = (app.view.width / resolution) * 0.9;
-    circle.y = (app.view.height / resolution) / 6.1;
+    circle.y = (app.view.height / resolution) * 0.15;
+    
+    const baseScreenWidth = 800; // The screen width you designed for
+    const currentScreenWidth = window.innerWidth; // Get current screen (viewport) width
+    const dynamicFontSize = (currentScreenWidth / baseScreenWidth) * 40;
     
   let labelText=new PIXI.Text('Time Left: ', {fontFamily:'Neo둥근모', fontSize:36, fill: 'black'});
-  countdownText = new PIXI.Text('100', { fontFamily: 'Neo둥근모', fontSize: 50, fill: 'white' });
+  countdownText = new PIXI.Text('100', { fontFamily: 'Neo둥근모', fontSize: dynamicFontSize, fill: 'white', align: 'center' });
 
   
   labelText.x= ((app.view.width / resolution) - batContainer.width) / 2;
-  countdownText.x=(app.view.width / resolution)*0.865;
-  labelText.y =((app.view.height / resolution) - batContainer.height) / 2
-  countdownText.y =(app.view.height / resolution)/6.8;
+  labelText.y =((app.view.height / resolution) - batContainer.height) / 2;
+
+  countdownText.x = 0;
+  countdownText.y = 0;
+  countdownText.anchor.set(0.5, 0.5); // Center the text on the button
+
   circle.zIndex=999;
   countdownText.zIndex=9999;
+  circle.addChild(countdownText);   
   gameScene.addChild(circle);
-  gameScene.addChild(countdownText);   
+  
   gameScene.children.sort((a, b) => a.zIndex - b.zIndex); // Sort after adding new children
 
 }
@@ -419,8 +464,8 @@ function spawnBees() {
   const beeFrames = getBeeFrames(); // Getting frames from JSON spritesheet
   const bee = new PIXI.AnimatedSprite(beeFrames);
   
-  // bee.width = batSize;
-  // bee.height = batSize;
+  bee.width = batSize;
+  bee.height = batSize;
   bee.x = batSize * randomColumn;
   bee.y = batSize * randomRow;
   
@@ -450,7 +495,6 @@ function switchToNextCornSpriteSheet() {
   }
 }
 
-
 function getCornFrames(spriteSheetTexture) {
   const totalFrames = 2;
   const singleFrameWidth = spriteSheetTexture.baseTexture.width / totalFrames;
@@ -461,10 +505,8 @@ function getCornFrames(spriteSheetTexture) {
     const textureFrame = new PIXI.Texture(spriteSheetTexture.baseTexture, frame);
     frames.push(textureFrame);
   }
-
   return frames;
 }
-
 
 function findCorrespondingCorn(column, row) {
   if(column < 0 || column >= numberOfCol || row < 0 || row >= numberOfRows) {
@@ -476,10 +518,9 @@ function findCorrespondingCorn(column, row) {
 
 function updateAnimations(deltaTime){
  
- // const convertedDelta= delta/1000;
-    //for animation
+  //for animation
   accumulatedTime += deltaTime;
-  const switchThreshold=900; //adjust this value to control speed
+  const switchThreshold=1600; //adjust this value to control speed
   if (accumulatedTime >= switchThreshold) {
     switchToNextCornSpriteSheet();
     accumulatedTime -=switchThreshold; // reset the accumulated time or subtract 20 from it
@@ -488,7 +529,6 @@ function updateAnimations(deltaTime){
 
 function handlePopupsAndTimers(delta){
 
-   
       // Handle Weed timers
   batContainer.children.forEach(child => {
     if (child.entityType==='weed'&& child.timer !== undefined) {
@@ -645,6 +685,7 @@ function handleCollisions() {
     }
   });
 }
+
 function resetCollisions() {
   app.stage.children.forEach((sprite) => {
     if (sprite instanceof PIXI.Sprite) {
@@ -662,17 +703,23 @@ function resetCollisions() {
 }
 
 function generateBugs() {
-  
-  // randomly select which animation to use
-  const randomBugAni = Math.random() < 0.5 ? badbugFrames : mothFrames;
-  
-  // Get all frame names from the selected animation
-  const frameNames = Object.keys(randomBugAni);
-  // convert frame names to textures
-  const frames = frameNames.map((name) => randomBugAni[name]);
+  let sprite;
+  if (Math.random() < 0.5) {
+    const frameNames = Object.keys(badbugFrames);
+    const frames = frameNames.map((name) => badbugFrames[name]);
+    sprite = new PIXI.AnimatedSprite(frames);
+    
+    sprite.width = batSize * 0.65;
+    sprite.height = batSize * 0.65;
+  } else {
+    const frameNames = Object.keys(mothFrames);
+    const frames = frameNames.map((name) => mothFrames[name]);
+    sprite = new PIXI.AnimatedSprite(frames);
+    
+    sprite.width = batSize * 1.2;
+    sprite.height = batSize * 1.2;
+  }
 
-  // create an animated spirte with the chosen frames
-  const sprite = new PIXI.AnimatedSprite(frames);
   sprite.animationSpeed = 0.3;
   sprite.play();
   // sprite.scale.set(0.6);
@@ -717,6 +764,7 @@ function generateBugs() {
 
   return sprite;
 }
+
 function generateAnimals() {
   const walkingRight = Math.random() < 0.5;
   const randomAnimalIndex = Math.floor(Math.random() * 3);
@@ -724,20 +772,29 @@ function generateAnimals() {
   let animationTextures;
   if (walkingRight) {
     switch (randomAnimalIndex) {
-      case 0: animationTextures = walkingRightTextures1; break;
-      case 1: animationTextures = walkingRightTextures2; break;
-      case 2: animationTextures = walkingRightTextures3; break;
+      case 0: animationTextures = crowRightTexture; break;
+      case 1: animationTextures = waterDeerRightTexture; break;
+      case 2: animationTextures = boarRightTexture; break;
     }
   } else {
     switch (randomAnimalIndex) {
-      case 0: animationTextures = walkingLeftTextures1; break;
-      case 1: animationTextures = walkingLeftTextures2; break;
-      case 2: animationTextures = walkingLeftTextures3; break;
+      case 0: animationTextures = crowLeftTexture; break;
+      case 1: animationTextures = waterDeerLeftTexture; break;
+      case 2: animationTextures = boarLeftTexture; break;
     }
   }
 
   const frames = Object.keys(animationTextures).map((name) => animationTextures[name]);
   const sprite = new PIXI.AnimatedSprite(frames);
+  
+  if (randomAnimalIndex == 0) {
+    sprite.width = batSize * 2;
+    sprite.height = batSize * 2;
+  } else {
+    sprite.width = batSize * 3;
+    sprite.height = batSize * 3;
+  }
+
   sprite.isAnimal=true; //tag as animal
   sprite.animationSpeed = 0.3;
   sprite.play();
@@ -777,6 +834,7 @@ function cornFail(cornSprite,textureName) {
    score -= 4;
   console.log("cornFail! score:", score);
 }
+
 function pushSpriteAway(event) {
   
   const sprite = event.currentTarget;
@@ -794,138 +852,160 @@ function pushSpriteAway(event) {
   sprite.vx = -(dx / distance) * pushForce;
   sprite.vy = -(dy / distance) * pushForce;
   
-  
+  if(sprite.isAnimal){
+    sounds.AnimalPush.play();
+  }else{
   sounds.bugPush.play();
+}
 }
 
 
 
 function generateJeChoJePopup(){
-  common.addPopup({
-                popupId: 'jechoPopup',
-                title: translation.GAME_02_POPUP_POISON,
-                content: null,
-                imgURL: '/images/popup/5-2-1_success.png',
-                buttons: [
-                  {
-                    title: translation.GAME_02_YES,
-                    onclick: (event) => {
-                      shouldSpawnWeeds=false;
-                     generateWormPopup();
-                    // app.ticker.start();
-                    isGamePaused=false;
-                 //   isPopup1Generated=true;
-                     counting=true;
-                    }
-                },
-                {
-                  title: translation.GAME_02_NO,
-                  onclick: (event) => {
-                    common.hideAllPopup();
-                    isGamePaused=false;
-                   // isPopup1Generated=true;
-                    ecoPoint++;
-               //     app.ticker.start();
-                    counting=true;
-                  }
-                }]    
-            }, () => {
-  //  app.ticker.stop();   
-		 isGamePaused=true;
-		 sounds.popup.play();
-      counting=false;
-      isPopup1Generated=true;
-});
+  if (document.getElementById("jechoPopup")) {
+    common.showPopup('jechoPopup');
+  } else {
+    common.addPopup({
+      popupId: 'jechoPopup',
+      title: translation.GAME_02_POPUP_POISON,
+      content: null,
+      imgURL: '/images/popup/5-2-1_success.png',
+      buttons: [
+        {
+          title: translation.GAME_02_YES,
+          onclick: (event) => {
+            shouldSpawnWeeds=false;
+           generateWormPopup();
+          // app.ticker.start();
+          isGamePaused=false;
+       //   isPopup1Generated=true;
+           counting=true;
+          }
+      },
+      {
+        title: translation.GAME_02_NO,
+        onclick: (event) => {
+          common.hideAllPopup();
+          isGamePaused=false;
+         // isPopup1Generated=true;
+          ecoPoint++;
+          app.ticker.start();
+          counting=true;
+        }
+      }]    
+    }, () => {
+         app.ticker.stop();   
+    		 isGamePaused=true;
+    		 sounds.popup.play();
+          counting=false;
+          isPopup1Generated=true;
+          
+    });
+  }
 }
 
 function generateWormPopup(){
-  common.addPopup({
-                popupId: 'WormPopup',
-                title: translation.GAME_02_POPUP_WORM,
-                content: null,
-                imgURL: '/images/popup/earthworm_popup.png',
-                buttons: [
-                  {
-                    title: translation.CONFIRM,
-                    onclick: (event) => {
-                      
-                      common.hideAllPopup();
-                      //resume the game
-                     isGamePaused=false;
-                     isPopup1Generated=true;
-                    counting=true;
-                  //   app.ticker.start();
-                    }
-                }]
-  },() => {
-    isGamePaused=true;
-    sounds.popup.play();
-//   app.ticker.stop();
-    counting=false;
-    
-  });
+  if (document.getElementById("WormPopup")) {
+    common.showPopup('WormPopup');
+  } else {
+    common.addPopup({
+      popupId: 'WormPopup',
+      title: translation.GAME_02_POPUP_WORM,
+      content: null,
+      imgURL: '/images/popup/earthworm_popup.png',
+      buttons: [
+        {
+          title: translation.CONFIRM,
+          onclick: (event) => {
+            
+            common.hideAllPopup();
+            //resume the game
+           isGamePaused=false;
+           isPopup1Generated=true;
+          counting=true;
+           app.ticker.start();
+          }
+      }]
+    },() => {
+      isGamePaused=true;
+      sounds.popup.play();
+     app.ticker.stop();
+      counting=false;
+      
+    });
+  }
 }
 
 
 function generateNongYakPopup(){
-   common.addPopup({
-                popupId: 'nongyakPopup',
-                title: translation.GAME_02_POPUP_BUGKILLER,
-                content: null,
-                imgURL: '/images/popup/5-2-2_success.png',
-                buttons: [
-                  {
-                    title: translation.GAME_02_YES,
-                    onclick: (event) => {
-                      shouldGenerateBugs=false;
-                      shouldSpawnBees=false;
-                     generateBeesGoodByePopUp();
-                    //  app.ticker.start();
-                      counting=true;
-                      isGamePaused=false;
-                    }
-                },
-                {
-                  title: translation.GAME_02_NO,
-                  onclick: (event) => {
-                    common.hideAllPopup();
-                    isGamePaused=false;
-                    isPopup2Generated=true;
-                    ecoPoint++; // app.ticker.start();
-                    counting=true;
-                  }
-                }]    
-            }, () => {
-		 isGamePaused=true;
-		sounds.popup.play();
-    counting=false;
-		// app.ticker.stop();
-		isPopup2Generated=true;
-});
+  if (document.getElementById("nongyakPopup")) {
+    common.showPopup('nongyakPopup');
+  } else {
+    common.addPopup({
+      popupId: 'nongyakPopup',
+      title: translation.GAME_02_POPUP_BUGKILLER,
+      content: null,
+      imgURL: '/images/popup/5-2-2_success.png',
+      buttons: [
+        {
+          title: translation.GAME_02_YES,
+          onclick: (event) => {
+            shouldGenerateBugs=false;
+            shouldSpawnBees=false;
+           generateBeesGoodByePopUp();
+           // app.ticker.start();
+            counting=true;
+            isGamePaused=false;
+          }
+      },
+      {
+        title: translation.GAME_02_NO,
+        onclick: (event) => {
+          common.hideAllPopup();
+          isGamePaused=false;
+          isPopup2Generated=true;
+          ecoPoint++; app.ticker.start();
+          counting=true;
+        }
+      }]    
+    }, () => {
+    		 isGamePaused=true;
+    		sounds.popup.play();
+        counting=false;
+    		app.ticker.stop();
+    		isPopup2Generated=true;
+    });
+  }
 }
 
 function generateBeesGoodByePopUp(){
-   common.addPopup({
-                popupId: 'BeesPopup',
-                title: translation.GAME_02_POPUP_BEE,
-                content: null,
-                imgURL: '/images/popup/beesgoodbye_popup.png',
-                buttons: [
-                  {
-                    title: translation.CONFIRM,
-                    onclick: (event) => {
-                      
-                      common.hideAllPopup();
-                     isGamePaused=false;
-                     isPopup2Generated=true;
-                    counting=true;
-                    }
-                }]
-  },() => {
-    isGamePaused=true;
-   		 sounds.popup.play();
-counting=false;
-  });
+  if (document.getElementById("BeesPopup")) {
+    common.showPopup('BeesPopup');
+  } else {
+    common.addPopup({
+      popupId: 'BeesPopup',
+      title: translation.GAME_02_POPUP_BEE,
+      content: null,
+      imgURL: '/images/popup/beesgoodbye_popup.png',
+      buttons: [
+        {
+          title: translation.CONFIRM,
+          onclick: (event) => {
+            
+            common.hideAllPopup();
+           isGamePaused=false;
+           isPopup2Generated=true;
+          counting=true;
+          app.ticker.start();
+          }
+      }]
+    },() => {
+      isGamePaused=true;
+     	sounds.popup.play();
+      counting=false;
+      app.ticker.stop();
+    });
+  }
 }
 
 
@@ -944,105 +1024,130 @@ function checkFinalScore(){
 }
 
 function failPopup(){
-  common.addPopup({
-                popupId: 'failPopup',
-                title: translation.GAME_02_FAIL_03,
-                content: null,
-                imgURL: '/images/popup/5-2-3_fail.png',
-                buttons: [
-                  {
-                    title: translation.GAME_02_RETRY,
-                    onclick: (event) => {
-                      
-                     common.hideAllPopup();
-                     restartGame();
-                    }
-                }]
-  },() => {
-    isGamePaused=true;
-    sounds.popup.play();
-
-  });
+  if (document.getElementById("failPopup")) {
+    common.showPopup('failPopup');
+  } else {
+    common.addPopup({
+      popupId: 'failPopup',
+      title: translation.GAME_02_FAIL_03,
+      content: null,
+      imgURL: '/images/popup/5-2-3_fail.png',
+      buttons: [
+        {
+          title: translation.GAME_02_RETRY,
+          onclick: (event) => {
+            
+           common.hideAllPopup();
+           restartGame();
+          }
+      }]
+    },() => {
+      isGamePaused=true;
+      sounds.popup.play();
+     app.ticker.stop();
+     sounds.fail.play();
+    });
+  }
 }
 
 function weedFailPopup(){
-  common.addPopup({
-    popupId:'weedFailPopup',
-    title:'옥수수 농사 실패! 잡초에게 영양분을 뺏겼어요',
-    content: null,
-    imgURL: '/images/popup/5-2-1_fail.png',
-    buttons: [
-      {
-        title:'다시하기',
-        onclick:(event) => {
-          common.hideAllPopup();
-          restartGame();
-        }
-      }]
-  }, () => {
-    isGamePaused=true;
-    sounds.popup.play();
-  });
+  if (document.getElementById("weedFailPopup")) {
+    common.showPopup('weedFailPopup');
+  } else {
+    common.addPopup({
+      popupId:'weedFailPopup',
+      title:'옥수수 농사 실패! 잡초에게 영양분을 뺏겼어요',
+      content: null,
+      imgURL: '/images/popup/5-2-1_fail.png',
+      buttons: [
+        {
+          title:'다시하기',
+          onclick:(event) => {
+            common.hideAllPopup();
+            restartGame();
+          }
+        }]
+    }, () => {
+      isGamePaused=true;
+      counting=false;
+      sounds.popup.play();
+      app.ticker.stop();
+    });
+  }
 }
 function bugFailPopup(){
-  common.addPopup({
-    popupId:'bugFailPopup',
-    title:'옥수수 농사 실패! 해충을 제 때 방제해주세요',
-    content: null,
-    imgURL: '/images/popup/5-2-2_fail.png',
-    buttons: [
-      {
-        title:'다시하기',
-        onclick:(event) => {
-          common.hideAllPopup();
-          restartGame();
-        }
-      }]
-  }, () => {
-    isGamePaused=true;
-    sounds.popup.play();
-  });
+  if (document.getElementById("bugFailPopup")) {
+    common.showPopup('bugFailPopup');
+  } else {
+    common.addPopup({
+      popupId:'bugFailPopup',
+      title:'옥수수 농사 실패! 해충을 제 때 방제해주세요',
+      content: null,
+      imgURL: '/images/popup/5-2-2_fail.png',
+      buttons: [
+        {
+          title:'다시하기',
+          onclick:(event) => {
+            common.hideAllPopup();
+            restartGame();
+          }
+        }]
+    }, () => {
+      isGamePaused=true;
+      counting=false;
+      sounds.popup.play();
+      app.ticker.stop();
+    });
+  }
 }
 function successOne(){
-  common.addPopup({
-                popupId: 'SuccessOnePopup',
-                title: translation.GAME_02_SUCCESS,
-                content: null,
-                imgURL: '/images/popup/5-2-3_success01.png',
-                buttons: [
-                  {
-                    title: translation.GAME_02_HARVEST,
-                    onclick: (event) => {
-                      
-                     common.hideAllPopup();
-                     common.completeStage('02');
-                    }
-                }]
-  },() => {
-    isGamePaused=true;
-    sounds.success.play();
-  });
+  if (document.getElementById("SuccessOnePopup")) {
+    common.showPopup('SuccessOnePopup');
+  } else {
+    common.addPopup({
+      popupId: 'SuccessOnePopup',
+      title: translation.GAME_02_SUCCESS,
+      content: null,
+      imgURL: '/images/popup/5-2-3_success01.png',
+      buttons: [
+        {
+          title: translation.GAME_02_HARVEST,
+          onclick: (event) => {
+            
+           common.hideAllPopup();
+           common.completeStage('02');
+          }
+      }]
+    },() => {
+      isGamePaused=true;
+      sounds.success.play();
+    });
+  }
 }
 
 function successTwo(){
-  common.addPopup({
-                popupId: 'SuccessTwoPopup',
-                title: translation.GAME_02_SUCCESS_ORGANIC,
-                content: null,
-                imgURL: '/images/popup/5-2-3_success02.png',
-                buttons: [
-                  {
-                    title: translation.GAME_02_HARVEST,
-                    onclick: (event) => {
-                      
-                     common.hideAllPopup();
-                     common.completeStage('02');
-                    }
-                }]
-  },() => {
-    isGamePaused=true;
-    sounds.success.play();
-  });
+  if (document.getElementById("SuccessTwoPopup")) {
+    common.showPopup('SuccessTwoPopup');
+  } else {
+    common.addPopup({
+      popupId: 'SuccessTwoPopup',
+      title: translation.GAME_02_SUCCESS_ORGANIC,
+      content: null,
+      imgURL: '/images/popup/5-2-3_success02.png',
+      buttons: [
+        {
+          title: translation.GAME_02_HARVEST,
+          onclick: (event) => {
+            
+           common.hideAllPopup();
+           common.completeStage('02');
+          }
+      }]
+    },() => {
+      isGamePaused=true;
+      sounds.success.play();
+    });
+  }
 }
 
 

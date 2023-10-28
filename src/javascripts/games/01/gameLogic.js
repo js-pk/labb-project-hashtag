@@ -9,12 +9,9 @@ const stageSentences = translation.GAME_01_SENTENCES;
 import { common } from '../../common.js';
 
 let batContainer; let toolboxContainer; let items; let melon; let rake; let wateringCan; let seedPouch; let batSize; let cursorSprite; let guideBox; let guideText;let startButton;
-let wateringCanClicked = false;
-let seedPouchClicked = false;
-let rakeClicked = false;
-let state; let id; let rocks; let healthBar; let outerBar; let redBar; let innerBar; let gameScene; let health; let MaxHealthValue; let numberOfCol; let numberOfRows; let scale;
+let clickAnimation; let state; let id; let rocks; let healthBar; let outerBar; let redBar; let innerBar; let gameScene; let health; let MaxHealthValue; let numberOfCol; let numberOfRows; let scale;
 let isGamePaused=false; let melonState='melon'; let niceFace; let faces; let notbadFace; let badFace; let currentStageAtStart; let popupSound;let earthworm;
-let gameStage = 0;
+let gameStage = 0; let isMelonPopupGenerated=false; let isNoodlePopupGenerated=false; let isCoffeePopupGenerated=false; let isRockPopupGenerated=false;
 const bat1Array = [];
 
 const currentMessage = {
@@ -32,6 +29,24 @@ const baseBatSize = 60; // Original rectangle size
 
 batSize = baseBatSize * scale / resolution;
 
+const sounds={
+  seed:new Howl({
+    src:['/sound/S_seed.mp3']}),
+  
+watering:new Howl({
+  src:['/sound/S_water.mp3']
+}),  
+rake:new Howl({
+  src:['/sound/S_tool.mp3']
+}),
+success:new Howl({
+  src:['/sound/S_success.mp3']
+}), 
+fail:new Howl({
+  src:['/sound/S_fail.mp3']
+})
+}
+
 export function setup() {
  // console.log('All image files loaded');
   id = resources['/images/sprites/soils.json'].textures;
@@ -42,13 +57,11 @@ export function setup() {
     src: ['/sound/S_popup.mp3'],
   });
   
-  
   gameScene = new PIXI.Container();
   app.stage.addChild(gameScene);
   
   createStartButton();
   gameScene.alpha=0.3;
-  
   
   CreateToolBox();
   toolboxContainer.visible=false;
@@ -100,14 +113,19 @@ function createBat() {
   gameScene.addChild(batContainer);
 }
 
+function getClickFrames(){
+  const clickTextureAtlas = resources['/images/sprites/click-tab.json'].textures;
+  const frames = Object.keys(clickTextureAtlas).map(frameKey => clickTextureAtlas[frameKey]);
+  return frames;
+}
+
 function CreateToolBox() {
+ 
   const toolWidth = batSize;
   const toolHeight = batSize;
 
-  // Create a new container for the toolbox
   toolboxContainer = new PIXI.Container();
 
-  // Create and add rake to the container
   rake = new Sprite(items['rake_true2x.png']);
   rake.anchor.set(0.5);
   rake.width = toolWidth;
@@ -115,44 +133,26 @@ function CreateToolBox() {
   rake.x = toolWidth / 2; // Start from the half of the width
   rake.y = toolHeight / 2;
   rake.interactive = true;
-  rake.on('pointerdown', () => {
-    changeItem(rake);
-    rakeClicked = true;
-    console.log('rakeClicked');
-  });
   toolboxContainer.addChild(rake);
 
-  // Create and add wateringCan to the container
-  wateringCan = new Sprite(items['water_true2x.png']);
+  wateringCan = new Sprite(items['water_false2x.png']);
   wateringCan.anchor.set(0.5);
   wateringCan.width = toolWidth;
   wateringCan.height = toolHeight;
   wateringCan.x = rake.x + toolWidth;
   wateringCan.y = toolHeight / 2;
   wateringCan.interactive = false;
-  wateringCan.on('pointerdown', () => {
-    changeItem(wateringCan);
-    wateringCanClicked = true;
-    console.log('wateringCanClicked');
-  });
   toolboxContainer.addChild(wateringCan);
 
-  // Create and add seedPouch to the container
-  seedPouch = new Sprite(items['seeds_true2x.png']);
+  seedPouch = new Sprite(items['seeds_false2x.png']);
   seedPouch.anchor.set(0.5);
   seedPouch.width = toolWidth;
   seedPouch.height = toolHeight;
   seedPouch.x = wateringCan.x + toolWidth;
   seedPouch.y = toolHeight / 2;
   seedPouch.interactive = false;
-  seedPouch.on('pointerdown', () => {
-    changeItem(seedPouch);
-    seedPouchClicked = true;
-    console.log('seedPouchClicked');
-  });
   toolboxContainer.addChild(seedPouch);
 
-  // Create and add melon to the container
   melon = new Sprite(items['melon_true2x.png']);
   melon.anchor.set(0.5);
   melon.width = toolWidth;
@@ -163,7 +163,6 @@ function CreateToolBox() {
   melon.on('pointerdown', melonClick);
   toolboxContainer.addChild(melon);
 
-  // Position the toolboxContainer
   toolboxContainer.x = ((app.view.width / resolution) - toolboxContainer.width) / 2;
   toolboxContainer.y = (app.view.height / resolution) - toolboxContainer.height - 12;
 
@@ -171,30 +170,30 @@ function CreateToolBox() {
 }
 
 function melonClick() {
-   health += 50;
+   health += 30;
   changeItem(melon);
-  
-  if(melonState==='rock'){
-     health+=5;
-    console.log('rock clicked, health incremented to: ', health);
-    restwithantPopup();
-    //return;// If you don’t want to show a popup when the rock is clicked, return here
-  }
 }
 
 function changeItem(item) {
- if(item != melon){
+ if(item !== melon){
     if (item === rake) {
-    item.texture = items['rake_false2x.png'];
+      item.texture = items['rake_false2x.png'];
+    }
+    if (item === wateringCan) {
+      // Check if wateringCan texture is 'water_true2x.png'
+      // and change it to 'water_false2x.png' if it is
+      if(item.texture === items['water_true2x.png']) {
+        item.texture = items['water_false2x.png'];
+      } else {
+        item.texture = items['water_true2x.png'];
+      }
+    }
+    if (item === seedPouch) {
+      item.texture = items['seeds_true2x.png'];
+    }
+    return;
   }
-  if (item === wateringCan) {
-    item.texture = items['water_false2x.png'];
-  }
-  if (item === seedPouch) {
-    item.texture = items['seeds_false2x.png'];
-  }
-  return;
- }
+ 
  
  let previousState= melonState;
  
@@ -217,96 +216,126 @@ function changeItem(item) {
   
   switch(previousState){
     case 'melon':
-      melonToNoodlePopup();
+          melonToNoodlePopup();
+         // isMelonPopupGenerated=true;
       break;
-    case'noodle':
-      noodleToCoffeePopup();
+    case 'noodle':
+        noodleToCoffeePopup();
+      //  isNoodlePopupGenerated=true;
       break;
     case 'coffee':
-      coffeeToRockPopup();
+          coffeeToRockPopup();
+       // isCoffeePopupGenerated=true;
       break;
+    case 'rock':
+      health+=2;
+      console.log('rock clicked, health incremented to: ', health);
+        restwithantPopup();
+     //   isRockPopupGenerated=false;
+    break;
   }
 }
 
 function melonToNoodlePopup(){
-  common.addPopup({
-    popupId: 'melonToNoodlePopup',
-    title: translation.GAME_01_POPUP_WATERMELON,
-    content: null,
-    imgURL:'/images/popup/4-2-1_energy.png',
-    buttons: [{
-      title: translation.GAME_01_EAT,
-      onclick: (event) => {
-        common.hideAllPopup();
-        isGamePaused=false;
-      }
-    }]
-  }, ()=> {
-    isGamePaused=true;
-    popupSound.play();
-   
-  });
+  if (document.getElementById('melonToNoodlePopup')) {
+    common.showPopup('melonToNoodlePopup');
+  } else {
+    common.addPopup({
+      popupId: 'melonToNoodlePopup',
+      title: translation.GAME_01_POPUP_WATERMELON,
+      content: null,
+      imgURL:'/images/popup/4-2-1_energy.png',
+      buttons: [{
+        title: translation.GAME_01_EAT,
+        onclick: (event) => {
+          common.hideAllPopup();
+          isGamePaused=false;
+          isMelonPopupGenerated=false;
+        }
+      }]
+    }, ()=> {
+      isGamePaused=true;
+      popupSound.play();
+     
+    });
+  }
 }
 
 
 function noodleToCoffeePopup(){
-  common.addPopup({
-    popupId: 'noodleToCoffeePopup',
-    title: translation.GAME_01_POPUP_NOODLE,
-    content: null,
-    imgURL:'/images/popup/4-2-2_energy.png',
-    buttons: [{
-      title: translation.GAME_01_EAT,
-      onclick: (event) => {
-        common.hideAllPopup();
-        isGamePaused=false;
-      }
-    }]
-  }, ()=> {
-    isGamePaused=true;
+  if (document.getElementById('noodleToCoffeePopup')) {
+    common.showPopup('noodleToCoffeePopup');
+  } else {
+    common.addPopup({
+      popupId: 'noodleToCoffeePopup',
+      title: translation.GAME_01_POPUP_NOODLE,
+      content: null,
+      imgURL:'/images/popup/4-2-2_energy.png',
+      buttons: [{
+        title: translation.GAME_01_EAT,
+        onclick: (event) => {
+          common.hideAllPopup();
+          isGamePaused=false;
+          isNoodlePopupGenerated=false;
+        }
+      }]
+    }, ()=> {
+      isGamePaused=true;
       popupSound.play();
-   
-  });
+      isNoodlePopupGenerated=true;
+    });
+  }
 }
 
 function coffeeToRockPopup(){
-  common.addPopup({
-    popupId: 'coffeeToRockPopup',
-    title: translation.GAME_01_POPUP_AMERICANO,
-    content: null,
-    imgURL:'/images/popup/4-2-3_energy.png',
-    buttons: [{
-      title: translation.GAME_01_EAT,
-      onclick: (event) => {
-        common.hideAllPopup();
-        isGamePaused=false;
-      }
-    }]
-  }, ()=> {
-    isGamePaused=true;
+  if (document.getElementById('coffeeToRockPopup')) {
+    common.showPopup('coffeeToRockPopup');
+  } else {
+    common.addPopup({
+      popupId: 'coffeeToRockPopup',
+      title: translation.GAME_01_POPUP_AMERICANO,
+      content: null,
+      imgURL:'/images/popup/4-2-3_energy.png',
+      buttons: [{
+        title: translation.GAME_01_EAT,
+        onclick: (event) => {
+          common.hideAllPopup();
+          isGamePaused=false;
+          isCoffeePopupGenerated=false;
+        }
+      }]
+    }, ()=> {
+      isGamePaused=true;
       popupSound.play();
-    
-  });
+      isCoffeePopupGenerated=true;
+    });
+  }
 }
 
 function restwithantPopup(){
-   common.addPopup({
-    popupId: 'restwithantPopup',
-    title: translation.GAME_01_POPUP_REST,
-    content: null,
-    imgURL:'/images/popup/restwithant_popup.png',
-    buttons: [{
-      title: translation.GAME_01_REST,
-      onclick: (event) => {
-        common.hideAllPopup();
-        isGamePaused=false;
-      }
-    }]
-  }, ()=> {
-    isGamePaused=true;
-      popupSound.play();
-    //  health+=20;
-  });
+  if (document.getElementById('restwithantPopup')) {
+    common.showPopup('restwithantPopup');
+  } else {
+    common.addPopup({
+      popupId: 'restwithantPopup',
+      title: translation.GAME_01_POPUP_REST,
+      content: null,
+      imgURL:'/images/popup/restwithant_popup.png',
+      buttons: [{
+        title: translation.GAME_01_REST,
+        onclick: (event) => {
+          common.hideAllPopup();
+          isGamePaused=false;
+          isRockPopupGenerated=false;
+        }
+      }]
+    }, ()=> {
+      isGamePaused=true;
+        popupSound.play();
+      isRockPopupGenerated=true;
+  
+    });
+  }
 }
 function CreateHealthBar() {
   MaxHealthValue = app.view.height * 0.5 / resolution;
@@ -446,7 +475,7 @@ startButton.drawRoundedRect(0, 0, 150, 50,20); // Draw the rectangle
 startButton.endFill();
 
 // Add text to the button
-let buttonText = new PIXI.Text('START', {fontFamily : 'Neo둥근모', fontSize: 24, fill : 0xFFFFFF, align : 'center'});
+let buttonText = new PIXI.Text('START', {fontFamily : 'Neo둥근모', fontSize: 28, fill : 0xFFFFFF, align : 'center'});
 buttonText.x = startButton.width / 2;
 buttonText.y = startButton.height / 2;
 buttonText.anchor.set(0.5, 0.5); // Center the text on the button
@@ -465,16 +494,24 @@ startButton.on('pointerdown', onStartButtonClick);
 
 // Add the button to the stage
 app.stage.addChild(startButton);
+
+const clickFrames=getClickFrames();
+clickAnimation=new PIXI.AnimatedSprite(clickFrames);
+clickAnimation.x= startButton.x+startButton.width/2;
+clickAnimation.y=startButton.y;
+clickAnimation.animationSpeed=0.2;
+clickAnimation.loop=true;
+app.stage.addChild(clickAnimation);
+clickAnimation.play();
 }
+
 function onStartButtonClick() {
   let startSound = new Howl({
     src: ['/sound/S_levelStart.mp3'],
   });
   startSound.play(); // Play sound after a user gesture (click)
-
-  // guideText.interactive = false;
-  // guideText.buttonMode = false;
-  // guideText.off('pointerdown', onStartTextClick); // Remove the click event after it's clicked
+  clickAnimation.stop();
+  clickAnimation.visible=false;
   gameScene.interactive=true;
   gameScene.visible=true;
   gameScene.alpha=1;
@@ -489,6 +526,18 @@ function onStartButtonClick() {
       console.error('No sentences found for stage 1');
     }
   }, 2000);
+  
+  setTimeout(() =>{
+    clickAnimation.x=(app.view.width/resolution)/2-100;
+    clickAnimation.y=(app.view.height/resolution)/2;
+    clickAnimation.visible=true;
+    clickAnimation.play();
+    
+    setTimeout(() =>{
+      clickAnimation.visible=false;
+      clickAnimation.stop();
+    },2000);
+  },1000);
 }
 
 function initializeGuideBox(sentences){
@@ -518,7 +567,10 @@ function startSentenceDisplayInterval(sentences) {
   let index = 0;
   
   const interval = setInterval(() => {
-    if (gameStage !== 1) clearInterval(interval);
+    if (gameStage !== 1) {
+      clearInterval(interval);
+      return;
+    }
     guideText.text = sentences[index];
     index++;
     if (index >= sentences.length) {
@@ -530,6 +582,10 @@ function startSentenceDisplayInterval(sentences) {
 }
 
 function displayWarning(message, duration) {
+  if (!currentMessage || !guideText || !stageSentences[gameStage]) {
+    console.error("Undefined variables in displayWarning function.");
+    return;
+  }
   clearInterval(currentMessage.interval); // stop the regular guide message
   guideText.text = message;
 
@@ -542,6 +598,10 @@ function displayWarning(message, duration) {
 }
 
 function continueGuideMessages() {
+  if (!currentMessage || !guideText || !stageSentences[gameStage]) {
+    console.error("Undefined variables in continueGuideMessages function.");
+    return;
+  }
   currentMessage.interval = setInterval(() => {
     if (currentMessage.type !== 'guide') {
       // if the message type has changed to warning, stop updating guide messages
@@ -578,6 +638,8 @@ function transitionToStage2() {
   console.log('transitioned to stage 2');
   wateringCan.visible = true;
   wateringCan.interactive = true;
+  changeItem(wateringCan);
+  changeItem(rake);
   // reset isFilled for all spots for stage 2
   Array.from(batContainer.children).forEach((sprite) => {
     sprite.isFilled = false;
@@ -590,13 +652,13 @@ function transitionToStage3() {
 
   seedPouch.visible = true;
   seedPouch.interactive = true;
+  changeItem(seedPouch);
+  changeItem(wateringCan);
   // reset isFilled for all spots for stage 2
   Array.from(batContainer.children).forEach((sprite) => {
     sprite.isFilled = false;
   });
 }
-
-
 
 function onClick() {
   if (this.texture === rocks['soils0-1.png'] || this.texture === rocks['soils0-2.png'] || this.texture === rocks['soils0-3.png']) {
@@ -611,39 +673,30 @@ function onClick() {
   }
 
   let batSprite;
-  let rakeSound=new Howl ({
-    src:['/sound/S_tool.mp3'],
-  });
-  let waterSound=new Howl ({
-    src:['/sound/S_water.mp3'],
-  });
-  let seedSound=new Howl ({
-    src:['/sound/S_seed.mp3'],
-  });
-
-  if (gameStage === 1 && rakeClicked) {
+  
+  if (gameStage === 1) {
     if (Math.random() <= 0.4) {
       const rockVariations = ['soils0-1.png', 'soils0-2.png', 'soils0-3.png'];
       const randomRock = rockVariations[Math.floor(Math.random() * rockVariations.length)];
       batSprite = new Sprite(rocks[randomRock]);
+      sounds.rake.play();
     } else {
       batSprite = new Sprite(id['soils02@3x.png']);
+      sounds.rake.play();
     }
     batSprite.interactive = true;
     batSprite.on('pointerdown', function(){
-      if(gameStage===1) rakeSound.play();
+      if(gameStage===1) sounds.rake.play();
       onClick.call(batSprite);
     });
     bat1Array.push(batSprite);
     wateringCan.interactive = false;
   } else if (gameStage === 2) {
-    wateringCan.interactive = true;
-
-    if (wateringCanClicked) {
       batSprite = new Sprite(id['soils03@3x.png']);
+      sounds.watering.play();
       batSprite.interactive = true;
       batSprite.on('pointerdown', function(){
-        waterSound.play();
+        sounds.watering.play();
         onClick.call(batSprite);
       });
       
@@ -653,12 +706,13 @@ function onClick() {
       } else {
         bat1Array.push(batSprite);
       }
-    }
-  } else if (gameStage === 3 && seedPouchClicked) {
+    
+  } else if (gameStage === 3) {
     batSprite = new Sprite(id['soils04-1@3x.png']);
+    sounds.seed.play();
     batSprite.interactive = true;
     batSprite.on('pointerdown',function(){
-      seedSound.play();
+      sounds.seed.play();
       onClick.call(batSprite);
     });
 
@@ -687,64 +741,79 @@ function onClick() {
 
 
 function end() {
-
-  common.addPopup({
-                popupId: 'failGamePopup',
-                title: translation.GAME_01_WARNING_02,
-                content: null,
-                imgURL: '/images/popup/4-3_fail.png',
-                buttons: [{
-                    title: translation.GAME_01_RETRY,
-                    onclick: (event) => {
-                      
-                      common.hideAllPopup();
-                      restartGame();
-                    }
-                }]    
-            }, () => {
-		 isGamePaused=true;
-});
+  if (document.getElementById('failGamePopup')) {
+    common.showPopup('failGamePopup');
+  } else {
+    common.addPopup({
+      popupId: 'failGamePopup',
+      title: translation.GAME_01_WARNING_02,
+      content: null,
+      imgURL: '/images/popup/level1_fail.png',
+      buttons: [{
+          title: translation.GAME_01_RETRY,
+          onclick: (event) => {
+            
+            common.hideAllPopup();
+            restartGame();
+          }
+      }]    
+    }, () => {
+    	isGamePaused=true;
+      sounds.fail.play();
+    });
+  }
 }
 
 function SuccessScene() {
-
-   common.addPopup({
-                popupId: 'successGamePopup',
-                title: translation.GAME_01_POPUP_SUCCESS,
-                content: null,
-                imgURL: '/images/popup/4-3_success.png',
-                buttons: [{
-                    title: translation.GAME_01_POPUP_MOVE,
-                    onclick: (event) =>{
-                     common.completeStage('01');
-                      common.hideAllPopup();
-                    } 
-                }]    
-            }, () => {
-		// 팝업 열렸을때 실행시키고 싶은 함수
-		 isGamePaused=true;
-});
+  if (document.getElementById('successGamePopup')) {
+    common.showPopup('successGamePopup');
+  } else {
+    common.addPopup({
+      popupId: 'successGamePopup',
+      title: translation.GAME_01_POPUP_SUCCESS,
+      content: null,
+      imgURL: '/images/popup/4-3_success.png',
+      buttons: [{
+          title: translation.GAME_01_POPUP_MOVE,
+          onclick: (event) =>{
+           common.completeStage('01');
+            common.hideAllPopup();
+          } 
+      }]    
+    }, () => {
+  		// 팝업 열렸을때 실행시키고 싶은 함수
+  		 isGamePaused=true;
+  		 sounds.success.play();
+    });
+  }
 }
 
 
-
 function restartGame() {
-  gameStage = 1;
-  wateringCan.visible = false;
-  melon.interactive = true;
-  isGamePaused = false; // Ensure game is not paused when restarted
+  console.log('restartGame');
+  isGamePaused=true;
+  gameStage = 0;
+  //app.stage.removeChildren();
 
   // Removing children from the containers
   batContainer.removeChildren();
   toolboxContainer.removeChildren();
   if (cursorSprite) cursorSprite.removeChildren();
   
+  app.stage.addChild(gameScene);
+  
   // Recreate elements and add them back to their parent containers
   createBat();
   CreateToolBox();
+  melonState='melon';
+ 
   CreateGuideConsole();
   createFaceStatus();
   startSentenceDisplayInterval();
+  
+  createStartButton();
+  gameScene.alpha=0.3;
+ 
   // Reset health and the health bar graphics to their initial state
   health = MaxHealthValue;
   outerBar.height = health;
@@ -758,9 +827,8 @@ function restartGame() {
   // Reset the game state to play and restart the ticker if it was stopped
   state = play;
   if (!app.ticker.started) app.ticker.start();
+    isGamePaused = false; // Ensure game is not paused when restarted
 
-  rakeClicked = false;
-  // Possibly other variables that need to be reset
 }
 
 

@@ -66,7 +66,7 @@ export function resize() {
   app.renderer.view.style.height = `${h}px`;
 
   app.renderer.view.style.left = `${(actualWidth - w) / 2}px`;
-  app.renderer.view.style.top = 0;
+  app.renderer.view.style.top = '0px';
 }
 
 const debouncedResize = debounce(resize, 100);

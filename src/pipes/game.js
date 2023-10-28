@@ -33,7 +33,7 @@ const resizeImage = async (buffer) =>
 // TODO: should handle error
   await sharp(buffer)
     .resize({
-      width: 1200,
+      width: 720,
       fit: 'outside',
     })
     .toBuffer();
@@ -41,7 +41,7 @@ const resizeImage = async (buffer) =>
 const resizeImageToFile = (buffer) => {
   sharp(buffer)
     .resize({
-      width: 1200,
+      width: 720,
       fit: 'outside',
     })
     .toFile(

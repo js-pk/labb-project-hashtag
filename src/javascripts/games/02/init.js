@@ -9,8 +9,6 @@ export const { Sprite } = PIXI;
 export const { Rectangle } = PIXI;
 export const { Graphics } = PIXI;
 
-const maxPixelRatio = 2; // Adjust to preference
-// export const resolution = Math.min(window.devicePixelRatio, maxPixelRatio);
 export const resolution = 2;
 export const width = window.innerWidth;
 export const height = window.innerHeight;
@@ -26,9 +24,13 @@ export const app = new PIXI.Application({
   resolution,
 });
 
+// will-read-frequently 속성 추가
+app.renderer.view.setAttribute('will-read-frequently', 'true');
+
 app.renderer.view.style.position = 'absolute';
 app.renderer.view.style.display = 'block';
 //app.renderer.view.style.border = '2px solid #333';
+app.renderer.view.style.width = '100%';
 
 if (document.getElementById('game2')) {
   document.getElementById('game2').appendChild(app.view);
@@ -46,8 +48,7 @@ function debounce(func, wait) {
 }
 
 export function resize() {
-  let w; let
-    h;
+  let w; let h;
 
   const portraitGameRatio = 10 / 16;
 
@@ -66,21 +67,17 @@ export function resize() {
     h = w / portraitGameRatio;
   }
 
-  app.renderer.resize(w * resolution, h * resolution);
-  console.log('w:', w);
-  console.log('resolution', resolution);
+  // app.renderer.resize(w * resolution, h * resolution);
+  app.renderer.resize(w, h);
   app.renderer.view.style.width = `${w}px`;
   app.renderer.view.style.height = `${h}px`;
-  console.log('appStyleWidth', app.renderer.view.style.width);
-  console.log('appViewWidth', app.view.width);
-
+  // console.log(app.renderer.width, app.render.height)
+ 
   app.renderer.view.style.left = `${(actualWidth - w) / 2}px`;
-  app.renderer.view.style.top = 0;
+  app.renderer.view.style.top = '0px';
 }
-// Debounced version of the resize function
-const debouncedResize = debounce(resize, 100);
 
-// Handle the resize event
+const debouncedResize = debounce(resize, 100);
 window.addEventListener('resize', debouncedResize);
 
 // Initial resize

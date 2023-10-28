@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 	
 	sceneEl.addEventListener('arReady', function () {
-	  document.getElementById('capture').addEventListener('click', handleClick);
+	  
 	  if (arSystem.shouldFaceUser) {
 	    arSystem.video.className = 'flipped';
 	    sceneEl.className = 'flipped';
@@ -92,6 +92,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	    arSystem.video.className = '';
 	    sceneEl.className = '';
 	  }
+	});
+	
+	sceneEl.addEventListener("targetFound", event => {
+	  document.getElementById('loading').style.display = 'none';
+	  document.getElementById('capture').addEventListener('click', handleClick);
 	});
 	
 
