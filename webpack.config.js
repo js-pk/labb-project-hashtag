@@ -11,6 +11,7 @@ module.exports = {
     devtool: 'inline-source-map',
     devServer: {
       static: './public',
+      allowedHosts: 'all',
       hot: true,
     },
     plugins: [
