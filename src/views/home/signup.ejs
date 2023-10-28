@@ -2,10 +2,16 @@
 <%- include("../_header") -%>
 <link rel="stylesheet" type="text/css" href="/styles/signup.css"/>
 <script>
-    const token = '<%= locals.token %>';
-    if (token != '') {
-        window.history.replaceState(null, null, `${window.location.pathname}?token=${token}`);
+    // in case of error and rerendered
+    const tokenFromSever = '<%= locals.token %>';
+    if (tokenFromSever != '') {
+        window.history.replaceState(null, null, `${window.location.pathname}?token=${tokenFromSever}`);
     }
+    
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+    let token = params.token; 
     
     function submitForm(action){
         let form = document.getElementById("form");
@@ -13,6 +19,7 @@
             let startSound = new Howl({
                 src: ['/sound/levelStart.mp3'],
                 onend: () => {
+                    document.getElementById('token').value = token;
                     form.action = action;
                     form.method = 'POST';
                     form.submit();
@@ -99,11 +106,10 @@
             <input 
                 id="email"
                 class="text-input"
-                type="email" 
+                type="email"
                 name="email"
                 maxlength="64"
                 placeholder="username@example.org"
-                autocomplete="email"
                 required
             />
             <label 
@@ -127,7 +133,7 @@
                 onclick="submitForm('/user/register')" 
                 value="시작"
             />
-            
+            <input type="hidden" name="token" id="token">
             <a class="guiding-text" onclick="redirectToLogin(event)"><%= translation.LOGIN_GUIDE %></a>
         </fieldset>
     </form>
