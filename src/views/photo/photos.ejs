@@ -17,7 +17,7 @@
               createCanvas(windowWidth, windowHeight);
             
               circles = [];
-              packCircles(1000);
+              packCircles(300);
             
               drawPhotos();
               noLoop();
@@ -32,7 +32,7 @@
                 let xPos = random(windowWidth);
                 let yPos = random(windowHeight);
             
-                let diameter = random(50,600);
+                let diameter = random(150,600);
                 let placeable = true;
             
                 for(let k = 0; k < circles.length; k++){
@@ -74,7 +74,7 @@
           window.onload = () => {
             setTimeout(() => {
               location.reload();
-            }, 60 * 1000)
+            }, 3 * 60 * 1000)
           }
         </script>
     </head>

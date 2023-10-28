@@ -23,7 +23,7 @@ exports.run = async (req, res, next) => {
     return reject();
   }
 
-  const recentPhotos = await db.all('photos', 'ORDER BY id DESC', [], 100);
+  const recentPhotos = await db.all('photos', 'ORDER BY id DESC', [], 20);
   res.render('photo/photos', {
     photos: recentPhotos,
   });
