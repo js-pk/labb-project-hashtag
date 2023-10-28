@@ -62,10 +62,16 @@ input {
     
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    width: 100vw;
+    
 }
 
 .menu-container {
-    width: 100vw;
+    width: 100%;
+    max-width: 560px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -75,7 +81,7 @@ input {
 
 .menu-container .button {
     background-color: var(--blue-dark);
-    font-size: 16px;
+    font-size: max(3vw, 16px);
 }
 
 .menu-container .button:hover {
@@ -83,7 +89,8 @@ input {
 }
 
 .levels-container {
-    width: 100vw;
+    width: 100%;
+    max-width: 560px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -135,7 +142,7 @@ img.title {
     
     background-color: #000000;
     color: #ffffff;
-    font-size: 18px;
+    font-size: max(3.2vw, 18px);
     border-radius: 32px;
     
     text-decoration: none;

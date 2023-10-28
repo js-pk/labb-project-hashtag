@@ -35,24 +35,8 @@ const common = {
         document.body.style.overflow = "scroll";
         document.body.style.pointerEvents = "auto";
     },
-    // {
-    //     popupId: "id (필수)",
-    //     title: "상단 헤더 텍스트",
-    //     content: "줄글로 들어갈 텍스트",
-    //     imgURL: "중앙에 들어갈 이미지 URL",
-    //     buttons: [
-    //         {
-    //             title: "버튼 타이틀",
-    //             onclick: function
-    //         },
-    //         {
-    //             title: "버튼 타이틀",
-    //             onclick: function
-    //         },
-    //     ]
-    // }
-    
-    addPopup: function({ popupId, title, content, imgURL, buttons }, whilePopupVisible) {
+ 
+    addPopup: function({ popupId, title, content, subImgURL, imgURL, buttons }, whilePopupVisible) {
         if (document.getElementById(popupId)) {
             return false;
         }
@@ -75,6 +59,11 @@ const common = {
             contentElement.classList.add("content");
             const contentText = document.createTextNode(content);
             contentElement.appendChild(contentText);
+            if (subImgURL) {
+              const img = document.createElement("img");
+              img.src = subImgURL;
+              contentElement.appendChild(img);
+            }
             popup.appendChild(contentElement);
         } else if (imgURL) {
             const img = document.createElement("img");
@@ -107,63 +96,3 @@ const common = {
         startSound.play();
     }
 }
-
-
-// function sendGetRequest(uri, func, func_timeout) {
-//     let request = new XMLHttpRequest();
-//     request.open('GET', uri);
-
-//     if (func_timeout) {
-//         request.timeout = 5000;
-//         request.addEventListener('timeout', func_timeout);
-//     }
-
-//     let processed = false;
-//     request.onload = () => {
-//         if (request.readyState == 4 && !processed) {
-//             if (request.status == 200) {
-//                 let data = JSON.parse(this.responseText);
-//                 func(data);
-//                 processed = true;
-//             }
-//         } else {
-//             console.log(`Error: ${request.status}`)
-//         }
-//     }
-// }
-
-// function sendPostRequest(uri, json, func) {
-//     let request = new XMLHttpRequest();
-//     request.open("POST", uri);
-//     request.setRequestHeader("Accept", "application/json");
-//     request.setRequestHeader("Content-Type", "application/json");
-//     request.onreadystatechange = function(e) {
-//         if (request.readyState == 4) {
-//             if (request.status == 200) {
-//                 let data = JSON.parse(this.responseText);
-//                 func(data);
-//             } else {
-//                 console.log(`Error: ${request.status}`);
-//             }
-//         }
-//     }
-//     request.send(json)
-// }
-
-// function sendPutRequest(uri, json = null, func) {
-//     let request = new XMLHttpRequest();
-//     request.open("PUT", uri);
-//     request.setRequestHeader("Accept", "application/json");
-//     request.setRequestHeader("Content-Type", "application/json");
-//     request.onreadystatechange = function(e) {
-//         if (request.readyState == 4) {
-//             if (request.status == 200) {
-//                 let data = JSON.parse(this.responseText);
-//                 func(data);
-//             } else {
-//                 console.log(`Error: ${request.status}`);
-//             }
-//         }
-//     }
-//     request.send(json)
-// }

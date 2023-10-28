@@ -1,11 +1,15 @@
 body {
     width:100%;
     height:100vh;
-    background: rgb(221,255,118);
-    background: -webkit-linear-gradient(bottom, rgba(221,255,118,1) 0%, rgba(116,255,216,1) 100%);
-    background: -moz-linear-gradient(bottom, rgba(221,255,118,1) 0%, rgba(116,255,216,1) 100%);
-    background: -o-linear-gradient(bottom, rgba(221,255,118,1) 0%, rgba(116,255,216,1) 100%);
-    background: linear-gradient(to top, rgba(221,255,118,1) 0%, rgba(116,255,216,1) 100%);
+    /*background: rgb(221,255,118);*/
+    /*background: -webkit-linear-gradient(bottom, rgba(221,255,118,1) 0%, rgba(116,255,216,1) 100%);*/
+    /*background: -moz-linear-gradient(bottom, rgba(221,255,118,1) 0%, rgba(116,255,216,1) 100%);*/
+    /*background: -o-linear-gradient(bottom, rgba(221,255,118,1) 0%, rgba(116,255,216,1) 100%);*/
+    /*background: linear-gradient(to top, rgba(221,255,118,1) 0%, rgba(116,255,216,1) 100%);*/
+    background: url('/images/misc/ascii_background.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: repeat-x;
 }
 
 .ar-photo {
