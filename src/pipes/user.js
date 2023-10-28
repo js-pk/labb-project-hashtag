@@ -3,9 +3,10 @@ const db = new Database();
 
 const twoFactor = require("node-2fa");
 const secret = process.env.APP_SECRET;
-const token = twoFactor.generateToken(secret).token;
+// const token = twoFactor.generateToken(secret).token;
 
 exports.logout = function (req, res) {
+  const token = req.session.token;
   req.session.destroy(() => {
     req.session;
   });
@@ -13,7 +14,7 @@ exports.logout = function (req, res) {
 };
 
 exports.login = async function (req, res) {
-  const { email } = req.body;
+  const { email, token } = req.body;
   const user = await db.first('users', 'WHERE email=?', [email]);
   if (user) {
     req.session.user = {
@@ -25,6 +26,7 @@ exports.login = async function (req, res) {
       stage_03: user.stage_03 !== 0,
       reward_exchanged: user.reward_exchanged !== 0,
     };
+    req.session.token = token;
     res.redirect('/');
   } else {
     res.render('home/login', {
@@ -39,7 +41,7 @@ exports.login = async function (req, res) {
 };
 
 exports.register = async function (req, res) {
-  const { name, email } = req.body;
+  const { name, email, token } = req.body;
   if (!name) return console.error('name is not defined.');
   if (!email) return console.error('email is not defined.');
 
@@ -66,6 +68,7 @@ exports.register = async function (req, res) {
           stage_03: false,
           reward_exchanged: false,
         };
+        req.session.token = token;
         res.redirect('/tutorial/01');
       }).catch((err) => {
         console.err(err.message);
