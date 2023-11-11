@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="https://unpkg.com/@kfonts/neodgm/index.css" />
     <link rel="stylesheet" type="text/css" href="/styles/global.css"></link>
     <meta name=”color-scheme” content=”light”>
+    <% if (locals.token) {%>
+      <meta http-equiv="refresh" content="1200; url=/?token=<%=locals.token%>">
+    <% }%>
 </head>
 
 <body>
