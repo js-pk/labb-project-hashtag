@@ -1,4 +1,5 @@
 const express = require('express');
+const sqlite3 = require('sqlite3').verbose();
 require('dotenv').config();
 
 const path = require('path');
@@ -6,7 +7,11 @@ const ejs = require('ejs');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const MemoryStore = require('memorystore')(session);
+
+const sqliteStoreFactory = require("express-session-sqlite").default;
+const SqliteStore = sqliteStoreFactory(session);
+// const MemoryStore = require('memorystore')(session);
+// const FileStore = require('session-file-store')(session);
 const fileUpload = require('express-fileupload');
 const i18n=require("i18n-express");
 
@@ -21,6 +26,7 @@ const app = express();
 // Config
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, './views'));
+app.set('trust proxy', 1);
 app.use(express.static('public'));
 
 // Set middlewares
@@ -39,13 +45,17 @@ app.use(fileUpload({
 
 // Set cookie and session
 app.use(cookieParser());
-const maxAge = 1000 * 60 * 60 * 12; // 12hours
+const maxAge = 1000 * 60 * 60 * 12; // 12 hours
 app.use(
   session({
     secret: process.env.SESSEION_SECRET,
     resave: false,
     saveUninitialized: true,
-    store: new MemoryStore({ checkPeriod: maxAge }),
+    store: new SqliteStore({
+        driver: sqlite3.Database,
+        path: './sessions/session.db',
+        ttl: maxAge
+      }),
     cookie: {
       maxAge,
     },
