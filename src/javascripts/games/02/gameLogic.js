@@ -1056,12 +1056,12 @@ function weedFailPopup(){
   } else {
     common.addPopup({
       popupId:'weedFailPopup',
-      title:'옥수수 농사 실패! 잡초에게 영양분을 뺏겼어요',
+      title: translation.GAME_02_FAIL_01,
       content: null,
       imgURL: '/images/popup/5-2-1_fail.png',
       buttons: [
         {
-          title:'다시하기',
+          title: translation.GAME_02_RETRY,
           onclick:(event) => {
             common.hideAllPopup();
             restartGame();
@@ -1081,12 +1081,12 @@ function bugFailPopup(){
   } else {
     common.addPopup({
       popupId:'bugFailPopup',
-      title:'옥수수 농사 실패! 해충을 제 때 방제해주세요',
+      title: translation.GAME_02_FAIL_02,
       content: null,
       imgURL: '/images/popup/5-2-2_fail.png',
       buttons: [
         {
-          title:'다시하기',
+          title: translation.GAME_02_RETRY,
           onclick:(event) => {
             common.hideAllPopup();
             restartGame();

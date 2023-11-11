@@ -164,9 +164,10 @@ exports.complete = function (req, res, next) {
         res.redirect('/reward');
       }
     } else {
-      res.status(404).send('Server error');
+      res.status(404).send('Page not founded');
     }
   } else {
+    console.log("req not authorized");
     res.status(500).send('Server error');
   }
 };
