@@ -29,8 +29,8 @@
             
             function packCircles(N){
               for(let n = 0; n < N; n++){
-                let xPos = random(windowWidth);
-                let yPos = random(windowHeight);
+                let xPos = random(windowWidth - 200) + 100;
+                let yPos = random(windowHeight - 400) + 200;
             
                 let diameter = random(150,600);
                 let placeable = true;
@@ -74,7 +74,7 @@
           window.onload = () => {
             setTimeout(() => {
               location.reload();
-            }, 3 * 60 * 1000)
+            }, 1 * 60 * 1000)
           }
         </script>
     </head>
